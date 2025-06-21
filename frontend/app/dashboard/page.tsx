@@ -72,21 +72,17 @@ export default async function DashboardPage() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Assets by Type Chart */}
-        <div className="col-span-4">
-          <AssetsByType data={data.assetsByType} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
+        {/* Left Column */}
+        <div className="col-span-1 space-y-4 lg:col-span-4">
+          <AssetsByType data={data} />
+          <AssetsByState data={data.assetsByState} />
         </div>
 
-        {/* Recent Activity */}
-        <div className="col-span-3">
+        {/* Right Column (Recent Activity) */}
+        <div className="col-span-1 lg:col-span-3">
           <RecentActivity data={data.recentActivity} />
         </div>
-      </div>
-
-      {/* Asset State Overview */}
-      <div className="grid gap-4 md:grid-cols-1">
-        <AssetsByState data={data.assetsByState} />
       </div>
     </div>
   );

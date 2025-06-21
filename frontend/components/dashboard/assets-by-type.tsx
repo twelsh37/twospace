@@ -2,16 +2,17 @@
 // Assets by Type Chart Component
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AssetType } from "@/lib/types";
+import { AssetType, DashboardData } from "@/lib/types";
 import { ASSET_TYPE_LABELS } from "@/lib/constants";
 import { BarChart3 } from "lucide-react";
 
 type AssetsByTypeProps = {
-  data: { type: string; count: number }[];
+  data: DashboardData;
 };
 
 export function AssetsByType({ data }: AssetsByTypeProps) {
-  const totalAssets = data.reduce((sum, item) => sum + item.count, 0);
+  const assetsByType = data.assetsByType;
+  const totalAssets = assetsByType.reduce((sum, item) => sum + item.count, 0);
 
   // Fallback for when there are no assets to avoid division by zero
   if (totalAssets === 0) {
@@ -30,7 +31,7 @@ export function AssetsByType({ data }: AssetsByTypeProps) {
     );
   }
 
-  const assetData = data.map((item) => ({
+  const assetData = assetsByType.map((item) => ({
     type: item.type as AssetType,
     count: item.count,
     percentage: (item.count / totalAssets) * 100,
@@ -91,8 +92,19 @@ export function AssetsByType({ data }: AssetsByTypeProps) {
         {/* Summary */}
         <div className="mt-6 pt-4 border-t">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Total Assets</span>
-            <span className="text-lg font-bold">{totalAssets}</span>
+            <span className="text-lg font-bold">Total Assets</span>
+            <span className="text-lg font-bold">
+              {new Intl.NumberFormat("en-GB").format(totalAssets)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-lg font-bold">Total Value</span>
+            <span className="text-lg font-bold">
+              {new Intl.NumberFormat("en-GB", {
+                style: "currency",
+                currency: "GBP",
+              }).format(data.totalValue)}
+            </span>
           </div>
         </div>
       </CardContent>
