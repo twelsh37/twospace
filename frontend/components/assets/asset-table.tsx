@@ -3,8 +3,8 @@
 
 "use client";
 
-import { useState } from "react";
-import { Asset, AssetState, AssetType } from "@/lib/types";
+import { useState, useEffect } from "react";
+import { Asset, AssetState } from "@/lib/types";
 import { ASSET_STATE_LABELS, ASSET_TYPE_LABELS } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
@@ -27,51 +27,26 @@ import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export function AssetTable() {
-  // TODO: Replace with real data from API
-  const [assets] = useState<Asset[]>([
-    {
-      id: "1",
-      assetNumber: "01-00001",
-      type: AssetType.MOBILE_PHONE,
-      state: AssetState.AVAILABLE,
-      serialNumber: "MP001234567",
-      description: "iPhone 15 Pro 256GB",
-      purchasePrice: 1099.99,
-      location: "IT Department",
-      assignmentType: "INDIVIDUAL",
-      createdAt: new Date("2024-01-15"),
-      updatedAt: new Date("2024-01-15"),
-    },
-    {
-      id: "2",
-      assetNumber: "04-00001",
-      type: AssetType.LAPTOP,
-      state: AssetState.ISSUED,
-      serialNumber: "LT987654321",
-      description: 'MacBook Pro 16" M3',
-      purchasePrice: 2499.99,
-      location: "Headquarters - Floor 2",
-      assignmentType: "INDIVIDUAL",
-      assignedTo: "John Doe",
-      employeeId: "EMP001",
-      department: "Engineering",
-      createdAt: new Date("2024-01-10"),
-      updatedAt: new Date("2024-01-20"),
-    },
-    {
-      id: "3",
-      assetNumber: "05-00001",
-      type: AssetType.MONITOR,
-      state: AssetState.READY_TO_GO,
-      serialNumber: "MON456789123",
-      description: 'Dell UltraSharp 27" 4K',
-      purchasePrice: 599.99,
-      location: "Warehouse - Main",
-      assignmentType: "SHARED",
-      createdAt: new Date("2024-01-12"),
-      updatedAt: new Date("2024-01-18"),
-    },
-  ]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    totalAssets: 0,
+    totalPages: 1,
+  });
+
+  const fetchAssets = async (page = 1, limit = 25) => {
+    const response = await fetch(`/api/assets?page=${page}&limit=${limit}`);
+    const { data } = await response.json();
+    if (data && data.assets) {
+      setAssets(data.assets);
+      setPagination(data.pagination);
+    }
+  };
+
+  useEffect(() => {
+    fetchAssets(pagination.page, pagination.limit);
+  }, [pagination.page, pagination.limit]);
 
   const getStateVariant = (state: AssetState) => {
     switch (state) {
@@ -108,9 +83,12 @@ export function AssetTable() {
         </TableHeader>
         <TableBody>
           {assets.map((asset) => (
-            <TableRow key={asset.id}>
+            <TableRow key={asset.assetNumber}>
               <TableCell className="font-medium">
-                <Link href={`/assets/${asset.id}`} className="hover:underline">
+                <Link
+                  href={`/assets/${asset.assetNumber}`}
+                  className="hover:underline"
+                >
                   {asset.assetNumber}
                 </Link>
               </TableCell>
@@ -137,7 +115,7 @@ export function AssetTable() {
                 )}
               </TableCell>
               <TableCell>{formatCurrency(asset.purchasePrice)}</TableCell>
-              <TableCell>{formatDate(asset.updatedAt)}</TableCell>
+              <TableCell>{formatDate(new Date(asset.updatedAt))}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -148,13 +126,13 @@ export function AssetTable() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/assets/${asset.id}`}>
+                      <Link href={`/assets/${asset.assetNumber}`}>
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href={`/assets/${asset.id}/edit`}>
+                      <Link href={`/assets/${asset.assetNumber}/edit`}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Asset
                       </Link>
@@ -170,6 +148,32 @@ export function AssetTable() {
           ))}
         </TableBody>
       </Table>
+      <div className="flex items-center justify-between mt-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {assets.length} of {pagination.totalAssets} assets
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
+            disabled={pagination.page <= 1}
+          >
+            Previous
+          </Button>
+          <span>
+            Page {pagination.page} of {pagination.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
+            disabled={pagination.page >= pagination.totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

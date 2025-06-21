@@ -29,3 +29,18 @@ export function getRelativeTime(date: Date): string {
 
   return "just now";
 }
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(amount);
+}
+
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+}

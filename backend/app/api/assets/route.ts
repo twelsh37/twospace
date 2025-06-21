@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
 
     // Create initial history entry
     await createAssetHistory(
-      newAsset.id,
+      newAsset.assetNumber,
       "AVAILABLE",
       "system", // TODO: Replace with actual user ID from authentication
       "Asset created",

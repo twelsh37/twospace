@@ -64,8 +64,7 @@ export const locationsTable = pgTable("locations", {
 
 // Assets table - main asset records
 export const assetsTable = pgTable("assets", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  assetNumber: varchar("asset_number", { length: 10 }).notNull().unique(),
+  assetNumber: varchar("asset_number", { length: 10 }).primaryKey(),
   type: assetTypeEnum("type").notNull(),
   state: assetStateEnum("state").notNull().default("AVAILABLE"),
   serialNumber: varchar("serial_number", { length: 255 }).notNull().unique(),
@@ -91,9 +90,9 @@ export const assetsTable = pgTable("assets", {
 // Asset history for audit trail
 export const assetHistoryTable = pgTable("asset_history", {
   id: uuid("id").primaryKey().defaultRandom(),
-  assetId: uuid("asset_id")
+  assetId: varchar("asset_id", { length: 10 })
     .notNull()
-    .references(() => assetsTable.id, { onDelete: "cascade" }),
+    .references(() => assetsTable.assetNumber, { onDelete: "cascade" }),
   previousState: assetStateEnum("previous_state"),
   newState: assetStateEnum("new_state").notNull(),
   changedBy: uuid("changed_by")
@@ -107,9 +106,9 @@ export const assetHistoryTable = pgTable("asset_history", {
 // Asset assignments for tracking individual/shared assignments
 export const assetAssignmentsTable = pgTable("asset_assignments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  assetId: uuid("asset_id")
+  assetId: varchar("asset_id", { length: 10 })
     .notNull()
-    .references(() => assetsTable.id, { onDelete: "cascade" }),
+    .references(() => assetsTable.assetNumber, { onDelete: "cascade" }),
   userId: uuid("user_id").references(() => usersTable.id), // For individual assignments
   locationId: uuid("location_id").references(() => locationsTable.id), // For shared/location assignments
   assignmentType: assignmentTypeEnum("assignment_type").notNull(),
