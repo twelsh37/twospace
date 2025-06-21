@@ -1,11 +1,8 @@
 // backend/drizzle.config.ts
 // Drizzle Kit configuration for Asset Management System
 
-import * as dotenv from "dotenv";
+import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
-
-// Explicitly load variables from .env.local
-dotenv.config({ path: ".env.local" });
 
 if (!process.env.POSTGRES_URL) {
   throw new Error("POSTGRES_URL is not set in .env.local");

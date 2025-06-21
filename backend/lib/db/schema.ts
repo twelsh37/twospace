@@ -13,7 +13,6 @@ import {
   integer,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 
 // Enum definitions
 export const assetTypeEnum = pgEnum("asset_type", [
@@ -127,69 +126,6 @@ export const assetSequencesTable = pgTable("asset_sequences", {
   assetType: assetTypeEnum("asset_type").primaryKey(),
   nextSequence: integer("next_sequence").notNull().default(1),
 });
-
-// Relations
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  assetHistory: many(assetHistoryTable),
-  userAssignments: many(assetAssignmentsTable, {
-    relationName: "assignedToUser",
-  }),
-  createdAssignments: many(assetAssignmentsTable, {
-    relationName: "assignedByUser",
-  }),
-}));
-
-export const locationsRelations = relations(locationsTable, ({ many }) => ({
-  assets: many(assetsTable),
-  assignments: many(assetAssignmentsTable),
-}));
-
-export const assetsRelations = relations(assetsTable, ({ one, many }) => ({
-  location: one(locationsTable, {
-    fields: [assetsTable.locationId],
-    references: [locationsTable.id],
-  }),
-  history: many(assetHistoryTable),
-  assignments: many(assetAssignmentsTable),
-}));
-
-export const assetHistoryRelations = relations(
-  assetHistoryTable,
-  ({ one }) => ({
-    asset: one(assetsTable, {
-      fields: [assetHistoryTable.assetId],
-      references: [assetsTable.id],
-    }),
-    user: one(usersTable, {
-      fields: [assetHistoryTable.changedBy],
-      references: [usersTable.id],
-    }),
-  })
-);
-
-export const assetAssignmentsRelations = relations(
-  assetAssignmentsTable,
-  ({ one }) => ({
-    asset: one(assetsTable, {
-      fields: [assetAssignmentsTable.assetId],
-      references: [assetsTable.id],
-    }),
-    assignedTo: one(usersTable, {
-      fields: [assetAssignmentsTable.userId],
-      references: [usersTable.id],
-      relationName: "assignedToUser",
-    }),
-    location: one(locationsTable, {
-      fields: [assetAssignmentsTable.locationId],
-      references: [locationsTable.id],
-    }),
-    assignedBy: one(usersTable, {
-      fields: [assetAssignmentsTable.assignedBy],
-      references: [usersTable.id],
-      relationName: "assignedByUser",
-    }),
-  })
-);
 
 // Type exports for use in application
 export type User = typeof usersTable.$inferSelect;
