@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# PIP
+We are using pip package manager to manage python packages in the backend
+
+

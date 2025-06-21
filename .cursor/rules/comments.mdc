@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Comments
+- ALWAYS add more helpful explanatory comments into our code.
+- NEVER delete old comments unless they are obviously wrong/obsolete.
+- Include LOTS of explanatory commets in the code. 
+- ALWAYS write well documented code.
+- Document old changes under reasoning IN THE COMMENTS YOU WRITE.
+- When writing comments, use clear and easy to understand language. Write in short sentences.
+
+

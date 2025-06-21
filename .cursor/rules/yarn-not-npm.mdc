@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+# We are using YARN (not npm) to build nextjs applications for the frontend
+We are using yarn in our current project... not NPM

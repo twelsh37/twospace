@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Build on Windows PC
+- We are are using a Windows PC Development Environment. 
+- Do not give me Linux commands. 
+- I want PowerShell or Windows cmd command format if I have to enter anything on the command line

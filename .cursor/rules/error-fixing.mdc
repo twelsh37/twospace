@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- DO NOT JUMP TO CONCLUSIONS, consider multiple possible causes before deciding.
+- Explain the problem in plain English.
+- Make minimal necessary changes, changing as few lines of code as possible.
+- In case of strange errors, ask the user to perform a perplexity web search to find the latest up-to-date information.
+

@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Write clean, simple, readable code
+- ALWAYS add filepath and file name as first entry in any file
+- Implement features in simplest way possible.
+- Keep files small and focused (< 200 lines)
+- Test after every meaningful change.
+- Focus on core functionality before optimisation
+- Use clear consistent naming
+- Think thoroughly before coding. Write 2 to 3 reasoning paragraphs
+- ALWAYS write simple clean and modular code. 
+- Use clear and easy to understand language.  Write in short sentences
+
+

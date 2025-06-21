@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Building process
+- Verify each new feature works by testing it.
+- If testing python code use [Pytest](https://docs.pytest.org/en/stable/how-to/index.html#)
+- If testing Typescript use [Jest](https://jestjs.io/docs/getting-started)
+- DO NOT write complicated or confusing code. Opt for the simple and modular approach.
+- When not sure what to do, ask the user for guidance.
+
+
