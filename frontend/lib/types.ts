@@ -1,6 +1,7 @@
 // frontend/lib/types.ts
 // Core types for Asset Management System
 
+// Enums for internal frontend logic and constants
 export enum AssetType {
   MOBILE_PHONE = "MOBILE_PHONE",
   TABLET = "TABLET",
@@ -10,97 +11,54 @@ export enum AssetType {
 }
 
 export enum AssetState {
-  AVAILABLE = "AVAILABLE", // Available Stock
-  SIGNED_OUT = "SIGNED_OUT", // Signed Out for building/configuration
-  BUILT = "BUILT", // Built and configured (phones, tablets, desktops, laptops only)
-  READY_TO_GO = "READY_TO_GO", // Ready To Go Stock (RTGS)
-  ISSUED = "ISSUED", // Issued to individuals or locations
+  AVAILABLE = "AVAILABLE",
+  SIGNED_OUT = "SIGNED_OUT",
+  BUILT = "BUILT",
+  READY_TO_GO = "READY_TO_GO",
+  ISSUED = "ISSUED",
 }
 
-export enum UserRole {
-  ADMIN = "ADMIN",
-  USER = "USER",
-}
+// --- Types reflecting API data structures ---
 
-export interface Asset {
-  id: string;
-  assetNumber: string; // Format: XX-YYYYY (prefix + 5-digit sequence)
-  type: AssetType;
-  state: AssetState;
+// Data structure for a single asset, matching the assets API response
+export type Asset = {
+  assetNumber: string;
+  type: string; // Corresponds to AssetType enum
+  state: string; // Corresponds to AssetState enum
   serialNumber: string;
   description: string;
-  purchasePrice: number;
+  purchasePrice: string;
   location: string;
-  assignmentType: "INDIVIDUAL" | "SHARED";
-  assignedTo?: string; // Person name for individual assignments
-  employeeId?: string; // Employee ID for individual assignments
-  department?: string; // Department for assignments
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date; // Soft delete tracking
-}
+  assignmentType: string;
+  assignedTo?: string;
+  employeeId?: string;
+  department?: string;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+};
 
-export interface User {
-  id: string;
-  name: string;
-  employeeId: string;
-  department: string;
-  role: UserRole;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Location {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface AssetHistory {
-  id: string;
-  assetId: string;
-  previousState?: AssetState;
-  newState: AssetState;
-  changedBy: string; // User ID who made the change
-  changeReason?: string;
-  timestamp: Date;
-  details?: Record<string, any>; // Additional change details
-}
-
-export interface AssetAssignment {
-  id: string;
-  assetId: string;
-  userId?: string; // For individual assignments
-  locationId?: string; // For shared/location assignments
-  assignmentType: "INDIVIDUAL" | "SHARED";
-  assignedAt: Date;
-  assignedBy: string; // User ID who made the assignment
-  unassignedAt?: Date;
-}
-
-// Dashboard data types
-export interface DashboardData {
+// Type for the pagination object returned by the assets API
+export type Pagination = {
+  page: number;
+  limit: number;
   totalAssets: number;
-  assetsByType: Record<AssetType, number>;
-  assetsByState: Record<AssetState, number>;
-  assetsByLocation: Record<string, number>;
-  recentActivity: AssetHistory[];
-}
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+};
 
-// Import system types
-export interface ImportMapping {
-  sourceColumn: string;
-  targetField: keyof Asset;
-  required: boolean;
-  dataType: "string" | "number" | "date" | "enum";
-}
-
-export interface ImportResult {
-  successful: number;
-  failed: number;
-  errors: string[];
-  importedAssets: Asset[];
-}
+// Type for the aggregated data used on the dashboard, matching the dashboard API response
+export type DashboardData = {
+  totalAssets: number;
+  assetsByState: { state: string; count: number }[];
+  assetsByType: { type: string; count: number }[];
+  recentActivity: {
+    id: string;
+    assetId: string;
+    newState: string;
+    changeReason: string | null;
+    timestamp: string; // ISO date string
+    userName: string;
+    assetDescription: string | null;
+  }[];
+};

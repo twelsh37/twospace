@@ -7,30 +7,39 @@ import { AssetState } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { TrendingUp } from "lucide-react";
 
-export function AssetsByState() {
-  // TODO: Replace with real data from API
-  const stateData = [
-    {
-      state: AssetState.AVAILABLE,
-      count: 312,
-      percentage: 25.3,
-      trend: "+5.2%",
-    },
-    { state: AssetState.ISSUED, count: 687, percentage: 55.7, trend: "+12.1%" },
-    {
-      state: AssetState.READY_TO_GO,
-      count: 145,
-      percentage: 11.8,
-      trend: "-2.3%",
-    },
-    {
-      state: AssetState.SIGNED_OUT,
-      count: 67,
-      percentage: 5.4,
-      trend: "+8.7%",
-    },
-    { state: AssetState.BUILT, count: 23, percentage: 1.8, trend: "+15.2%" },
-  ];
+type AssetsByStateProps = {
+  data: { state: string; count: number }[];
+};
+
+export function AssetsByState({ data }: AssetsByStateProps) {
+  const totalAssets = data.reduce((sum, item) => sum + item.count, 0);
+
+  // Fallback for when there are no assets to avoid division by zero
+  if (totalAssets === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Asset Lifecycle Distribution
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">No asset data to display.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const stateData = data.map((item) => ({
+    state: item.state as AssetState,
+    count: item.count,
+    percentage: (item.count / totalAssets) * 100,
+  }));
+
+  const getCountByState = (state: AssetState) => {
+    return stateData.find((s) => s.state === state)?.count || 0;
+  };
 
   const getStateColor = (state: AssetState) => {
     switch (state) {
@@ -85,10 +94,7 @@ export function AssetsByState() {
                     item.state
                   )}`}
                 >
-                  {ASSET_STATE_LABELS[item.state]}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {item.trend}
+                  {ASSET_STATE_LABELS[item.state] || item.state}
                 </span>
               </div>
 
@@ -96,13 +102,17 @@ export function AssetsByState() {
               <div>
                 <div className="text-2xl font-bold">{item.count}</div>
                 <div className="text-sm text-muted-foreground">
-                  {item.percentage}% of total
+                  {item.percentage.toFixed(1)}% of total
                 </div>
               </div>
 
               {/* Progress Bar */}
               <div className="space-y-1">
-                <Progress value={item.percentage} className="h-2" />
+                <Progress
+                  value={item.percentage}
+                  className="h-2"
+                  indicatorClassName={getProgressColor(item.state)}
+                />
               </div>
             </div>
           ))}
@@ -113,8 +123,7 @@ export function AssetsByState() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-lg font-semibold">
-                {stateData.find((s) => s.state === AssetState.AVAILABLE)
-                  ?.count || 0}
+                {getCountByState(AssetState.AVAILABLE)}
               </div>
               <div className="text-xs text-muted-foreground">
                 Ready to Deploy
@@ -122,27 +131,21 @@ export function AssetsByState() {
             </div>
             <div>
               <div className="text-lg font-semibold">
-                {(stateData.find((s) => s.state === AssetState.SIGNED_OUT)
-                  ?.count || 0) +
-                  (stateData.find((s) => s.state === AssetState.BUILT)?.count ||
-                    0)}
+                {getCountByState(AssetState.SIGNED_OUT) +
+                  getCountByState(AssetState.BUILT)}
               </div>
               <div className="text-xs text-muted-foreground">In Processing</div>
             </div>
             <div>
               <div className="text-lg font-semibold">
-                {stateData.find((s) => s.state === AssetState.ISSUED)?.count ||
-                  0}
+                {getCountByState(AssetState.ISSUED)}
               </div>
               <div className="text-xs text-muted-foreground">In Use</div>
             </div>
             <div>
               <div className="text-lg font-semibold">
                 {Math.round(
-                  ((stateData.find((s) => s.state === AssetState.ISSUED)
-                    ?.count || 0) /
-                    stateData.reduce((sum, item) => sum + item.count, 0)) *
-                    100
+                  (getCountByState(AssetState.ISSUED) / totalAssets) * 100
                 )}
                 %
               </div>

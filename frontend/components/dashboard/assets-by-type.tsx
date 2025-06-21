@@ -6,15 +6,35 @@ import { AssetType } from "@/lib/types";
 import { ASSET_TYPE_LABELS } from "@/lib/constants";
 import { BarChart3 } from "lucide-react";
 
-export function AssetsByType() {
-  // TODO: Replace with real data from API
-  const assetData = [
-    { type: AssetType.LAPTOP, count: 425, percentage: 34.4 },
-    { type: AssetType.MONITOR, count: 318, percentage: 25.8 },
-    { type: AssetType.MOBILE_PHONE, count: 256, percentage: 20.7 },
-    { type: AssetType.DESKTOP, count: 164, percentage: 13.3 },
-    { type: AssetType.TABLET, count: 71, percentage: 5.8 },
-  ];
+type AssetsByTypeProps = {
+  data: { type: string; count: number }[];
+};
+
+export function AssetsByType({ data }: AssetsByTypeProps) {
+  const totalAssets = data.reduce((sum, item) => sum + item.count, 0);
+
+  // Fallback for when there are no assets to avoid division by zero
+  if (totalAssets === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Assets by Type
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">No asset data to display.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const assetData = data.map((item) => ({
+    type: item.type as AssetType,
+    count: item.count,
+    percentage: (item.count / totalAssets) * 100,
+  }));
 
   const getTypeColor = (type: AssetType) => {
     switch (type) {
@@ -50,12 +70,12 @@ export function AssetsByType() {
                   className={`w-3 h-3 rounded-full ${getTypeColor(item.type)}`}
                 />
                 <span className="text-sm font-medium">
-                  {ASSET_TYPE_LABELS[item.type]}
+                  {ASSET_TYPE_LABELS[item.type] || item.type}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-muted-foreground">
-                  {item.count} ({item.percentage}%)
+                  {item.count} ({item.percentage.toFixed(1)}%)
                 </span>
                 <div className="w-24 bg-secondary rounded-full h-2">
                   <div
@@ -72,9 +92,7 @@ export function AssetsByType() {
         <div className="mt-6 pt-4 border-t">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium">Total Assets</span>
-            <span className="text-lg font-bold">
-              {assetData.reduce((sum, item) => sum + item.count, 0)}
-            </span>
+            <span className="text-lg font-bold">{totalAssets}</span>
           </div>
         </div>
       </CardContent>

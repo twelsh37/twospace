@@ -19,7 +19,7 @@ if (!process.env.POSTGRES_URL) {
 // Note: For Supabase with Transaction pooling, disable prepare
 const queryClient = postgres(process.env.POSTGRES_URL, {
   prepare: false, // Required for Supabase Transaction pooling
-  max: isProduction ? 10 : 1, // Connection pool size
+  max: isProduction ? 10 : 5, // Allow more connections in development
 });
 
 // Create Drizzle instance with schema

@@ -4,7 +4,7 @@
 import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq } from "drizzle-orm";
+import { eq, ne } from "drizzle-orm";
 
 import * as schema from "./schema";
 import {
@@ -16,6 +16,7 @@ import {
   assetSequencesTable,
   assetsTable,
   assetHistoryTable,
+  assetTypeEnum,
 } from "./schema";
 
 // Explicitly load .env.local for this script
@@ -28,17 +29,74 @@ if (!POSTGRES_URL) {
 }
 
 // Create a new, dedicated client for the seed script
-const client = postgres(POSTGRES_URL, { max: 1 });
+const client = postgres(POSTGRES_URL, { max: 10 }); // Increase pool size for seeding
 const db = drizzle(client, { schema });
+
+// --- Data for random generation ---
+const MALE_FIRST_NAMES = [
+  "John",
+  "Peter",
+  "Mike",
+  "David",
+  "Chris",
+  "James",
+  "Robert",
+  "Daniel",
+  "Paul",
+  "Mark",
+];
+const FEMALE_FIRST_NAMES = [
+  "Mary",
+  "Jennifer",
+  "Linda",
+  "Patricia",
+  "Susan",
+  "Jessica",
+  "Sarah",
+  "Karen",
+  "Nancy",
+  "Lisa",
+];
+const LAST_NAMES = [
+  "Smith",
+  "Jones",
+  "Williams",
+  "Brown",
+  "Davis",
+  "Miller",
+  "Wilson",
+  "Moore",
+  "Taylor",
+  "Anderson",
+];
+const DEPARTMENTS = [
+  "Engineering",
+  "Sales",
+  "Marketing",
+  "Human Resources",
+  "Finance",
+  "Customer Support",
+  "Operations",
+];
 
 async function seedDatabase() {
   console.log("🌱 Seeding database...");
 
   try {
-    // Stage 1: Seed foundational data (users, locations)
-    console.log("   - Seeding foundational data (if necessary)...");
+    // --- Stage 1: Clean Slate ---
+    console.log("   - Clearing previously seeded data for a clean run...");
+    await db.delete(assetHistoryTable);
+    await db.delete(assetsTable);
+    // Keep the admin user for future reference if needed
+    await db.delete(usersTable).where(ne(usersTable.role, "ADMIN"));
+    console.log("   - Previous data cleared.");
 
-    // These are wrapped in onConflictDoNothing to be idempotent.
+    console.log("   - Resetting all asset sequences to 1...");
+    await db.update(assetSequencesTable).set({ nextSequence: 1 });
+
+    // --- Stage 2: Seed Foundational Data ---
+    console.log("   - Seeding foundational data (locations, admin user)...");
+    // (Locations and Sequences are idempotent due to onConflictDoNothing in original script)
     await db
       .insert(assetSequencesTable)
       .values([
@@ -64,24 +122,9 @@ async function seedDatabase() {
         description: "Management and administrative offices",
       },
       {
-        name: "Branch Office - North",
-        description: "Northern branch location",
-      },
-      {
-        name: "Branch Office - South",
-        description: "Southern branch location",
-      },
-      {
-        name: "Warehouse - Main",
-        description: "Primary storage and distribution center",
-      },
-      {
         name: "IT Department",
         description: "IT support and asset management office",
       },
-      { name: "Reception Area", description: "Main building reception" },
-      { name: "Conference Room A", description: "Large conference room" },
-      { name: "Storage Room", description: "General storage facility" },
     ];
     await db.insert(locationsTable).values(locations).onConflictDoNothing();
 
@@ -94,65 +137,115 @@ async function seedDatabase() {
     };
     await db.insert(usersTable).values(adminUserData).onConflictDoNothing();
 
-    // --- Stage 2: Clean and Reseed Assets ---
-    console.log("   - Clearing previously seeded assets for a clean run...");
-    await db.delete(assetHistoryTable);
-    await db.delete(assetsTable);
-    console.log("   - Previous asset data cleared.");
+    // --- Stage 3: Seed Users (1200) ---
+    console.log("   - Preparing to seed 1200 users...");
+    const usersToInsert: NewUser[] = [];
 
-    console.log("   - Resetting all asset sequences to 1...");
-    await db.update(assetSequencesTable).set({ nextSequence: 1 });
+    // Create 12 IT Department users
+    for (let i = 0; i < 12; i++) {
+      const gender = Math.random() > 0.5 ? "male" : "female";
+      const firstName =
+        gender === "male"
+          ? MALE_FIRST_NAMES[i % MALE_FIRST_NAMES.length]
+          : FEMALE_FIRST_NAMES[i % FEMALE_FIRST_NAMES.length];
+      const lastName = LAST_NAMES[i % LAST_NAMES.length];
+      usersToInsert.push({
+        name: `${firstName} ${lastName}`,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.it@company.com`,
+        employeeId: `IT${String(1000 + i).padStart(4, "0")}`,
+        department: "IT Department",
+        role: "USER",
+      });
+    }
 
-    // --- Stage 3: Comprehensive Asset Seeding ---
-    console.log("   - Seeding comprehensive assets with batching...");
+    // Create 1188 other users
+    for (let i = 0; i < 1188; i++) {
+      const gender = Math.random() > 0.5 ? "male" : "female";
+      const firstName =
+        gender === "male"
+          ? MALE_FIRST_NAMES[i % MALE_FIRST_NAMES.length]
+          : FEMALE_FIRST_NAMES[i % FEMALE_FIRST_NAMES.length];
+      const lastName = LAST_NAMES[(i + 5) % LAST_NAMES.length]; // Offset to vary names
+      usersToInsert.push({
+        name: `${firstName} ${lastName}`,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@company.com`,
+        employeeId: `EMP${String(1000 + i).padStart(4, "0")}`,
+        department: DEPARTMENTS[i % DEPARTMENTS.length],
+        role: "USER",
+      });
+    }
 
-    const [allLocations, adminUser, currentSequences] = await Promise.all([
+    // Insert users in batches
+    const USER_BATCH_SIZE = 50;
+    for (let i = 0; i < usersToInsert.length; i += USER_BATCH_SIZE) {
+      const batch = usersToInsert.slice(i, i + USER_BATCH_SIZE);
+      console.log(
+        `     - 👤 Inserting user batch ${i / USER_BATCH_SIZE + 1}...`
+      );
+      await db.insert(usersTable).values(batch).onConflictDoNothing();
+    }
+    console.log("   - All users seeded successfully.");
+
+    // --- Stage 4: Comprehensive Asset Seeding (1234) ---
+    console.log("   - Seeding 1234 comprehensive assets with batching...");
+
+    const [allLocations, allUsers, currentSequences] = await Promise.all([
       db.query.locationsTable.findMany(),
-      db.query.usersTable.findFirst({ where: eq(usersTable.role, "ADMIN") }),
+      db.query.usersTable.findMany({ where: eq(usersTable.role, "USER") }),
       db.query.assetSequencesTable.findMany(),
     ]);
 
-    if (!adminUser || allLocations.length === 0) {
-      throw new Error(
-        "Could not find admin user or locations to create assets."
-      );
+    const adminUser = await db.query.usersTable.findFirst({
+      where: eq(usersTable.role, "ADMIN"),
+    });
+    if (!adminUser) throw new Error("Admin user not found!");
+
+    // Define asset distribution
+    const assetDistribution = {
+      TABLET: 247,
+      DESKTOP: 309,
+      MONITOR: 309,
+      LAPTOP: 185,
+      MOBILE_PHONE: 185,
+    };
+
+    const assetBlueprints: {
+      type: (typeof assetTypeEnum.enumValues)[number];
+    }[] = [];
+    for (const [type, count] of Object.entries(assetDistribution)) {
+      for (let i = 0; i < count; i++) {
+        assetBlueprints.push({
+          type: type as (typeof assetTypeEnum.enumValues)[number],
+        });
+      }
     }
 
-    const assetTypes: NewAsset["type"][] = [
-      "MOBILE_PHONE",
-      "LAPTOP",
-      "MONITOR",
-      "DESKTOP",
-      "TABLET",
-    ];
-    const assetTypePrefixes: Record<NewAsset["type"], string> = {
+    // Use a reliable mapping for prefixes
+    const assetTypePrefixes: Record<
+      (typeof assetTypeEnum.enumValues)[number],
+      string
+    > = {
       MOBILE_PHONE: "01",
       TABLET: "02",
       DESKTOP: "03",
       LAPTOP: "04",
       MONITOR: "05",
     };
+
     const sequenceMap = new Map(
       currentSequences.map((s) => [s.assetType, s.nextSequence])
     );
-    const TOTAL_ASSETS = 250;
-    const BATCH_SIZE = 50;
-    console.log(
-      `   - Preparing to generate and insert ${TOTAL_ASSETS} assets in batches of ${BATCH_SIZE}...`
-    );
+    const ASSET_BATCH_SIZE = 50;
 
-    for (let i = 0; i < TOTAL_ASSETS; i += BATCH_SIZE) {
+    for (let i = 0; i < assetBlueprints.length; i += ASSET_BATCH_SIZE) {
+      const batch = assetBlueprints.slice(i, i + ASSET_BATCH_SIZE);
       const assetsToInsert: NewAsset[] = [];
-      const batchEnd = Math.min(i + BATCH_SIZE, TOTAL_ASSETS);
       console.log(
-        `     - Generating batch ${i / BATCH_SIZE + 1}: assets ${
-          i + 1
-        } to ${batchEnd}`
+        `     - 📦 Generating asset batch ${i / ASSET_BATCH_SIZE + 1}...`
       );
 
-      for (let j = i; j < batchEnd; j++) {
-        const type = assetTypes[j % assetTypes.length];
-        const location = allLocations[j % allLocations.length];
+      for (const blueprint of batch) {
+        const { type } = blueprint;
         const prefix = assetTypePrefixes[type];
         const currentSequence = sequenceMap.get(type) || 1;
         const assetNumber = `${prefix}-${String(currentSequence).padStart(
@@ -161,7 +254,7 @@ async function seedDatabase() {
         )}`;
         sequenceMap.set(type, currentSequence + 1);
 
-        const asset: NewAsset = {
+        let asset: NewAsset = {
           assetNumber,
           type,
           state: "AVAILABLE",
@@ -171,14 +264,28 @@ async function seedDatabase() {
             .toUpperCase()}`,
           description: `Seeded ${type} #${currentSequence}`,
           purchasePrice: (Math.random() * 1500 + 300).toFixed(2),
-          locationId: location.id,
-          assignmentType: "INDIVIDUAL",
+          locationId:
+            allLocations[Math.floor(Math.random() * allLocations.length)].id,
+          assignmentType: "INDIVIDUAL", // Default to individual
         };
+
+        // Randomly assign ~60% of assets to users
+        if (Math.random() < 0.6 && allUsers.length > 0) {
+          const randomUser =
+            allUsers[Math.floor(Math.random() * allUsers.length)];
+          asset = {
+            ...asset,
+            state: "ISSUED",
+            assignedTo: randomUser.name,
+            employeeId: randomUser.employeeId,
+            department: randomUser.department,
+          };
+        }
         assetsToInsert.push(asset);
       }
 
       if (assetsToInsert.length > 0) {
-        console.log(`     - 📦 Inserting ${assetsToInsert.length} assets...`);
+        console.log(`     - Inserting ${assetsToInsert.length} assets...`);
         const insertedAssets = await db
           .insert(assetsTable)
           .values(assetsToInsert)
@@ -187,9 +294,6 @@ async function seedDatabase() {
             state: assetsTable.state,
           });
 
-        console.log(
-          `     - 📜 Inserting ${insertedAssets.length} history records...`
-        );
         const historyToInsert = insertedAssets.map((asset) => ({
           assetId: asset.assetNumber,
           newState: asset.state,
@@ -200,6 +304,7 @@ async function seedDatabase() {
       }
     }
 
+    // --- Stage 5: Update Sequences ---
     console.log("   - 💾 Updating final asset sequence numbers...");
     for (const [assetType, nextSequence] of sequenceMap.entries()) {
       await db
@@ -211,17 +316,18 @@ async function seedDatabase() {
     console.log("✅ Database seeded successfully!");
   } catch (error) {
     console.error("❌ Error seeding database:", error);
-    throw error; // Rethrow to ensure script exits with an error code
+    throw error;
   } finally {
     console.log("   - Closing database connection...");
-    await client.end(); // Ensure connection is always closed
+    await client.end();
   }
 }
 
 // --- Main execution ---
-seedDatabase().catch(() => {
-  // The error is already logged in the catch block of seedDatabase
-  // We call catch here to prevent an unhandled promise rejection warning
-  // and ensure the process exits with a failure code.
+seedDatabase().catch((err) => {
+  console.error(
+    "A critical error occurred during seeding. Process will exit.",
+    err
+  );
   process.exit(1);
 });
