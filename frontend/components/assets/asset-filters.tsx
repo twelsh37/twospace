@@ -1,5 +1,5 @@
 // frontend/components/assets/asset-filters.tsx
-// Asset Filters Component for search and filtering
+// Asset Filters Component for filtering
 
 "use client";
 
@@ -16,10 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, X } from "lucide-react";
+import { Filter, X } from "lucide-react";
 
 interface FilterState {
-  search: string;
   type: AssetType | "all";
   state: AssetState | "all";
   location: string | "all";
@@ -28,7 +27,6 @@ interface FilterState {
 
 export function AssetFilters() {
   const [filters, setFilters] = useState<FilterState>({
-    search: "",
     type: "all",
     state: "all",
     location: "all",
@@ -43,7 +41,6 @@ export function AssetFilters() {
 
   const clearFilters = () => {
     setFilters({
-      search: "",
       type: "all",
       state: "all",
       location: "all",
@@ -52,32 +49,19 @@ export function AssetFilters() {
   };
 
   const hasActiveFilters = Object.values(filters).some(
-    (value) => value !== "" && value !== "all"
+    (value) => value !== "all"
   );
 
   const getActiveFilterCount = () => {
-    return Object.entries(filters).filter(
-      ([key, value]) => value !== "" && value !== "all"
-    ).length;
+    return Object.values(filters).filter((value) => value !== "all").length;
   };
 
   return (
     <div className="flex flex-col space-y-4">
-      {/* Search and Primary Filters */}
+      {/* Primary Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Search Input */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search assets by asset number, serial number, or description..."
-            value={filters.search}
-            onChange={(e) => updateFilter("search", e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
         {/* Filter Dropdowns */}
-        <div className="flex gap-2">
+        <div className="flex flex-1 gap-2">
           {/* Asset Type Filter */}
           <Select
             value={filters.type}
@@ -151,16 +135,6 @@ export function AssetFilters() {
             <Filter className="h-4 w-4" />
             Active filters ({getActiveFilterCount()}):
           </div>
-
-          {filters.search && (
-            <Badge variant="secondary" className="gap-1">
-              Search: "{filters.search}"
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => updateFilter("search", "")}
-              />
-            </Badge>
-          )}
 
           {filters.type !== "all" && (
             <Badge variant="secondary" className="gap-1">

@@ -38,10 +38,8 @@ export default function AssetsPage() {
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="flex items-center space-x-2">
-        <AssetFilters />
-      </div>
+      {/* Filters */}
+      <AssetFilters />
 
       {/* Assets Table */}
       <div className="rounded-md border">
