@@ -27,48 +27,58 @@ interface NavItem {
   badge?: string;
 }
 
-const navItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Assets",
-    href: "/assets",
-    icon: Package,
-    badge: "1,234",
-  },
-  {
-    title: "Users",
-    href: "/users",
-    icon: Users,
-  },
-  {
-    title: "Locations",
-    href: "/locations",
-    icon: MapPin,
-  },
-  {
-    title: "Import",
-    href: "/import",
-    icon: Upload,
-  },
-  {
-    title: "Reports",
-    href: "/reports",
-    icon: BarChart3,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
-];
-
-export function Sidebar() {
+export function Sidebar({
+  totalAssets,
+  totalUsers,
+  totalLocations,
+}: {
+  totalAssets?: number;
+  totalUsers?: number;
+  totalLocations?: number;
+}) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+
+  const navItems: NavItem[] = [
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Assets",
+      href: "/assets",
+      icon: Package,
+      badge: totalAssets?.toLocaleString() || "...",
+    },
+    {
+      title: "Users",
+      href: "/users",
+      icon: Users,
+      badge: totalUsers?.toLocaleString() || "...",
+    },
+    {
+      title: "Locations",
+      href: "/locations",
+      icon: MapPin,
+      badge: totalLocations?.toLocaleString() || "...",
+    },
+    {
+      title: "Import",
+      href: "/import",
+      icon: Upload,
+    },
+    {
+      title: "Reports",
+      href: "/reports",
+      icon: BarChart3,
+    },
+    {
+      title: "Settings",
+      href: "/settings",
+      icon: Settings,
+    },
+  ];
 
   return (
     <>

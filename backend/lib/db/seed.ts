@@ -22,7 +22,7 @@ type AssetBlueprint = {
 };
 
 // --- Configuration ---
-const TOTAL_USERS = 12000;
+const TOTAL_USERS = 120000;
 const BATCH_SIZE = 500; // Increased batch size for performance with large datasets
 const LAPTOP_RATIO = 0.75;
 const DESKTOP_RATIO = 0.24;
@@ -264,11 +264,15 @@ async function seedDatabase() {
     const itStoreRoom = await db.query.locationsTable.findFirst({
       where: eq(locationsTable.name, "IT Department - store room"),
     });
+    const officeLocations = await db.query.locationsTable.findMany({
+      where: ne(locationsTable.name, "IT Department - store room"),
+    });
     const adminUser = await db.query.usersTable.findFirst({
       where: eq(usersTable.role, "ADMIN"),
     });
-    if (!itStoreRoom || !adminUser)
-      throw new Error("Could not find IT Store Room or Admin User");
+    if (!itStoreRoom || !adminUser || officeLocations.length === 0) {
+      throw new Error("Could not find required locations or Admin User");
+    }
 
     const sequenceMap = new Map(assetTypeEnum.enumValues.map((e) => [e, 1]));
     const assetTypePrefixes: Record<
@@ -299,6 +303,9 @@ async function seedDatabase() {
         ).padStart(5, "0")}`;
         sequenceMap.set(type, currentSequence + 1);
 
+        const description = `${type.replace(/_/g, " ")} #${currentSequence}`;
+        const serialNumber = `SN-${assetNumber}`; // Guaranteed unique serial number
+
         let asset: schema.NewAsset;
         if (blueprint.assignedToUser) {
           const user = blueprint.assignedToUser;
@@ -306,28 +313,25 @@ async function seedDatabase() {
             assetNumber,
             type,
             state: "ISSUED",
-            serialNumber: `SN-${type.slice(0, 2)}-${Math.random()
-              .toString(36)
-              .substring(2, 9)
-              .toUpperCase()}`,
-            description: `Seeded ${type} #${currentSequence}`,
+            serialNumber,
+            description,
             purchasePrice: (Math.random() * 1500 + 300).toFixed(2),
             assignmentType: "INDIVIDUAL",
             assignedTo: user.name,
             employeeId: user.employeeId,
             department: user.department,
-            locationId: itStoreRoom.id,
+            locationId:
+              officeLocations[
+                Math.floor(Math.random() * officeLocations.length)
+              ].id,
           };
         } else {
           asset = {
             assetNumber,
             type,
             state: "AVAILABLE",
-            serialNumber: `SN-${type.slice(0, 2)}-${Math.random()
-              .toString(36)
-              .substring(2, 9)
-              .toUpperCase()}`,
-            description: `Seeded ${type} #${currentSequence}`,
+            serialNumber,
+            description,
             purchasePrice: (Math.random() * 1500 + 300).toFixed(2),
             assignmentType: "INDIVIDUAL",
             locationId: itStoreRoom.id,

@@ -56,6 +56,7 @@ export type DashboardData = {
     id: string;
     assetId: string;
     newState: string;
+    type: string; // The type of asset (e.g., 'LAPTOP')
     changeReason: string | null;
     timestamp: string; // ISO date string
     userName: string;
