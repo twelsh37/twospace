@@ -3,7 +3,12 @@
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { assetsTable, assetHistoryTable, usersTable } from "@/lib/db/schema";
+import {
+  assetsTable,
+  assetHistoryTable,
+  usersTable,
+  locationsTable,
+} from "@/lib/db/schema";
 import { desc, count, eq } from "drizzle-orm";
 
 /**
@@ -18,6 +23,14 @@ export async function GET() {
       const totalAssetsResult = await tx
         .select({ value: count() })
         .from(assetsTable);
+
+      const totalUsersResult = await tx
+        .select({ value: count() })
+        .from(usersTable);
+
+      const totalLocationsResult = await tx
+        .select({ value: count() })
+        .from(locationsTable);
 
       const assetsByStateResult = await tx
         .select({
@@ -40,6 +53,7 @@ export async function GET() {
           id: assetHistoryTable.id,
           assetId: assetHistoryTable.assetId,
           newState: assetHistoryTable.newState,
+          type: assetsTable.type,
           changeReason: assetHistoryTable.changeReason,
           timestamp: assetHistoryTable.timestamp,
           userName: usersTable.name,
@@ -57,6 +71,8 @@ export async function GET() {
       // Format the results
       return {
         totalAssets: totalAssetsResult[0]?.value || 0,
+        totalUsers: totalUsersResult[0]?.value || 0,
+        totalLocations: totalLocationsResult[0]?.value || 0,
         assetsByState: assetsByStateResult,
         assetsByType: assetsByTypeResult,
         recentActivity: recentActivityResult.map((activity) => ({

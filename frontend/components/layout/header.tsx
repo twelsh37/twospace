@@ -44,12 +44,6 @@ export function Header() {
 
       {/* Right Side - Actions and User */}
       <div className="flex items-center space-x-4">
-        {/* Quick Add Button */}
-        <Button size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Asset
-        </Button>
-
         {/* Notifications */}
         <div className="relative">
           <Button variant="ghost" size="sm">

@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AssetState } from "@/lib/types";
+import { AssetState, AssetType } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { getRelativeTime } from "@/lib/utils";
 import { Activity } from "lucide-react";
@@ -13,6 +13,7 @@ type RecentActivityProps = {
     id: string;
     assetId: string;
     newState: string;
+    type: string;
     changeReason: string | null;
     timestamp: string;
     userName: string;
@@ -21,18 +22,19 @@ type RecentActivityProps = {
 };
 
 export function RecentActivity({ data }: RecentActivityProps) {
-  const getStateColor = (state: AssetState) => {
-    switch (state) {
-      case AssetState.AVAILABLE:
+  // Color mapping based on Asset Type, consistent with AssetsByType component
+  const getTypeColor = (type: AssetType) => {
+    switch (type) {
+      case AssetType.LAPTOP:
         return "bg-blue-500";
-      case AssetState.SIGNED_OUT:
-        return "bg-yellow-500";
-      case AssetState.BUILT:
+      case AssetType.MONITOR:
         return "bg-green-500";
-      case AssetState.READY_TO_GO:
+      case AssetType.MOBILE_PHONE:
         return "bg-purple-500";
-      case AssetState.ISSUED:
-        return "bg-red-500";
+      case AssetType.DESKTOP:
+        return "bg-orange-500";
+      case AssetType.TABLET:
+        return "bg-pink-500";
       default:
         return "bg-gray-500";
     }
@@ -68,8 +70,8 @@ export function RecentActivity({ data }: RecentActivityProps) {
             <div key={activity.id} className="flex items-start space-x-3">
               {/* Timeline dot */}
               <div
-                className={`w-2 h-2 rounded-full mt-2 ${getStateColor(
-                  activity.newState as AssetState
+                className={`w-2 h-2 rounded-full mt-2 ${getTypeColor(
+                  activity.type as AssetType
                 )}`}
               />
 
