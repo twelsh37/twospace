@@ -37,6 +37,20 @@ export type Asset = {
   updatedAt: string; // ISO date string
 };
 
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  employeeId: string;
+  department: string;
+};
+
+export type Location = {
+  id: string;
+  name: string;
+  description: string | null;
+};
+
 // Type for the pagination object returned by the assets API
 export type Pagination = {
   page: number;
@@ -50,6 +64,7 @@ export type Pagination = {
 // Type for the aggregated data used on the dashboard, matching the dashboard API response
 export type DashboardData = {
   totalAssets: number;
+  totalValue: number;
   assetsByState: { state: string; count: number }[];
   assetsByType: { type: string; count: number }[];
   recentActivity: {

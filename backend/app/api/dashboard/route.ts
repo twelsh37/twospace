@@ -24,6 +24,14 @@ export async function GET() {
         .select({ value: count() })
         .from(assetsTable);
 
+      const allAssets = await tx
+        .select({ purchasePrice: assetsTable.purchasePrice })
+        .from(assetsTable);
+      const totalValue = allAssets.reduce(
+        (sum, asset) => sum + parseFloat(asset.purchasePrice || "0"),
+        0
+      );
+
       const totalUsersResult = await tx
         .select({ value: count() })
         .from(usersTable);
@@ -71,6 +79,7 @@ export async function GET() {
       // Format the results
       return {
         totalAssets: totalAssetsResult[0]?.value || 0,
+        totalValue,
         totalUsers: totalUsersResult[0]?.value || 0,
         totalLocations: totalLocationsResult[0]?.value || 0,
         assetsByState: assetsByStateResult,
