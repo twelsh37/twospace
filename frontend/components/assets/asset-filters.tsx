@@ -17,20 +17,15 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Filter, X } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/config";
 
-type FilterKey =
-  | "type"
-  | "state"
-  | "assignmentType"
-  | "locationId"
-  | "assignedTo";
+type FilterKey = "type" | "state" | "assignmentType" | "locationId";
 
 interface FilterState {
   type: AssetType | "all";
   state: AssetState | "all";
   assignmentType: "INDIVIDUAL" | "SHARED" | "all";
   locationId: string | "all";
-  assignedTo: string | "all";
 }
 
 export function AssetFilters() {
@@ -38,27 +33,33 @@ export function AssetFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [locations, setLocations] = useState<Location[]>([]);
-  const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
 
   useEffect(() => {
-    // TODO: Replace with actual API calls
-    const fetchLocations = async () => {
-      // In a real app, you'd fetch this from /api/locations
-      const mockLocations: Location[] = [
-        { id: "e6f8f7a6-b5f7-4b7e-8b3a-4b2e1b2f7c2d", name: "Headquarters" },
-        { id: "f7a6e6f8-b5f7-4b7e-8b3a-4b2e1b2f7c2d", name: "Remote Office" },
-      ];
-      setLocations(mockLocations);
+    const fetchFilterData = async () => {
+      let response;
+      try {
+        response = await fetch(`${getApiBaseUrl()}/api/locations`);
+      } catch (error) {
+        console.error("Failed to initiate fetch for locations:", error);
+        return; // Exit if fetch itself fails
+      }
+
+      if (!response.ok) {
+        console.error(
+          `Failed to fetch locations: ${response.status} ${response.statusText}`
+        );
+        return; // Exit if response is not OK
+      }
+
+      try {
+        const { data } = await response.json();
+        setLocations(data);
+      } catch (error) {
+        console.error("Failed to parse locations JSON:", error);
+      }
     };
 
-    const fetchAssignedUsers = async () => {
-      // In a real app, you'd fetch this from /api/assets/assigned-users
-      const mockUsers: string[] = ["Alice", "Bob", "Charlie"];
-      setAssignedUsers(mockUsers);
-    };
-
-    fetchLocations();
-    fetchAssignedUsers();
+    fetchFilterData();
   }, []);
 
   const filters: FilterState = {
@@ -67,7 +68,6 @@ export function AssetFilters() {
     assignmentType:
       (searchParams.get("assignmentType") as "INDIVIDUAL" | "SHARED") || "all",
     locationId: (searchParams.get("locationId") as string) || "all",
-    assignedTo: (searchParams.get("assignedTo") as string) || "all",
   };
 
   const createQueryString = useCallback(
@@ -171,24 +171,6 @@ export function AssetFilters() {
             </SelectContent>
           </Select>
 
-          <Select
-            value={filters.assignedTo}
-            onValueChange={(value) => updateFilter("assignedTo", value)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Assigned To" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Users</SelectItem>
-              <SelectItem value="unassigned">Unassigned</SelectItem>
-              {assignedUsers.map((user) => (
-                <SelectItem key={user} value={user}>
-                  {user}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           {hasActiveFilters && (
             <Button
               variant="outline"
@@ -251,16 +233,6 @@ export function AssetFilters() {
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => updateFilter("locationId", "all")}
-              />
-            </Badge>
-          )}
-
-          {filters.assignedTo !== "all" && (
-            <Badge variant="secondary" className="gap-1">
-              Assigned: {filters.assignedTo}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => updateFilter("assignedTo", "all")}
               />
             </Badge>
           )}
