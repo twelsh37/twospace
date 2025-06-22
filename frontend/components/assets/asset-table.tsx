@@ -4,7 +4,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { Asset, AssetState, AssetType, AssetWithPagination } from "@/lib/types";
 import { ASSET_STATE_LABELS, ASSET_TYPE_LABELS } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -45,8 +44,12 @@ const getStateVariant = (state: AssetState) => {
   }
 };
 
-export function AssetTable() {
-  const searchParams = useSearchParams();
+interface AssetTableProps {
+  queryString: string;
+  onPageChange: (pageNumber: number) => void;
+}
+
+export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
   const [data, setData] = useState<AssetWithPagination | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,10 +57,12 @@ export function AssetTable() {
     const fetchAssets = async () => {
       setIsLoading(true);
       try {
-        const query = searchParams.toString();
-        const response = await fetch(`${getApiBaseUrl()}/api/assets?${query}`, {
-          cache: "no-store",
-        });
+        const response = await fetch(
+          `${getApiBaseUrl()}/api/assets?${queryString}`,
+          {
+            cache: "no-store",
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch assets");
         }
@@ -72,13 +77,7 @@ export function AssetTable() {
     };
 
     fetchAssets();
-  }, [searchParams]);
-
-  const createPageURL = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
-    return `/assets?${params.toString()}`;
-  };
+  }, [queryString]);
 
   if (isLoading) {
     return <div className="p-8 text-center">Loading assets...</div>;
@@ -187,8 +186,13 @@ export function AssetTable() {
           Showing {assets.length} of {totalAssets} assets
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" asChild disabled={page <= 1}>
-            <Link href={createPageURL(page - 1)}>Previous</Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+          >
+            Previous
           </Button>
           <span>
             Page {page} of {totalPages}
@@ -196,10 +200,10 @@ export function AssetTable() {
           <Button
             variant="outline"
             size="sm"
-            asChild
+            onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
           >
-            <Link href={createPageURL(page + 1)}>Next</Link>
+            Next
           </Button>
         </div>
       </div>

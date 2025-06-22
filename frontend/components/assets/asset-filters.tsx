@@ -3,9 +3,7 @@
 
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { AssetType, AssetState, Location } from "@/lib/types";
+import { AssetType, AssetState } from "@/lib/types";
 import { ASSET_TYPE_LABELS, ASSET_STATE_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,83 +15,25 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Filter, X } from "lucide-react";
-import { getApiBaseUrl } from "@/lib/config";
 
-type FilterKey = "type" | "state" | "assignmentType" | "locationId";
+export type FilterKey = "type" | "state";
 
-interface FilterState {
+export interface FilterState {
   type: AssetType | "all";
   state: AssetState | "all";
-  assignmentType: "INDIVIDUAL" | "SHARED" | "all";
-  locationId: string | "all";
 }
 
-export function AssetFilters() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [locations, setLocations] = useState<Location[]>([]);
+interface AssetFiltersProps {
+  filters: FilterState;
+  onFilterChange: (key: FilterKey, value: string) => void;
+  onClearFilters: () => void;
+}
 
-  useEffect(() => {
-    const fetchFilterData = async () => {
-      let response;
-      try {
-        response = await fetch(`${getApiBaseUrl()}/api/locations`);
-      } catch (error) {
-        console.error("Failed to initiate fetch for locations:", error);
-        return; // Exit if fetch itself fails
-      }
-
-      if (!response.ok) {
-        console.error(
-          `Failed to fetch locations: ${response.status} ${response.statusText}`
-        );
-        return; // Exit if response is not OK
-      }
-
-      try {
-        const { data } = await response.json();
-        setLocations(data);
-      } catch (error) {
-        console.error("Failed to parse locations JSON:", error);
-      }
-    };
-
-    fetchFilterData();
-  }, []);
-
-  const filters: FilterState = {
-    type: (searchParams.get("type") as AssetType) || "all",
-    state: (searchParams.get("state") as AssetState) || "all",
-    assignmentType:
-      (searchParams.get("assignmentType") as "INDIVIDUAL" | "SHARED") || "all",
-    locationId: (searchParams.get("locationId") as string) || "all",
-  };
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-
-      if (value === "all") {
-        params.delete(name);
-      } else {
-        params.set(name, value);
-      }
-
-      params.set("page", "1");
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  const updateFilter = (key: FilterKey, value: string) => {
-    router.push(pathname + "?" + createQueryString(key, value));
-  };
-
-  const clearFilters = () => {
-    router.push(pathname);
-  };
-
+export function AssetFilters({
+  filters,
+  onFilterChange,
+  onClearFilters,
+}: AssetFiltersProps) {
   const hasActiveFilters = Object.values(filters).some(
     (value) => value !== "all"
   );
@@ -108,7 +48,7 @@ export function AssetFilters() {
         <div className="flex flex-1 gap-2 flex-wrap">
           <Select
             value={filters.type}
-            onValueChange={(value) => updateFilter("type", value)}
+            onValueChange={(value) => onFilterChange("type", value)}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Asset Type" />
@@ -125,7 +65,7 @@ export function AssetFilters() {
 
           <Select
             value={filters.state}
-            onValueChange={(value) => updateFilter("state", value)}
+            onValueChange={(value) => onFilterChange("state", value)}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Asset State" />
@@ -140,42 +80,11 @@ export function AssetFilters() {
             </SelectContent>
           </Select>
 
-          <Select
-            value={filters.assignmentType}
-            onValueChange={(value) => updateFilter("assignmentType", value)}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Assignment" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Assignments</SelectItem>
-              <SelectItem value="INDIVIDUAL">Individual</SelectItem>
-              <SelectItem value="SHARED">Shared</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={filters.locationId}
-            onValueChange={(value) => updateFilter("locationId", value)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Location" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Locations</SelectItem>
-              {locations.map((location) => (
-                <SelectItem key={location.id} value={location.id}>
-                  {location.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           {hasActiveFilters && (
             <Button
               variant="outline"
               size="sm"
-              onClick={clearFilters}
+              onClick={onClearFilters}
               className="whitespace-nowrap"
             >
               <X className="mr-2 h-4 w-4" />
@@ -197,7 +106,7 @@ export function AssetFilters() {
               Type: {ASSET_TYPE_LABELS[filters.type as AssetType]}
               <X
                 className="h-3 w-3 cursor-pointer"
-                onClick={() => updateFilter("type", "all")}
+                onClick={() => onFilterChange("type", "all")}
               />
             </Badge>
           )}
@@ -207,32 +116,7 @@ export function AssetFilters() {
               State: {ASSET_STATE_LABELS[filters.state as AssetState]}
               <X
                 className="h-3 w-3 cursor-pointer"
-                onClick={() => updateFilter("state", "all")}
-              />
-            </Badge>
-          )}
-
-          {filters.assignmentType !== "all" && (
-            <Badge variant="secondary" className="gap-1">
-              Assignment:{" "}
-              {filters.assignmentType === "INDIVIDUAL"
-                ? "Individual"
-                : "Shared"}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => updateFilter("assignmentType", "all")}
-              />
-            </Badge>
-          )}
-
-          {filters.locationId !== "all" && (
-            <Badge variant="secondary" className="gap-1">
-              Location:{" "}
-              {locations.find((l) => l.id === filters.locationId)?.name ||
-                "Unknown"}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => updateFilter("locationId", "all")}
+                onClick={() => onFilterChange("state", "all")}
               />
             </Badge>
           )}
