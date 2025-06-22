@@ -56,6 +56,19 @@ export const VALID_STATE_TRANSITIONS: Record<
   },
 };
 
+/**
+ * Get the valid next states for a given asset type and current state.
+ * @param type The type of the asset.
+ * @param currentState The current state of the asset.
+ * @returns An array of valid next states.
+ */
+export function getValidNextStates(
+  type: AssetType,
+  currentState: AssetState
+): AssetState[] {
+  return VALID_STATE_TRANSITIONS[type]?.[currentState] || [];
+}
+
 // Asset state display names
 export const ASSET_STATE_LABELS: Record<AssetState, string> = {
   [AssetState.AVAILABLE]: "Available Stock",

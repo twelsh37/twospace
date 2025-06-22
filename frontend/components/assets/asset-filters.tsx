@@ -3,10 +3,10 @@
 
 "use client";
 
-import { useState } from "react";
+import { useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { AssetType, AssetState } from "@/lib/types";
 import { ASSET_TYPE_LABELS, ASSET_STATE_LABELS } from "@/lib/constants";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -17,35 +17,60 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Filter, X } from "lucide-react";
+import { AssetsPageProps } from "@/app/assets/page";
+
+type FilterKey = "type" | "state" | "assignmentType";
 
 interface FilterState {
   type: AssetType | "all";
   state: AssetState | "all";
-  location: string | "all";
   assignmentType: "INDIVIDUAL" | "SHARED" | "all";
 }
 
-export function AssetFilters() {
-  const [filters, setFilters] = useState<FilterState>({
-    type: "all",
-    state: "all",
-    location: "all",
-    assignmentType: "all",
-  });
+export function AssetFilters({ searchParams }: AssetsPageProps) {
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const updateFilter = (key: keyof FilterState, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    // TODO: Apply filters to asset list
-    console.log("Filters updated:", { ...filters, [key]: value });
+  const filters: FilterState = {
+    type: (searchParams?.type as AssetType) || "all",
+    state: (searchParams?.state as AssetState) || "all",
+    assignmentType:
+      (searchParams?.assignmentType as "INDIVIDUAL" | "SHARED") || "all",
+  };
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      // Create a new URLSearchParams object from the current filters
+      // to avoid carrying over any unexpected query parameters.
+      const currentParams: Record<string, string> = {};
+      if (filters.type !== "all") currentParams.type = filters.type;
+      if (filters.state !== "all") currentParams.state = filters.state;
+      if (filters.assignmentType !== "all") {
+        currentParams.assignmentType = filters.assignmentType;
+      }
+
+      const params = new URLSearchParams(currentParams);
+
+      // Update the parameter that changed
+      if (value === "all") {
+        params.delete(name);
+      } else {
+        params.set(name, value);
+      }
+
+      // Reset page to 1 when filters change
+      params.set("page", "1");
+      return params.toString();
+    },
+    [filters]
+  );
+
+  const updateFilter = (key: FilterKey, value: string) => {
+    router.push(pathname + "?" + createQueryString(key, value));
   };
 
   const clearFilters = () => {
-    setFilters({
-      type: "all",
-      state: "all",
-      location: "all",
-      assignmentType: "all",
-    });
+    router.push(pathname);
   };
 
   const hasActiveFilters = Object.values(filters).some(
@@ -158,7 +183,10 @@ export function AssetFilters() {
 
           {filters.assignmentType !== "all" && (
             <Badge variant="secondary" className="gap-1">
-              Assignment: {filters.assignmentType}
+              Assignment:{" "}
+              {filters.assignmentType === "INDIVIDUAL"
+                ? "Individual"
+                : "Shared"}
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => updateFilter("assignmentType", "all")}

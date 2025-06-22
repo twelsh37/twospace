@@ -61,6 +61,11 @@ export type Pagination = {
   hasPrevPage: boolean;
 };
 
+export type AssetWithPagination = {
+  assets: Asset[];
+  pagination: Pagination;
+};
+
 // Type for the aggregated data used on the dashboard, matching the dashboard API response
 export type DashboardData = {
   totalAssets: number;

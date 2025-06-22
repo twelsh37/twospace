@@ -17,7 +17,7 @@ export default function AssetsPage() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Assets</h2>
           <p className="text-muted-foreground">
-            Manage your organization's assets and track their lifecycle
+            Manage your organization&apos;s assets and track their lifecycle
           </p>
         </div>
         <div className="flex items-center space-x-2">
@@ -43,15 +43,28 @@ export default function AssetsPage() {
 
       {/* Assets Table */}
       <div className="rounded-md border">
-        <Suspense
-          fallback={<div className="p-8 text-center">Loading assets...</div>}
-        >
+        <Suspense fallback={<AssetsLoadingSkeleton />}>
           <AssetTable />
         </Suspense>
       </div>
 
       {/* Bulk Actions */}
       <AssetActions />
+    </div>
+  );
+}
+
+// A more detailed loading skeleton
+function AssetsLoadingSkeleton() {
+  return (
+    <div className="p-8">
+      <div className="space-y-4">
+        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
+        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
+        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
+        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
+        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
+      </div>
     </div>
   );
 }
