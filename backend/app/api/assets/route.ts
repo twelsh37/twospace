@@ -12,13 +12,10 @@ import {
   sql,
   isNull,
   inArray,
+  isNotNull,
 } from "drizzle-orm";
-import { db, assetsTable, locationsTable, assetHistoryTable } from "@/lib/db";
-import {
-  generateAssetNumber,
-  createAssetHistory,
-  getActiveAssets,
-} from "@/lib/db/utils";
+import { db, assetsTable, locationsTable } from "@/lib/db";
+import { generateAssetNumber, createAssetHistory } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 
 // Define standard CORS headers for reusability
@@ -40,6 +37,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type") || "all";
     const state = searchParams.get("state") || "all";
     const locationId = searchParams.get("locationId") || "all";
+    const assignedTo = searchParams.get("assignedTo") || "all";
     const search = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
@@ -50,6 +48,7 @@ export async function GET(request: NextRequest) {
       type,
       state,
       locationId,
+      assignedTo,
       search,
       page,
       limit,
@@ -75,15 +74,30 @@ export async function GET(request: NextRequest) {
       whereConditions.push(eq(assetsTable.locationId, locationId));
     }
 
+    if (assignedTo !== "all") {
+      if (assignedTo === "unassigned") {
+        whereConditions.push(isNull(assetsTable.assignedTo));
+      } else {
+        whereConditions.push(eq(assetsTable.assignedTo, assignedTo));
+      }
+    }
+
     if (search) {
-      whereConditions.push(
-        or(
-          ilike(assetsTable.assetNumber, `%${search}%`),
-          ilike(assetsTable.serialNumber, `%${search}%`),
-          ilike(assetsTable.description, `%${search}%`),
-          ilike(assetsTable.assignedTo, `%${search}%`)
-        )
+      const searchConditions = [
+        ilike(assetsTable.assetNumber, `%${search}%`),
+        ilike(assetsTable.serialNumber, `%${search}%`),
+        ilike(assetsTable.description, `%${search}%`),
+      ];
+
+      const assignedToSearch = and(
+        isNotNull(assetsTable.assignedTo),
+        ilike(assetsTable.assignedTo, `%${search}%`)
       );
+      if (assignedToSearch) {
+        searchConditions.push(assignedToSearch);
+      }
+
+      whereConditions.push(or(...searchConditions)!);
     }
 
     // Get total count for pagination

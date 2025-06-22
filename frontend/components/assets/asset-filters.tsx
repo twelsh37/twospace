@@ -3,9 +3,9 @@
 
 "use client";
 
-import { useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { AssetType, AssetState } from "@/lib/types";
+import { useCallback, useState, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { AssetType, AssetState, Location } from "@/lib/types";
 import { ASSET_TYPE_LABELS, ASSET_STATE_LABELS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,52 +17,73 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Filter, X } from "lucide-react";
-import { AssetsPageProps } from "@/app/assets/page";
 
-type FilterKey = "type" | "state" | "assignmentType";
+type FilterKey =
+  | "type"
+  | "state"
+  | "assignmentType"
+  | "locationId"
+  | "assignedTo";
 
 interface FilterState {
   type: AssetType | "all";
   state: AssetState | "all";
   assignmentType: "INDIVIDUAL" | "SHARED" | "all";
+  locationId: string | "all";
+  assignedTo: string | "all";
 }
 
-export function AssetFilters({ searchParams }: AssetsPageProps) {
+export function AssetFilters() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
+
+  useEffect(() => {
+    // TODO: Replace with actual API calls
+    const fetchLocations = async () => {
+      // In a real app, you'd fetch this from /api/locations
+      const mockLocations: Location[] = [
+        { id: "e6f8f7a6-b5f7-4b7e-8b3a-4b2e1b2f7c2d", name: "Headquarters" },
+        { id: "f7a6e6f8-b5f7-4b7e-8b3a-4b2e1b2f7c2d", name: "Remote Office" },
+      ];
+      setLocations(mockLocations);
+    };
+
+    const fetchAssignedUsers = async () => {
+      // In a real app, you'd fetch this from /api/assets/assigned-users
+      const mockUsers: string[] = ["Alice", "Bob", "Charlie"];
+      setAssignedUsers(mockUsers);
+    };
+
+    fetchLocations();
+    fetchAssignedUsers();
+  }, []);
 
   const filters: FilterState = {
-    type: (searchParams?.type as AssetType) || "all",
-    state: (searchParams?.state as AssetState) || "all",
+    type: (searchParams.get("type") as AssetType) || "all",
+    state: (searchParams.get("state") as AssetState) || "all",
     assignmentType:
-      (searchParams?.assignmentType as "INDIVIDUAL" | "SHARED") || "all",
+      (searchParams.get("assignmentType") as "INDIVIDUAL" | "SHARED") || "all",
+    locationId: (searchParams.get("locationId") as string) || "all",
+    assignedTo: (searchParams.get("assignedTo") as string) || "all",
   };
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      // Create a new URLSearchParams object from the current filters
-      // to avoid carrying over any unexpected query parameters.
-      const currentParams: Record<string, string> = {};
-      if (filters.type !== "all") currentParams.type = filters.type;
-      if (filters.state !== "all") currentParams.state = filters.state;
-      if (filters.assignmentType !== "all") {
-        currentParams.assignmentType = filters.assignmentType;
-      }
+      const params = new URLSearchParams(searchParams.toString());
 
-      const params = new URLSearchParams(currentParams);
-
-      // Update the parameter that changed
       if (value === "all") {
         params.delete(name);
       } else {
         params.set(name, value);
       }
 
-      // Reset page to 1 when filters change
       params.set("page", "1");
       return params.toString();
     },
-    [filters]
+    [searchParams]
   );
 
   const updateFilter = (key: FilterKey, value: string) => {
@@ -83,11 +104,8 @@ export function AssetFilters({ searchParams }: AssetsPageProps) {
 
   return (
     <div className="flex flex-col space-y-4">
-      {/* Primary Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Filter Dropdowns */}
-        <div className="flex flex-1 gap-2">
-          {/* Asset Type Filter */}
+        <div className="flex flex-1 gap-2 flex-wrap">
           <Select
             value={filters.type}
             onValueChange={(value) => updateFilter("type", value)}
@@ -105,7 +123,6 @@ export function AssetFilters({ searchParams }: AssetsPageProps) {
             </SelectContent>
           </Select>
 
-          {/* Asset State Filter */}
           <Select
             value={filters.state}
             onValueChange={(value) => updateFilter("state", value)}
@@ -123,7 +140,6 @@ export function AssetFilters({ searchParams }: AssetsPageProps) {
             </SelectContent>
           </Select>
 
-          {/* Assignment Type Filter */}
           <Select
             value={filters.assignmentType}
             onValueChange={(value) => updateFilter("assignmentType", value)}
@@ -138,7 +154,41 @@ export function AssetFilters({ searchParams }: AssetsPageProps) {
             </SelectContent>
           </Select>
 
-          {/* Clear Filters Button */}
+          <Select
+            value={filters.locationId}
+            onValueChange={(value) => updateFilter("locationId", value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Location" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Locations</SelectItem>
+              {locations.map((location) => (
+                <SelectItem key={location.id} value={location.id}>
+                  {location.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filters.assignedTo}
+            onValueChange={(value) => updateFilter("assignedTo", value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Assigned To" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Users</SelectItem>
+              <SelectItem value="unassigned">Unassigned</SelectItem>
+              {assignedUsers.map((user) => (
+                <SelectItem key={user} value={user}>
+                  {user}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {hasActiveFilters && (
             <Button
               variant="outline"
@@ -153,7 +203,6 @@ export function AssetFilters({ searchParams }: AssetsPageProps) {
         </div>
       </div>
 
-      {/* Active Filters Display */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 items-center">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -190,6 +239,28 @@ export function AssetFilters({ searchParams }: AssetsPageProps) {
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => updateFilter("assignmentType", "all")}
+              />
+            </Badge>
+          )}
+
+          {filters.locationId !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Location:{" "}
+              {locations.find((l) => l.id === filters.locationId)?.name ||
+                "Unknown"}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => updateFilter("locationId", "all")}
+              />
+            </Badge>
+          )}
+
+          {filters.assignedTo !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Assigned: {filters.assignedTo}
+              <X
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => updateFilter("assignedTo", "all")}
               />
             </Badge>
           )}

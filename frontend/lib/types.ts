@@ -8,6 +8,7 @@ export enum AssetType {
   DESKTOP = "DESKTOP",
   LAPTOP = "LAPTOP",
   MONITOR = "MONITOR",
+  SHARED = "SHARED",
 }
 
 export enum AssetState {
@@ -18,24 +19,29 @@ export enum AssetState {
   ISSUED = "ISSUED",
 }
 
+export enum AssignmentType {
+  INDIVIDUAL = "INDIVIDUAL",
+  SHARED = "SHARED",
+}
+
 // --- Types reflecting API data structures ---
 
 // Data structure for a single asset, matching the assets API response
-export type Asset = {
+export interface Asset {
   assetNumber: string;
-  type: string; // Corresponds to AssetType enum
-  state: string; // Corresponds to AssetState enum
+  type: AssetType;
+  state: AssetState;
   serialNumber: string;
   description: string;
   purchasePrice: string;
   location: string;
-  assignmentType: string;
-  assignedTo?: string;
-  employeeId?: string;
-  department?: string;
+  assignmentType: AssignmentType;
+  assignedTo: string | null;
+  employeeId: string | null;
+  department: string | null;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
-};
+}
 
 export type User = {
   id: string;
@@ -45,26 +51,25 @@ export type User = {
   department: string;
 };
 
-export type Location = {
+export interface Location {
   id: string;
   name: string;
-  description: string | null;
-};
+}
 
 // Type for the pagination object returned by the assets API
-export type Pagination = {
+export interface Pagination {
   page: number;
   limit: number;
   totalAssets: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-};
+}
 
-export type AssetWithPagination = {
+export interface AssetWithPagination {
   assets: Asset[];
   pagination: Pagination;
-};
+}
 
 // Type for the aggregated data used on the dashboard, matching the dashboard API response
 export type DashboardData = {
@@ -83,3 +88,9 @@ export type DashboardData = {
     assetDescription: string | null;
   }[];
 };
+
+// Enum for user roles, if you implement user management
+export enum UserRole {
+  ADMIN = "ADMIN",
+  // ... existing code ...
+}
