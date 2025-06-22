@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,7 +21,6 @@ import {
   SearchResultsModal,
   type SearchResults,
 } from "@/components/search/search-results-modal";
-import { useDebounce } from "@/hooks/use-debounce";
 
 export function Header() {
   const [notifications] = useState(3); // TODO: Get from API
@@ -29,8 +28,6 @@ export function Header() {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // TODO: Get user data from authentication context
   const user = {
@@ -66,15 +63,6 @@ export function Header() {
       setIsSearching(false);
     }
   }, []);
-
-  useEffect(() => {
-    if (debouncedSearchQuery) {
-      const performSearch = async () => {
-        await handleSearch(debouncedSearchQuery);
-      };
-      performSearch();
-    }
-  }, [debouncedSearchQuery, handleSearch]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {

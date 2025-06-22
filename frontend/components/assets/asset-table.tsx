@@ -1,10 +1,10 @@
 // frontend/components/assets/asset-table.tsx
-// Asset Table Component with sorting and filtering
+// Asset Table Component with client-side data fetching for robustness.
 
 "use client";
 
 import { useState, useEffect } from "react";
-import { Asset, AssetState } from "@/lib/types";
+import { Asset, AssetState, AssetType, AssetWithPagination } from "@/lib/types";
 import { ASSET_STATE_LABELS, ASSET_TYPE_LABELS } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
@@ -25,45 +25,74 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { getApiBaseUrl } from "@/lib/config";
 
-export function AssetTable() {
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 25,
-    totalAssets: 0,
-    totalPages: 1,
-  });
+const getStateVariant = (state: AssetState) => {
+  switch (state) {
+    case AssetState.AVAILABLE:
+      return "secondary";
+    case AssetState.SIGNED_OUT:
+      return "outline";
+    case AssetState.BUILT:
+      return "default";
+    case AssetState.READY_TO_GO:
+      return "default";
+    case AssetState.ISSUED:
+      return "destructive";
+    default:
+      return "secondary";
+  }
+};
 
-  const fetchAssets = async (page = 1, limit = 25) => {
-    const response = await fetch(`/api/assets?page=${page}&limit=${limit}`);
-    const { data } = await response.json();
-    if (data && data.assets) {
-      setAssets(data.assets);
-      setPagination(data.pagination);
-    }
-  };
+interface AssetTableProps {
+  queryString: string;
+  onPageChange: (pageNumber: number) => void;
+}
+
+export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
+  const [data, setData] = useState<AssetWithPagination | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchAssets(pagination.page, pagination.limit);
-  }, [pagination.page, pagination.limit]);
+    const fetchAssets = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `${getApiBaseUrl()}/api/assets?${queryString}`,
+          {
+            cache: "no-store",
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch assets");
+        }
+        const result = await response.json();
+        setData(result.data);
+      } catch (error) {
+        console.error("Error fetching assets:", error);
+        setData(null); // Clear data on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const getStateVariant = (state: AssetState) => {
-    switch (state) {
-      case AssetState.AVAILABLE:
-        return "secondary";
-      case AssetState.SIGNED_OUT:
-        return "outline";
-      case AssetState.BUILT:
-        return "default";
-      case AssetState.READY_TO_GO:
-        return "default";
-      case AssetState.ISSUED:
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
+    fetchAssets();
+  }, [queryString]);
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading assets...</div>;
+  }
+
+  if (!data || !data.assets || data.assets.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-40">
+        <p className="text-muted-foreground">No assets found.</p>
+      </div>
+    );
+  }
+
+  const { assets, pagination } = data;
+  const { page, totalPages, totalAssets } = pagination;
 
   return (
     <div className="w-full">
@@ -82,7 +111,7 @@ export function AssetTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {assets.map((asset) => (
+          {assets.map((asset: Asset) => (
             <TableRow key={asset.assetNumber}>
               <TableCell className="font-medium">
                 <Link
@@ -92,13 +121,15 @@ export function AssetTable() {
                   {asset.assetNumber}
                 </Link>
               </TableCell>
-              <TableCell>{ASSET_TYPE_LABELS[asset.type]}</TableCell>
+              <TableCell>
+                {ASSET_TYPE_LABELS[asset.type as AssetType]}
+              </TableCell>
               <TableCell className="max-w-[200px] truncate">
                 {asset.description}
               </TableCell>
               <TableCell>
-                <Badge variant={getStateVariant(asset.state)}>
-                  {ASSET_STATE_LABELS[asset.state]}
+                <Badge variant={getStateVariant(asset.state as AssetState)}>
+                  {ASSET_STATE_LABELS[asset.state as AssetState]}
                 </Badge>
               </TableCell>
               <TableCell>{asset.location}</TableCell>
@@ -114,7 +145,9 @@ export function AssetTable() {
                   <span className="text-muted-foreground">Unassigned</span>
                 )}
               </TableCell>
-              <TableCell>{formatCurrency(asset.purchasePrice)}</TableCell>
+              <TableCell>
+                {formatCurrency(parseFloat(asset.purchasePrice))}
+              </TableCell>
               <TableCell>{formatDate(new Date(asset.updatedAt))}</TableCell>
               <TableCell>
                 <DropdownMenu>
@@ -148,27 +181,27 @@ export function AssetTable() {
           ))}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-between mt-4">
+      <div className="flex items-center justify-between p-4">
         <div className="text-sm text-muted-foreground">
-          Showing {assets.length} of {pagination.totalAssets} assets
+          Showing {assets.length} of {totalAssets} assets
         </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}
-            disabled={pagination.page <= 1}
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
           >
             Previous
           </Button>
           <span>
-            Page {pagination.page} of {pagination.totalPages}
+            Page {page} of {totalPages}
           </span>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}
-            disabled={pagination.page >= pagination.totalPages}
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= totalPages}
           >
             Next
           </Button>

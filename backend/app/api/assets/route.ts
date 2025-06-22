@@ -2,14 +2,28 @@
 // Asset Management API Routes with Drizzle ORM
 
 import { NextRequest, NextResponse } from "next/server";
-import { eq, and, or, ilike, desc, asc, sql, isNull } from "drizzle-orm";
-import { db, assetsTable, locationsTable, assetHistoryTable } from "@/lib/db";
 import {
-  generateAssetNumber,
-  createAssetHistory,
-  getActiveAssets,
-} from "@/lib/db/utils";
+  eq,
+  and,
+  or,
+  ilike,
+  desc,
+  asc,
+  sql,
+  isNull,
+  inArray,
+  isNotNull,
+} from "drizzle-orm";
+import { db, assetsTable, locationsTable } from "@/lib/db";
+import { generateAssetNumber, createAssetHistory } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
+
+// Define standard CORS headers for reusability
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // Or lock this down to your frontend's domain in production
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
 /**
  * GET /api/assets
@@ -23,6 +37,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type") || "all";
     const state = searchParams.get("state") || "all";
     const locationId = searchParams.get("locationId") || "all";
+    const assignedTo = searchParams.get("assignedTo") || "all";
     const search = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
@@ -33,6 +48,7 @@ export async function GET(request: NextRequest) {
       type,
       state,
       locationId,
+      assignedTo,
       search,
       page,
       limit,
@@ -47,36 +63,48 @@ export async function GET(request: NextRequest) {
     const whereConditions = [isNull(assetsTable.deletedAt)];
 
     if (type !== "all") {
-      whereConditions.push(eq(assetsTable.type, type as any));
+      whereConditions.push(eq(assetsTable.type, type as "LAPTOP"));
     }
 
     if (state !== "all") {
-      whereConditions.push(eq(assetsTable.state, state as any));
+      whereConditions.push(eq(assetsTable.state, state as "AVAILABLE"));
     }
 
     if (locationId !== "all") {
       whereConditions.push(eq(assetsTable.locationId, locationId));
     }
 
+    if (assignedTo !== "all") {
+      if (assignedTo === "unassigned") {
+        whereConditions.push(isNull(assetsTable.assignedTo));
+      } else {
+        whereConditions.push(eq(assetsTable.assignedTo, assignedTo));
+      }
+    }
+
     if (search) {
-      whereConditions.push(
-        or(
-          ilike(assetsTable.assetNumber, `%${search}%`),
-          ilike(assetsTable.serialNumber, `%${search}%`),
-          ilike(assetsTable.description, `%${search}%`),
-          ilike(assetsTable.assignedTo, `%${search}%`)
-        )
+      const searchConditions = [
+        ilike(assetsTable.assetNumber, `%${search}%`),
+        ilike(assetsTable.serialNumber, `%${search}%`),
+        ilike(assetsTable.description, `%${search}%`),
+      ];
+
+      const assignedToSearch = and(
+        isNotNull(assetsTable.assignedTo),
+        ilike(assetsTable.assignedTo, `%${search}%`)
       );
+      if (assignedToSearch) {
+        searchConditions.push(assignedToSearch);
+      }
+
+      whereConditions.push(or(...searchConditions)!);
     }
 
     // Get total count for pagination
-    let totalCountQuery = db
+    const totalCountQuery = db
       .select({ count: sql<number>`count(*)` })
-      .from(assetsTable);
-
-    if (whereConditions.length > 0) {
-      totalCountQuery = totalCountQuery.where(and(...whereConditions));
-    }
+      .from(assetsTable)
+      .where(and(...whereConditions));
 
     const totalCountResult = await totalCountQuery;
 
@@ -84,17 +112,14 @@ export async function GET(request: NextRequest) {
     const totalPages = Math.ceil(totalAssets / limit);
 
     // Get assets with location details
-    let assetsQuery = db
+    const assetsQuery = db
       .select({
         asset: assetsTable,
         location: locationsTable,
       })
       .from(assetsTable)
-      .leftJoin(locationsTable, eq(assetsTable.locationId, locationsTable.id));
-
-    if (whereConditions.length > 0) {
-      assetsQuery = assetsQuery.where(and(...whereConditions));
-    }
+      .leftJoin(locationsTable, eq(assetsTable.locationId, locationsTable.id))
+      .where(and(...whereConditions));
 
     const assetsWithLocations = await assetsQuery
       .orderBy(
@@ -123,7 +148,7 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { headers: corsHeaders });
   } catch (error) {
     console.error("Error fetching assets:", error);
     return NextResponse.json(
@@ -132,7 +157,7 @@ export async function GET(request: NextRequest) {
         error: "Failed to fetch assets",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -174,7 +199,7 @@ export async function POST(request: NextRequest) {
           details:
             "type, serialNumber, description, purchasePrice, and locationId are required",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -192,7 +217,7 @@ export async function POST(request: NextRequest) {
           error: "Invalid location",
           details: "The specified location does not exist",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -210,23 +235,25 @@ export async function POST(request: NextRequest) {
           error: "Serial number already exists",
           details: "An asset with this serial number already exists",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     // Generate asset number
-    const assetNumber = await generateAssetNumber(type as any);
+    const assetNumber = await generateAssetNumber(
+      type as "LAPTOP" | "MONITOR" | "DESKTOP" | "TABLET" | "MOBILE_PHONE"
+    );
 
     // Create new asset
     const newAssetData: NewAsset = {
       assetNumber,
-      type: type as any,
+      type: type as "LAPTOP",
       state: "AVAILABLE", // New assets start as AVAILABLE
       serialNumber,
       description,
       purchasePrice: parseFloat(purchasePrice).toString(),
       locationId,
-      assignmentType: assignmentType as any,
+      assignmentType: assignmentType as "INDIVIDUAL" | "SHARED",
       assignedTo: assignmentType === "INDIVIDUAL" ? assignedTo : null,
       employeeId: assignmentType === "INDIVIDUAL" ? employeeId : null,
       department: assignmentType === "INDIVIDUAL" ? department : null,
@@ -255,7 +282,7 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(response, { status: 201 });
+    return NextResponse.json(response, { status: 201, headers: corsHeaders });
   } catch (error) {
     console.error("Error creating asset:", error);
     return NextResponse.json(
@@ -264,7 +291,7 @@ export async function POST(request: NextRequest) {
         error: "Failed to create asset",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
@@ -282,20 +309,18 @@ export async function PUT(request: NextRequest) {
     const {
       assetIds,
       operation,
-      newState,
-      updateData,
-      reason = "Bulk operation",
+      payload: { newState, ...updateData } = {},
     } = body;
 
-    // Basic validation
+    // Validate input
     if (!assetIds || !Array.isArray(assetIds) || assetIds.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing or invalid assetIds",
+          error: "Invalid input",
           details: "assetIds must be a non-empty array",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -307,86 +332,89 @@ export async function PUT(request: NextRequest) {
           details:
             'operation is required (e.g., "stateTransition", "bulkUpdate")',
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    let updatedAssets: any[] = [];
+    // Fetch assets to ensure they exist
+    const assetsToUpdate = await db
+      .select()
+      .from(assetsTable)
+      .where(inArray(assetsTable.assetNumber, assetIds));
 
-    if (operation === "stateTransition" && newState) {
-      // Get current assets to track previous states
-      const currentAssets = await db
-        .select()
-        .from(assetsTable)
-        .where(
-          and(
-            sql`${assetsTable.id} = ANY(${assetIds})`,
-            isNull(assetsTable.deletedAt)
-          )
-        );
-
-      // Update assets with new state
-      updatedAssets = await db
-        .update(assetsTable)
-        .set({
-          state: newState as any,
-          updatedAt: new Date(),
-        })
-        .where(sql`${assetsTable.id} = ANY(${assetIds})`)
-        .returning();
-
-      // Create history entries for each asset
-      for (const asset of currentAssets) {
-        await createAssetHistory(
-          asset.id,
-          newState,
-          "system", // TODO: Replace with actual user ID from authentication
-          reason,
-          asset.state,
-          { operation: "bulk_state_transition" }
-        );
-      }
-
-      console.log(
-        `Updated ${updatedAssets.length} assets to state: ${newState}`
+    if (assetsToUpdate.length !== assetIds.length) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid assetIds",
+          details: "Some assets do not exist",
+        },
+        { status: 400, headers: corsHeaders }
       );
-    } else if (operation === "bulkUpdate" && updateData) {
-      // Handle bulk field updates
-      updatedAssets = await db
-        .update(assetsTable)
-        .set({
-          ...updateData,
-          updatedAt: new Date(),
-        })
-        .where(sql`${assetsTable.id} = ANY(${assetIds})`)
-        .returning();
+    }
 
-      // Create history entries
-      for (const assetId of assetIds) {
-        await createAssetHistory(
-          assetId,
-          "UPDATED",
-          "system", // TODO: Replace with actual user ID from authentication
-          reason,
-          undefined,
-          { operation: "bulk_update", updateData }
+    // Process the operation
+    switch (operation) {
+      case "stateTransition":
+        if (!newState) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Missing newState",
+              details: "newState is required for stateTransition operation",
+            },
+            { status: 400, headers: corsHeaders }
+          );
+        }
+        for (const asset of assetsToUpdate) {
+          await createAssetHistory(
+            asset.assetNumber,
+            newState,
+            "system-bulk",
+            "Bulk state transition",
+            asset.state as "AVAILABLE" | "ISSUED"
+          );
+        }
+        await db
+          .update(assetsTable)
+          .set({ state: newState, updatedAt: new Date() })
+          .where(inArray(assetsTable.assetNumber, assetIds));
+        break;
+
+      case "bulkUpdate":
+        if (updateData) {
+          // For simplicity, only location is updatable for now. Extend as needed.
+          if (updateData.locationId) {
+            await db
+              .update(assetsTable)
+              .set({ locationId: updateData.locationId, updatedAt: new Date() })
+              .where(inArray(assetsTable.assetNumber, assetIds));
+          }
+        }
+        break;
+
+      default:
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Invalid operation",
+            details: "Invalid operation",
+          },
+          { status: 400, headers: corsHeaders }
         );
-      }
-
-      console.log(`Bulk updated ${updatedAssets.length} assets`);
     }
 
     const response = {
       success: true,
       data: {
-        updatedAssets,
-        message: `Successfully completed ${operation} for ${updatedAssets.length} assets`,
+        updatedAssets: assetsToUpdate,
+        message: `Successfully completed ${operation} for ${assetsToUpdate.length} assets`,
         operation,
-        affectedCount: updatedAssets.length,
+        affectedCount: assetsToUpdate.length,
       },
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { headers: corsHeaders });
   } catch (error) {
     console.error("Error bulk updating assets:", error);
     return NextResponse.json(
@@ -395,7 +423,7 @@ export async function PUT(request: NextRequest) {
         error: "Failed to bulk update assets",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

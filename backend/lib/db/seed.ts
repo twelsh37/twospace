@@ -22,7 +22,7 @@ type AssetBlueprint = {
 };
 
 // --- Configuration ---
-const TOTAL_USERS = 120000;
+const TOTAL_USERS = 12000;
 const BATCH_SIZE = 500; // Increased batch size for performance with large datasets
 const LAPTOP_RATIO = 0.75;
 const DESKTOP_RATIO = 0.24;
@@ -113,11 +113,20 @@ async function seedDatabase() {
   try {
     // --- Stage 1: Clean Slate ---
     console.log("\n--- Stage 1: Cleaning Database ---");
-    await db.delete(assetHistoryTable);
-    await db.delete(assetsTable);
-    await db.delete(usersTable).where(ne(usersTable.role, "ADMIN"));
-    await db.update(assetSequencesTable).set({ nextSequence: 1 });
-    console.log("   ✓ Previous data cleared and sequences reset.");
+    try {
+      await db.delete(assetHistoryTable);
+      await db.delete(assetsTable);
+      await db.delete(usersTable).where(ne(usersTable.role, "ADMIN"));
+      await db.update(assetSequencesTable).set({ nextSequence: 1 });
+      console.log("   ✓ Previous data cleared and sequences reset.");
+    } catch (error: unknown) {
+      console.warn(
+        "   - Warning: Could not clear all previous data. This is expected if tables do not exist yet."
+      );
+      if (error instanceof Error) {
+        console.log("     Original error:", error.message);
+      }
+    }
 
     // --- Stage 2: Seed Foundational Data ---
     console.log("\n--- Stage 2: Seeding Foundational Data ---");

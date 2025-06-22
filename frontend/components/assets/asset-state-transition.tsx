@@ -1,13 +1,14 @@
 // frontend/components/assets/asset-state-transition.tsx
 // Asset State Transition Component for lifecycle management
 
+"use client";
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AssetType, AssetState } from "@/lib/types";
-import { ASSET_STATE_LABELS } from "@/lib/constants";
-import { getValidNextStates } from "@/lib/utils";
+import { ASSET_STATE_LABELS, getValidNextStates } from "@/lib/constants";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 interface AssetStateTransitionProps {
