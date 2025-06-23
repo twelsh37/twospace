@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2 } from "lucide-react";
-import Link from "next/link";
 import { UserFilterState } from "./user-filters";
 import { UserDetailModal } from "./user-detail-modal";
 import { UserEditModal } from "./user-edit-modal";
@@ -201,11 +200,13 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
               <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
-                  <Link href={`/users/${user.id}`}>
-                    <Button variant="ghost" size="icon">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleUserClick(user.id)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
