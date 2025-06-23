@@ -30,6 +30,7 @@ const corsHeaders = {
  * Retrieve assets with optional filtering, searching, and pagination
  */
 export async function GET(request: NextRequest) {
+  const start = Date.now(); // Start timing
   try {
     const { searchParams } = new URL(request.url);
 
@@ -130,6 +131,8 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .offset(offset);
 
+    const durationMs = Date.now() - start; // End timing
+
     const response = {
       success: true,
       data: {
@@ -146,16 +149,19 @@ export async function GET(request: NextRequest) {
           hasPrevPage: page > 1,
         },
       },
+      timingMs: durationMs, // Add timing info
     };
 
     return NextResponse.json(response, { headers: corsHeaders });
   } catch (error) {
-    console.error("Error fetching assets:", error);
+    const durationMs = Date.now() - start;
+    console.error("Error fetching assets:", error, `Timing: ${durationMs}ms`);
     return NextResponse.json(
       {
         success: false,
         error: "Failed to fetch assets",
         details: error instanceof Error ? error.message : "Unknown error",
+        timingMs: durationMs, // Add timing info
       },
       { status: 500, headers: corsHeaders }
     );
