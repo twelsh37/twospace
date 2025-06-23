@@ -95,10 +95,16 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
 
   const handleAssetUpdated = () => {
     setEditModalOpen(false);
-    // Refresh asset list after update
+    setData(null);
     setTimeout(() => {
-      // Just re-trigger the effect by updating the queryString (parent should handle this)
-      // Or you can call fetchAssets again if needed
+      onPageChange(data?.pagination.page || 1);
+      if (
+        typeof window !== "undefined" &&
+        (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+      ) {
+        (window as Window & { mutateDashboard?: () => void })
+          .mutateDashboard!();
+      }
     }, 100);
   };
 
@@ -114,7 +120,17 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
       await fetch(`/api/assets/${deleteAssetNumber}`, { method: "DELETE" });
       setDeleteModalOpen(false);
       setDeleteAssetNumber(null);
-      setData(null); // triggers loading state and re-fetch
+      setData(null);
+      setTimeout(() => {
+        onPageChange(data?.pagination.page || 1);
+        if (
+          typeof window !== "undefined" &&
+          (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+        ) {
+          (window as Window & { mutateDashboard?: () => void })
+            .mutateDashboard!();
+        }
+      }, 100);
     } catch {
       setDeleting(false);
     }

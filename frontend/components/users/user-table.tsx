@@ -99,6 +99,13 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
     setUsers([]);
     setTimeout(() => {
       onPageChange(page);
+      if (
+        typeof window !== "undefined" &&
+        (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+      ) {
+        (window as Window & { mutateDashboard?: () => void })
+          .mutateDashboard!();
+      }
     }, 100);
   };
 
@@ -114,9 +121,16 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
       await fetch(`/api/users/${deleteUserId}`, { method: "DELETE" });
       setDeleteModalOpen(false);
       setDeleteUserId(null);
-      setUsers([]); // triggers loading state and re-fetch
+      setUsers([]);
       setTimeout(() => {
         onPageChange(page);
+        if (
+          typeof window !== "undefined" &&
+          (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+        ) {
+          (window as Window & { mutateDashboard?: () => void })
+            .mutateDashboard!();
+        }
       }, 100);
     } catch {
       setDeleting(false);

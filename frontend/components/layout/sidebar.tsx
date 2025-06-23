@@ -19,6 +19,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import useSWR, { mutate as globalMutate } from "swr";
 
 interface NavItem {
   title: string;
@@ -27,17 +28,22 @@ interface NavItem {
   badge?: string;
 }
 
-export function Sidebar({
-  totalAssets,
-  totalUsers,
-  totalLocations,
-}: {
-  totalAssets?: number;
-  totalUsers?: number;
-  totalLocations?: number;
-}) {
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export function useDashboardStats() {
+  const { data, error, isLoading, mutate } = useSWR("/api/dashboard", fetcher);
+  return {
+    stats: data?.data || {},
+    error,
+    isLoading,
+    mutate,
+  };
+}
+
+export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+  const { stats, isLoading, mutate } = useDashboardStats();
 
   const navItems: NavItem[] = [
     {
@@ -49,19 +55,19 @@ export function Sidebar({
       title: "Assets",
       href: "/assets",
       icon: Package,
-      badge: totalAssets?.toLocaleString() || "...",
+      badge: isLoading ? "..." : stats.totalAssets?.toLocaleString() || "0",
     },
     {
       title: "Users",
       href: "/users",
       icon: Users,
-      badge: totalUsers?.toLocaleString() || "...",
+      badge: isLoading ? "..." : stats.totalUsers?.toLocaleString() || "0",
     },
     {
       title: "Locations",
       href: "/locations",
       icon: MapPin,
-      badge: totalLocations?.toLocaleString() || "...",
+      badge: isLoading ? "..." : stats.totalLocations?.toLocaleString() || "0",
     },
     {
       title: "Import",
@@ -79,6 +85,9 @@ export function Sidebar({
       icon: Settings,
     },
   ];
+
+  // Expose mutate function globally for revalidation
+  (globalThis as any).mutateDashboard = mutate;
 
   return (
     <>
