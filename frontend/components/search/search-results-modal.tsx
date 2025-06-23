@@ -11,6 +11,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Asset as BaseAsset, User, Location } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { UserDetailModal } from "@/components/users/user-detail-modal";
 
 export type Asset = BaseAsset & {
   locationName: string | null;
@@ -43,6 +45,15 @@ export function SearchResultsModal({
     (results.assets.length > 0 ||
       results.users.length > 0 ||
       results.locations.length > 0);
+
+  // State for user detail modal
+  const [userModalOpen, setUserModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const handleUserClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setUserModalOpen(true);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -130,7 +141,11 @@ export function SearchResultsModal({
             <TabsContent value="users" className="flex-grow overflow-y-auto">
               <div className="space-y-2">
                 {results.users.map((user) => (
-                  <div key={user.id} className="border p-2 rounded">
+                  <div
+                    key={user.id}
+                    className="border p-2 rounded cursor-pointer hover:bg-accent"
+                    onClick={() => handleUserClick(user.id)}
+                  >
                     <p className="font-bold">{user.name}</p>
                     <p>{user.email}</p>
                     <p>Department: {user.department}</p>
@@ -153,6 +168,12 @@ export function SearchResultsModal({
             </TabsContent>
           </Tabs>
         )}
+        {/* User Detail Modal for search results */}
+        <UserDetailModal
+          userId={selectedUserId}
+          open={userModalOpen}
+          onOpenChange={setUserModalOpen}
+        />
       </DialogContent>
     </Dialog>
   );

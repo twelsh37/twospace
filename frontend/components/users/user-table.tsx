@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { UserFilterState } from "./user-filters";
+import { UserDetailModal } from "./user-detail-modal";
 
 interface UserTableProps {
   filters: UserFilterState;
@@ -43,6 +44,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -74,6 +77,11 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
     fetchUsers();
   }, [filters, page]);
 
+  const handleUserClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setModalOpen(true);
+  };
+
   if (isLoading) {
     return <div className="p-8 text-center">Loading users...</div>;
   }
@@ -88,6 +96,11 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
 
   return (
     <div className="w-full">
+      <UserDetailModal
+        userId={selectedUserId}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
       <Table>
         <TableHeader>
           <TableRow>
@@ -102,7 +115,14 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.name}</TableCell>
+              <TableCell className="font-medium">
+                <button
+                  className="text-blue-600 hover:underline"
+                  onClick={() => handleUserClick(user.id)}
+                >
+                  {user.name}
+                </button>
+              </TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell>{user.department}</TableCell>
