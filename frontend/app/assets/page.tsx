@@ -59,7 +59,8 @@ export default function AssetsPage() {
             Manage your organization&apos;s assets and track their lifecycle
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        {/* Button group: Increased gap to 20px (space-x-5) for better separation between Export and Add Asset buttons */}
+        <div className="flex items-center space-x-5">
           <Button variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
             Export
