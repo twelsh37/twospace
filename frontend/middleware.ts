@@ -23,7 +23,14 @@ const ALLOWED_ASSET_PARAMS = [
  * or continues to the requested path.
  */
 export function middleware(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Rewrite root path to /dashboard
+  if (pathname === "/") {
+    const dashboardUrl = new URL("/dashboard", request.url);
+    return NextResponse.rewrite(dashboardUrl);
+  }
+
   const newSearchParams = new URLSearchParams();
   let paramsChanged = false;
 
@@ -53,5 +60,5 @@ export function middleware(request: NextRequest) {
 // This config specifies that the middleware should only run on the /assets path
 // and any sub-paths.
 export const config = {
-  matcher: "/assets/:path*",
+  matcher: ["/", "/assets/:path*"],
 };

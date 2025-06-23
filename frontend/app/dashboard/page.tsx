@@ -18,12 +18,7 @@ async function getDashboardData(): Promise<DashboardData | null> {
     );
 
     // We can use a relative path here because of the proxy configured in next.config.ts
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`,
-      {
-        cache: "no-store", // Ensure we always get the latest data
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`);
 
     if (!res.ok) {
       console.error("Failed to fetch dashboard data:", res.statusText);

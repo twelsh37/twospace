@@ -14,9 +14,10 @@ interface AssetDetailPageProps {
   };
 }
 
-export default function AssetDetailPage({ params }: AssetDetailPageProps) {
-  const { id } = params;
-
+export default async function AssetDetailPage({
+  params,
+}: AssetDetailPageProps) {
+  const { id } = await params;
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       {/* Page Header */}
