@@ -7,8 +7,6 @@ import {
   assetsTable,
   assetSequencesTable,
   assetHistoryTable,
-  assetTypeEnum,
-  type NewAsset,
   type NewAssetHistory,
 } from "./schema";
 

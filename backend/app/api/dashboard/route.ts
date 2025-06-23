@@ -9,7 +9,7 @@ import {
   usersTable,
   locationsTable,
 } from "@/lib/db/schema";
-import { desc, count, eq } from "drizzle-orm";
+import { desc, count, eq, sum } from "drizzle-orm";
 
 /**
  * GET /api/dashboard
@@ -17,20 +17,16 @@ import { desc, count, eq } from "drizzle-orm";
  */
 export async function GET() {
   try {
-    // A transaction ensures all queries are consistent
+    // A transaction ensures all queries are consistent and uses a single connection,
+    // which can prevent connection limit issues on some database providers.
     const dashboardData = await db.transaction(async (tx) => {
-      // Queries are now run sequentially within the transaction for stability
       const totalAssetsResult = await tx
         .select({ value: count() })
         .from(assetsTable);
 
-      const allAssets = await tx
-        .select({ purchasePrice: assetsTable.purchasePrice })
+      const totalValueResult = await tx
+        .select({ value: sum(assetsTable.purchasePrice) })
         .from(assetsTable);
-      const totalValue = allAssets.reduce(
-        (sum, asset) => sum + parseFloat(asset.purchasePrice || "0"),
-        0
-      );
 
       const totalUsersResult = await tx
         .select({ value: count() })
@@ -77,9 +73,9 @@ export async function GET() {
         .limit(5);
 
       // Format the results
-      return {
+      const dashboardData = {
         totalAssets: totalAssetsResult[0]?.value || 0,
-        totalValue,
+        totalValue: parseFloat(totalValueResult[0]?.value || "0"),
         totalUsers: totalUsersResult[0]?.value || 0,
         totalLocations: totalLocationsResult[0]?.value || 0,
         assetsByState: assetsByStateResult,
@@ -89,6 +85,8 @@ export async function GET() {
           userName: activity.userName || "System",
         })),
       };
+
+      return dashboardData;
     });
 
     return NextResponse.json({ success: true, data: dashboardData });

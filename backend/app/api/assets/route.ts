@@ -13,11 +13,10 @@ import {
   isNull,
   inArray,
 } from "drizzle-orm";
-import { db, assetsTable, locationsTable, assetHistoryTable } from "@/lib/db";
+import { db, assetsTable, locationsTable } from "@/lib/db";
 import {
   generateAssetNumber,
   createAssetHistory,
-  getActiveAssets,
 } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 
