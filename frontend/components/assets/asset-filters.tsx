@@ -96,30 +96,7 @@ export function AssetFilters({
 
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 items-center">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Filter className="h-4 w-4" />
-            Active filters ({getActiveFilterCount()}):
-          </div>
-
-          {filters.type !== "all" && (
-            <Badge variant="secondary" className="gap-1">
-              Type: {ASSET_TYPE_LABELS[filters.type as AssetType]}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => onFilterChange("type", "all")}
-              />
-            </Badge>
-          )}
-
-          {filters.state !== "all" && (
-            <Badge variant="secondary" className="gap-1">
-              State: {ASSET_STATE_LABELS[filters.state as AssetState]}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => onFilterChange("state", "all")}
-              />
-            </Badge>
-          )}
+          {/* Removed active filter badges and label as per user request */}
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { Asset, AssetState, AssetType, AssetWithPagination } from "@/lib/types";
 import { ASSET_STATE_LABELS, ASSET_TYPE_LABELS } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -26,6 +26,8 @@ import {
 import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { getApiBaseUrl } from "@/lib/config";
+import { AssetEditModal } from "./asset-edit-modal";
+import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 
 const getStateVariant = (state: AssetState) => {
   switch (state) {
@@ -52,6 +54,13 @@ interface AssetTableProps {
 export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
   const [data, setData] = useState<AssetWithPagination | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editAssetNumber, setEditAssetNumber] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteAssetNumber, setDeleteAssetNumber] = useState<string | null>(
+    null
+  );
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -79,6 +88,55 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
     fetchAssets();
   }, [queryString]);
 
+  const handleEditClick = (assetNumber: string) => {
+    setEditAssetNumber(assetNumber);
+    setEditModalOpen(true);
+  };
+
+  const handleAssetUpdated = () => {
+    setEditModalOpen(false);
+    setData(null);
+    setTimeout(() => {
+      onPageChange(data?.pagination.page || 1);
+      if (
+        typeof window !== "undefined" &&
+        (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+      ) {
+        (window as Window & { mutateDashboard?: () => void })
+          .mutateDashboard!();
+      }
+    }, 100);
+  };
+
+  const handleDeleteClick = (assetNumber: string) => {
+    setDeleteAssetNumber(assetNumber);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteAssetNumber) return;
+    setDeleting(true);
+    try {
+      await fetch(`/api/assets/${deleteAssetNumber}`, { method: "DELETE" });
+      setDeleteModalOpen(false);
+      setDeleteAssetNumber(null);
+      setData(null);
+      setTimeout(() => {
+        onPageChange(data?.pagination.page || 1);
+        if (
+          typeof window !== "undefined" &&
+          (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+        ) {
+          (window as Window & { mutateDashboard?: () => void })
+            .mutateDashboard!();
+        }
+      }, 100);
+    } catch {
+      setDeleting(false);
+    }
+    setDeleting(false);
+  };
+
   if (isLoading) {
     return <div className="p-8 text-center">Loading assets...</div>;
   }
@@ -96,6 +154,22 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
 
   return (
     <div className="w-full">
+      <AssetEditModal
+        assetNumber={editAssetNumber}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onUpdated={handleAssetUpdated}
+      />
+      <ConfirmDeleteModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        onConfirm={handleDeleteConfirmed}
+        loading={deleting}
+        title="Delete Asset"
+        description={
+          "This action cannot be undone. To confirm, type 'confirm deletion' below to delete this asset."
+        }
+      />
       <Table>
         <TableHeader>
           <TableRow>
@@ -148,7 +222,16 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
               <TableCell>
                 {formatCurrency(parseFloat(asset.purchasePrice))}
               </TableCell>
-              <TableCell>{formatDate(new Date(asset.updatedAt))}</TableCell>
+              <TableCell>
+                {new Date(asset.updatedAt).toLocaleString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
+              </TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -164,13 +247,16 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                         View Details
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/assets/${asset.assetNumber}/edit`}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Asset
-                      </Link>
+                    <DropdownMenuItem
+                      onClick={() => handleEditClick(asset.assetNumber)}
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Asset
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
+                    <DropdownMenuItem
+                      className="text-destructive"
+                      onClick={() => handleDeleteClick(asset.assetNumber)}
+                    >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete Asset
                     </DropdownMenuItem>

@@ -11,6 +11,7 @@ import {
 } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
+import { NextRequest } from "next/server";
 
 type RouteContext = {
   params: {
@@ -71,6 +72,88 @@ export async function GET(request: Request, context: RouteContext) {
         error: "Failed to fetch asset details",
         details: error instanceof Error ? error.message : "Unknown error",
       },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { assetNumber: string } }
+) {
+  try {
+    const { assetNumber } = params;
+    if (!assetNumber) {
+      return NextResponse.json(
+        { error: "Asset number is required" },
+        { status: 400 }
+      );
+    }
+    const body = await request.json();
+    // Only allow updating fields that exist in the assetsTable
+    const allowedFields = [
+      "type",
+      "state",
+      "serialNumber",
+      "description",
+      "purchasePrice",
+      "locationId",
+      "department",
+      "assignedTo",
+      "employeeId",
+    ];
+    const updateData: Record<string, any> = {};
+    for (const key of allowedFields) {
+      if (key in body) updateData[key] = body[key];
+    }
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: "No valid fields to update" },
+        { status: 400 }
+      );
+    }
+    const updated = await db
+      .update(assetsTable)
+      .set(updateData)
+      .where(eq(assetsTable.assetNumber, assetNumber))
+      .returning();
+    if (!updated.length) {
+      return NextResponse.json({ error: "Asset not found" }, { status: 404 });
+    }
+    return NextResponse.json({ data: updated[0] });
+  } catch (error) {
+    console.error("Error updating asset:", error);
+    return NextResponse.json(
+      { error: "Failed to update asset" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { assetNumber: string } }
+) {
+  try {
+    const { assetNumber } = params;
+    if (!assetNumber) {
+      return NextResponse.json(
+        { error: "Asset number is required" },
+        { status: 400 }
+      );
+    }
+    const deleted = await db
+      .delete(assetsTable)
+      .where(eq(assetsTable.assetNumber, assetNumber))
+      .returning();
+    if (!deleted.length) {
+      return NextResponse.json({ error: "Asset not found" }, { status: 404 });
+    }
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error("Error deleting asset:", error);
+    return NextResponse.json(
+      { error: "Failed to delete asset" },
       { status: 500 }
     );
   }
