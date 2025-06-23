@@ -170,104 +170,106 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
           "This action cannot be undone. To confirm, type 'confirm deletion' below to delete this asset."
         }
       />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Asset Number</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>State</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Assigned To</TableHead>
-            <TableHead>Purchase Price</TableHead>
-            <TableHead>Updated</TableHead>
-            <TableHead className="w-[70px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {assets.map((asset: Asset) => (
-            <TableRow key={asset.assetNumber}>
-              <TableCell className="font-medium">
-                <Link
-                  href={`/assets/${asset.assetNumber}`}
-                  className="hover:underline"
-                >
-                  {asset.assetNumber}
-                </Link>
-              </TableCell>
-              <TableCell>
-                {ASSET_TYPE_LABELS[asset.type as AssetType]}
-              </TableCell>
-              <TableCell className="max-w-[200px] truncate">
-                {asset.description}
-              </TableCell>
-              <TableCell>
-                <Badge variant={getStateVariant(asset.state as AssetState)}>
-                  {ASSET_STATE_LABELS[asset.state as AssetState]}
-                </Badge>
-              </TableCell>
-              <TableCell>{asset.location}</TableCell>
-              <TableCell>
-                {asset.assignedTo ? (
-                  <div>
-                    <div className="font-medium">{asset.assignedTo}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {asset.employeeId} • {asset.department}
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-muted-foreground">Unassigned</span>
-                )}
-              </TableCell>
-              <TableCell>
-                {formatCurrency(parseFloat(asset.purchasePrice))}
-              </TableCell>
-              <TableCell>
-                {new Date(asset.updatedAt).toLocaleString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                })}
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={`/assets/${asset.assetNumber}`}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Details
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditClick(asset.assetNumber)}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Asset
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => handleDeleteClick(asset.assetNumber)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Asset
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+      <div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Asset Number</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>State</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Assigned To</TableHead>
+              <TableHead>Purchase Price</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="w-[70px]"></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between p-4">
+          </TableHeader>
+          <TableBody>
+            {assets.map((asset: Asset) => (
+              <TableRow key={asset.assetNumber}>
+                <TableCell className="font-medium">
+                  <Link
+                    href={`/assets/${asset.assetNumber}`}
+                    className="hover:underline"
+                  >
+                    {asset.assetNumber}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  {ASSET_TYPE_LABELS[asset.type as AssetType]}
+                </TableCell>
+                <TableCell className="max-w-[200px] truncate">
+                  {asset.description}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStateVariant(asset.state as AssetState)}>
+                    {ASSET_STATE_LABELS[asset.state as AssetState]}
+                  </Badge>
+                </TableCell>
+                <TableCell>{asset.location}</TableCell>
+                <TableCell>
+                  {asset.assignedTo ? (
+                    <div>
+                      <div className="font-medium">{asset.assignedTo}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {asset.employeeId} • {asset.department}
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">Unassigned</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {formatCurrency(parseFloat(asset.purchasePrice))}
+                </TableCell>
+                <TableCell>
+                  {new Date(asset.updatedAt).toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/assets/${asset.assetNumber}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleEditClick(asset.assetNumber)}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit Asset
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDeleteClick(asset.assetNumber)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Asset
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-between p-4 mt-3">
         <div className="text-sm text-muted-foreground">
           Showing {assets.length} of {totalAssets} assets
         </div>
