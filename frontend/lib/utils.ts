@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { Asset } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -46,11 +47,46 @@ export function formatDate(date: Date): string {
 }
 
 /**
+ * Validate asset data for form submission
+ * @param asset - Asset data to validate
+ * @returns Array of validation error messages
+ */
+export function validateAsset(asset: Partial<Asset>): string[] {
+  const errors: string[] = [];
+
+  if (!asset.type) {
+    errors.push("Asset type is required");
+  }
+
+  if (!asset.serialNumber || asset.serialNumber.trim() === "") {
+    errors.push("Serial number is required");
+  }
+
+  if (!asset.description || asset.description.trim() === "") {
+    errors.push("Description is required");
+  }
+
+  if (
+    asset.purchasePrice === undefined ||
+    isNaN(parseFloat(asset.purchasePrice)) ||
+    parseFloat(asset.purchasePrice) < 0
+  ) {
+    errors.push("Purchase price must be a positive number");
+  }
+
+  if (!asset.location || asset.location.trim() === "") {
+    errors.push("Location is required");
+  }
+
+  return errors;
+}
+
+/**
  * Export an array of objects to CSV and trigger a download.
  * @param data Array of objects to export
  * @param filename Name of the file to save (should end with .csv)
  */
-export function exportToCSV(data: any[], filename: string) {
+export function exportToCSV(data: Record<string, unknown>[], filename: string) {
   if (!data || data.length === 0) return;
   const keys = Object.keys(data[0]);
   const csvRows = [
@@ -76,7 +112,10 @@ export function exportToCSV(data: any[], filename: string) {
  * @param data Array of objects to export
  * @param filename Name of the file to save (should end with .xlsx)
  */
-export async function exportToXLSX(data: any[], filename: string) {
+export async function exportToXLSX(
+  data: Record<string, unknown>[],
+  filename: string
+) {
   if (!data || data.length === 0) return;
   // Dynamically import xlsx to avoid bundling if not used
   const XLSX = await import("xlsx");

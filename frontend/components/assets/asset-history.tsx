@@ -3,14 +3,25 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AssetHistory as AssetHistoryType, AssetState } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { getRelativeTime } from "@/lib/utils";
 import { History, ArrowRight } from "lucide-react";
+import { AssetState } from "@/lib/types";
 
 interface AssetHistoryProps {
   assetId: string;
 }
+
+type AssetHistoryType = {
+  id: string;
+  assetId: string;
+  previousState?: AssetState;
+  newState: AssetState;
+  changedBy: string;
+  timestamp: Date;
+  changeReason?: string;
+  details?: Record<string, unknown>;
+};
 
 export function AssetHistory({ assetId }: AssetHistoryProps) {
   // TODO: Fetch asset history from API
@@ -134,19 +145,42 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
                       </p>
                     )}
 
-                    {entry.details && (
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        {entry.details.configurationNotes && (
-                          <p>Notes: {entry.details.configurationNotes}</p>
-                        )}
-                        {entry.details.purpose && (
-                          <p>Purpose: {entry.details.purpose}</p>
-                        )}
-                        {entry.details.reason && (
-                          <p>Reason: {entry.details.reason}</p>
-                        )}
-                      </div>
-                    )}
+                    {entry.details &&
+                      typeof entry.details === "object" &&
+                      entry.details !== null && (
+                        <div className="text-sm text-muted-foreground space-y-1">
+                          {"configurationNotes" in entry.details && (
+                            <p>
+                              Notes:{" "}
+                              {
+                                (entry.details as Record<string, unknown>)[
+                                  "configurationNotes"
+                                ] as string
+                              }
+                            </p>
+                          )}
+                          {"purpose" in entry.details && (
+                            <p>
+                              Purpose:{" "}
+                              {
+                                (entry.details as Record<string, unknown>)[
+                                  "purpose"
+                                ] as string
+                              }
+                            </p>
+                          )}
+                          {"reason" in entry.details && (
+                            <p>
+                              Reason:{" "}
+                              {
+                                (entry.details as Record<string, unknown>)[
+                                  "reason"
+                                ] as string
+                              }
+                            </p>
+                          )}
+                        </div>
+                      )}
 
                     <div className="text-xs text-muted-foreground mt-2">
                       Changed by{" "}

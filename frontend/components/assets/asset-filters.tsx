@@ -13,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Filter, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export type FilterKey = "type" | "state";
 
@@ -37,10 +36,6 @@ export function AssetFilters({
   const hasActiveFilters = Object.values(filters).some(
     (value) => value !== "all"
   );
-
-  const getActiveFilterCount = () => {
-    return Object.values(filters).filter((value) => value !== "all").length;
-  };
 
   return (
     <div className="flex flex-col space-y-4">

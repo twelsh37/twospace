@@ -11,6 +11,14 @@ import Link from "next/link";
 import { UserFilters, UserFilterState } from "@/components/users/user-filters";
 
 export default function UsersPage() {
+  return (
+    <Suspense fallback={<UsersLoadingSkeleton />}>
+      <UsersPageContent />
+    </Suspense>
+  );
+}
+
+function UsersPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

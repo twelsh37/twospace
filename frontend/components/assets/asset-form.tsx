@@ -4,7 +4,7 @@
 "use client";
 
 import { useState } from "react";
-import { Asset, AssetType } from "@/lib/types";
+import { Asset, AssetType, AssignmentType } from "@/lib/types";
 import { ASSET_TYPE_LABELS, INITIAL_LOCATIONS } from "@/lib/constants";
 import { validateAsset } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,9 +33,9 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
     type: AssetType.MOBILE_PHONE,
     serialNumber: "",
     description: "",
-    purchasePrice: 0,
+    purchasePrice: "0",
     location: "",
-    assignmentType: "INDIVIDUAL",
+    assignmentType: AssignmentType.INDIVIDUAL,
     assignedTo: "",
     employeeId: "",
     department: "",
@@ -74,9 +74,9 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
           type: AssetType.MOBILE_PHONE,
           serialNumber: "",
           description: "",
-          purchasePrice: 0,
+          purchasePrice: "0",
           location: "",
-          assignmentType: "INDIVIDUAL",
+          assignmentType: AssignmentType.INDIVIDUAL,
           assignedTo: "",
           employeeId: "",
           department: "",
@@ -90,7 +90,10 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
     }
   };
 
-  const updateField = (field: keyof Asset, value: any) => {
+  const updateField = (
+    field: keyof Asset,
+    value: string | number | AssetType
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear errors when user starts typing
     if (errors.length > 0) {
@@ -171,10 +174,8 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
               type="number"
               step="0.01"
               min="0"
-              value={formData.purchasePrice || 0}
-              onChange={(e) =>
-                updateField("purchasePrice", parseFloat(e.target.value) || 0)
-              }
+              value={formData.purchasePrice || "0"}
+              onChange={(e) => updateField("purchasePrice", e.target.value)}
               placeholder="0.00"
             />
           </div>
@@ -205,11 +206,11 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="individual"
-                checked={formData.assignmentType === "INDIVIDUAL"}
+                checked={formData.assignmentType === AssignmentType.INDIVIDUAL}
                 onCheckedChange={(checked) =>
                   updateField(
                     "assignmentType",
-                    checked ? "INDIVIDUAL" : "SHARED"
+                    checked ? AssignmentType.INDIVIDUAL : AssignmentType.SHARED
                   )
                 }
               />
@@ -218,7 +219,7 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
           </div>
 
           {/* Assignment Details (if individual) */}
-          {formData.assignmentType === "INDIVIDUAL" && (
+          {formData.assignmentType === AssignmentType.INDIVIDUAL && (
             <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
               <h4 className="font-medium">Assignment Details</h4>
 

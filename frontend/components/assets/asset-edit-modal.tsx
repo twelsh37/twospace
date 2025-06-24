@@ -76,9 +76,16 @@ export function AssetEditModal({
   // Track if form is dirty
   const isDirty =
     asset &&
-    Object.keys(form).some((key) => (form as any)[key] !== (asset as any)[key]);
+    Object.keys(form).some(
+      (key) =>
+        (form as Record<string, unknown>)[key] !==
+        (asset as unknown as Record<string, unknown>)[key]
+    );
 
-  const handleChange = (key: keyof Asset, value: any) => {
+  const handleChange = (
+    key: keyof Asset,
+    value: string | AssetType | AssetState
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 

@@ -54,6 +54,7 @@ export type User = {
 export interface Location {
   id: string;
   name: string;
+  description?: string;
 }
 
 // Type for the pagination object returned by the assets API

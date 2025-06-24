@@ -18,8 +18,17 @@ import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
 import { exportToCSV, exportToXLSX } from "@/lib/utils";
 import { useState } from "react";
+import { getApiBaseUrl } from "@/lib/config";
 
 export default function AssetsPage() {
+  return (
+    <Suspense fallback={<AssetsLoadingSkeleton />}>
+      <AssetsPageContent />
+    </Suspense>
+  );
+}
+
+function AssetsPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -31,7 +40,6 @@ export default function AssetsPage() {
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
-  const [tableData, setTableData] = useState<any[]>([]); // Store current page data for export
 
   const handleFilterChange = (key: FilterKey, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -56,26 +64,21 @@ export default function AssetsPage() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // Handler to receive current page data from AssetTable
-  const handleTableData = (data: any[]) => setTableData(data);
-
   // Export handler
-  const handleExport = async (type: "csv" | "xlsx", scope: "page" | "all") => {
+  const handleExport = async (type: "csv" | "xlsx") => {
     setExportLoading(true);
-    let dataToExport = tableData;
-    if (scope === "all") {
-      // Fetch all filtered data from backend
-      try {
-        const response = await fetch(
-          `${getApiBaseUrl()}/api/assets?${searchParams.toString()}&all=1`
-        );
-        const result = await response.json();
-        dataToExport = result.data.assets;
-      } catch (e) {
-        setExportLoading(false);
-        alert("Failed to fetch all data for export.");
-        return;
-      }
+    let dataToExport: Record<string, unknown>[] = [];
+    // Always fetch all filtered data from backend
+    try {
+      const response = await fetch(
+        `${getApiBaseUrl()}/api/assets?${searchParams.toString()}&all=1`
+      );
+      const result = await response.json();
+      dataToExport = result.data.assets;
+    } catch {
+      setExportLoading(false);
+      alert("Failed to fetch all data for export.");
+      return;
     }
     if (type === "csv") {
       exportToCSV(dataToExport, "assets.csv");
@@ -136,7 +139,6 @@ export default function AssetsPage() {
           <AssetTable
             queryString={searchParams.toString()}
             onPageChange={handlePageChange}
-            onData={handleTableData} // Pass handler to receive current page data
           />
         </Suspense>
       </div>
@@ -158,27 +160,6 @@ function AssetsLoadingSkeleton() {
         <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
         <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
       </div>
-    </div>
-  );
-}
-
-// Loading component for the page
-export function AssetsLoading() {
-  return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <div className="h-8 w-32 bg-muted animate-pulse rounded" />
-          <div className="h-4 w-64 bg-muted animate-pulse rounded" />
-        </div>
-        <div className="flex space-x-2">
-          <div className="h-9 w-20 bg-muted animate-pulse rounded" />
-          <div className="h-9 w-20 bg-muted animate-pulse rounded" />
-          <div className="h-9 w-24 bg-muted animate-pulse rounded" />
-        </div>
-      </div>
-      <div className="h-12 bg-muted animate-pulse rounded" />
-      <div className="h-96 bg-muted animate-pulse rounded" />
     </div>
   );
 }
