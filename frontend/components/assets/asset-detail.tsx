@@ -108,13 +108,13 @@ export function AssetDetail({ assetId }: AssetDetailProps) {
             <label className="text-sm font-medium text-muted-foreground">
               Created
             </label>
-            <p>{formatDate(asset.createdAt, true)}</p>
+            <p>{formatDate(asset.createdAt)}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
               Last Updated
             </label>
-            <p>{formatDate(asset.updatedAt, true)}</p>
+            <p>{formatDate(asset.updatedAt)}</p>
           </div>
         </div>
       </CardContent>

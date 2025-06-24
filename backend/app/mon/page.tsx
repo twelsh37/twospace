@@ -20,19 +20,27 @@ async function getDbStatus() {
 }
 
 async function getTableCounts() {
-  const tableNames = Object.keys(schema).filter((key) => key.endsWith("Table"));
+  // Explicitly list the tables we want to count
+  const tables = [
+    { name: "usersTable", table: schema.usersTable },
+    { name: "locationsTable", table: schema.locationsTable },
+    { name: "assetsTable", table: schema.assetsTable },
+    { name: "assetHistoryTable", table: schema.assetHistoryTable },
+    { name: "assetAssignmentsTable", table: schema.assetAssignmentsTable },
+    { name: "assetSequencesTable", table: schema.assetSequencesTable },
+  ];
+
   const counts: { tableName: string; count: number }[] = [];
 
-  for (const tableName of tableNames) {
+  for (const { name, table } of tables) {
     try {
-      const table = schema[tableName as keyof typeof schema];
       const result = await db
         .select({ count: sql<number>`count(*)` })
         .from(table);
-      counts.push({ tableName, count: result[0]?.count || 0 });
+      counts.push({ tableName: name, count: result[0]?.count || 0 });
     } catch (error) {
-      console.error(`Error counting rows for ${tableName}:`, error);
-      counts.push({ tableName, count: -1 }); // Indicate an error
+      console.error(`Error counting rows for ${name}:`, error);
+      counts.push({ tableName: name, count: -1 }); // Indicate an error
     }
   }
   return counts;

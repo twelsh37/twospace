@@ -69,10 +69,12 @@ export function LocationEditModal({
   const isDirty =
     location &&
     Object.keys(form).some(
-      (key) => (form as any)[key] !== (location as any)[key]
+      (key) =>
+        (form as Record<string, unknown>)[key] !==
+        (location as unknown as Record<string, unknown>)[key]
     );
 
-  const handleChange = (key: keyof Location, value: any) => {
+  const handleChange = (key: keyof Location, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 

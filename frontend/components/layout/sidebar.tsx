@@ -19,7 +19,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import useSWR, { mutate as globalMutate } from "swr";
+import useSWR from "swr";
 
 interface NavItem {
   title: string;
@@ -87,7 +87,7 @@ export function Sidebar() {
   ];
 
   // Expose mutate function globally for revalidation
-  (globalThis as any).mutateDashboard = mutate;
+  (globalThis as Record<string, unknown>).mutateDashboard = mutate;
 
   return (
     <>

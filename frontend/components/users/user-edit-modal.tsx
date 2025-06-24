@@ -77,9 +77,13 @@ export function UserEditModal({
   // Track if form is dirty
   const isDirty =
     user &&
-    Object.keys(form).some((key) => (form as any)[key] !== (user as any)[key]);
+    Object.keys(form).some(
+      (key) =>
+        (form as Record<string, unknown>)[key] !==
+        (user as unknown as Record<string, unknown>)[key]
+    );
 
-  const handleChange = (key: keyof User, value: any) => {
+  const handleChange = (key: keyof User, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 

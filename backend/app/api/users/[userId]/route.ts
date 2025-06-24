@@ -8,10 +8,10 @@ import { eq } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  context: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await context.params;
     if (!userId) {
       return NextResponse.json(
         { error: "User ID is required" },
@@ -37,17 +37,17 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  context: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await context.params;
     if (!userId) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
     }
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     // Only allow updating fields that exist in the usersTable
     const allowedFields = [
       "name",
@@ -56,10 +56,13 @@ export async function PATCH(
       "department",
       "isActive",
       "employeeId",
-    ];
-    const updateData: Record<string, any> = {};
+    ] as const;
+
+    const updateData: Record<string, unknown> = {};
     for (const key of allowedFields) {
-      if (key in body) updateData[key] = body[key];
+      if (key in body && body[key] !== undefined) {
+        updateData[key] = body[key];
+      }
     }
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
@@ -87,10 +90,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  context: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await context.params;
     if (!userId) {
       return NextResponse.json(
         { error: "User ID is required" },
