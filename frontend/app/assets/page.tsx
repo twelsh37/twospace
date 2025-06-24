@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
 import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
+import { ExportModal } from "@/components/ui/export-modal";
+import { exportToCSV, exportToXLSX } from "@/lib/utils";
+import { useState } from "react";
 
 export default function AssetsPage() {
   const router = useRouter();
@@ -25,6 +28,10 @@ export default function AssetsPage() {
     type: (searchParams.get("type") as AssetType) || "all",
     state: (searchParams.get("state") as AssetState) || "all",
   };
+
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [tableData, setTableData] = useState<any[]>([]); // Store current page data for export
 
   const handleFilterChange = (key: FilterKey, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -49,6 +56,36 @@ export default function AssetsPage() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
+  // Handler to receive current page data from AssetTable
+  const handleTableData = (data: any[]) => setTableData(data);
+
+  // Export handler
+  const handleExport = async (type: "csv" | "xlsx", scope: "page" | "all") => {
+    setExportLoading(true);
+    let dataToExport = tableData;
+    if (scope === "all") {
+      // Fetch all filtered data from backend
+      try {
+        const response = await fetch(
+          `${getApiBaseUrl()}/api/assets?${searchParams.toString()}&all=1`
+        );
+        const result = await response.json();
+        dataToExport = result.data.assets;
+      } catch (e) {
+        setExportLoading(false);
+        alert("Failed to fetch all data for export.");
+        return;
+      }
+    }
+    if (type === "csv") {
+      exportToCSV(dataToExport, "assets.csv");
+    } else {
+      await exportToXLSX(dataToExport, "assets.xlsx");
+    }
+    setExportLoading(false);
+    setExportModalOpen(false);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       {/* Page Header */}
@@ -61,7 +98,11 @@ export default function AssetsPage() {
         </div>
         {/* Button group: Increased gap to 20px (space-x-5) for better separation between Export and Add Asset buttons */}
         <div className="flex items-center space-x-5">
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setExportModalOpen(true)}
+          >
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -73,6 +114,14 @@ export default function AssetsPage() {
           </Link>
         </div>
       </div>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        onExport={handleExport}
+        loading={exportLoading}
+      />
 
       {/* Filters */}
       <AssetFilters
@@ -87,6 +136,7 @@ export default function AssetsPage() {
           <AssetTable
             queryString={searchParams.toString()}
             onPageChange={handlePageChange}
+            onData={handleTableData} // Pass handler to receive current page data
           />
         </Suspense>
       </div>
