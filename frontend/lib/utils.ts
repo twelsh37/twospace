@@ -44,3 +44,53 @@ export function formatDate(date: Date): string {
     day: "numeric",
   }).format(date);
 }
+
+/**
+ * Export an array of objects to CSV and trigger a download.
+ * @param data Array of objects to export
+ * @param filename Name of the file to save (should end with .csv)
+ */
+export function exportToCSV(data: any[], filename: string) {
+  if (!data || data.length === 0) return;
+  const keys = Object.keys(data[0]);
+  const csvRows = [
+    keys.join(","),
+    ...data.map((row) =>
+      keys.map((k) => JSON.stringify(row[k] ?? "")).join(",")
+    ),
+  ];
+  const csvString = csvRows.join("\n");
+  const blob = new Blob([csvString], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Export an array of objects to XLSX and trigger a download.
+ * @param data Array of objects to export
+ * @param filename Name of the file to save (should end with .xlsx)
+ */
+export async function exportToXLSX(data: any[], filename: string) {
+  if (!data || data.length === 0) return;
+  // Dynamically import xlsx to avoid bundling if not used
+  const XLSX = await import("xlsx");
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([wbout], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
