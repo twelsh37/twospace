@@ -32,6 +32,7 @@ type Props = {
   };
   page: number;
   onPageChange: (page: number) => void;
+  onRefresh?: () => void; // Optional callback to trigger parent refresh
 };
 
 interface Pagination {
@@ -43,7 +44,12 @@ interface Pagination {
   hasPrevPage: boolean;
 }
 
-export function LocationTable({ filters, page, onPageChange }: Props) {
+export function LocationTable({
+  filters,
+  page,
+  onPageChange,
+  onRefresh,
+}: Props) {
   const [locations, setLocations] = useState<Location[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,31 +63,33 @@ export function LocationTable({ filters, page, onPageChange }: Props) {
   const [deleteLocationId, setDeleteLocationId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    async function fetchLocations() {
-      setIsLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (filters.location && filters.location !== "all") {
-          params.set("name", filters.location);
-        }
-        if (filters.isActive && filters.isActive !== "all") {
-          params.set("isActive", filters.isActive);
-        }
-        params.set("page", page.toString());
-        params.set("limit", "10");
-        const response = await fetch(`/api/locations?${params.toString()}`);
-        if (!response.ok) throw new Error("Failed to fetch locations");
-        const result = await response.json();
-        setLocations(result.data || []);
-        setPagination(result.pagination || null);
-      } catch {
-        setLocations([]);
-        setPagination(null);
-      } finally {
-        setIsLoading(false);
+  // Function to fetch locations - extracted for reuse
+  const fetchLocations = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filters.location && filters.location !== "all") {
+        params.set("name", filters.location);
       }
+      if (filters.isActive && filters.isActive !== "all") {
+        params.set("isActive", filters.isActive);
+      }
+      params.set("page", page.toString());
+      params.set("limit", "10");
+      const response = await fetch(`/api/locations?${params.toString()}`);
+      if (!response.ok) throw new Error("Failed to fetch locations");
+      const result = await response.json();
+      setLocations(result.data || []);
+      setPagination(result.pagination || null);
+    } catch {
+      setLocations([]);
+      setPagination(null);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchLocations();
   }, [filters, page]);
 
@@ -107,14 +115,28 @@ export function LocationTable({ filters, page, onPageChange }: Props) {
       await fetch(`/api/locations/${deleteLocationId}`, { method: "DELETE" });
       setDeleteModalOpen(false);
       setDeleteLocationId(null);
-      setLocations([]);
-      setTimeout(() => {
-        onPageChange(page);
-      }, 100);
+      // Refresh the data after deletion
+      await fetchLocations();
+      // Also trigger parent refresh if callback provided
+      if (onRefresh) {
+        onRefresh();
+      }
     } catch {
       setDeleting(false);
     }
     setDeleting(false);
+  };
+
+  // Handle location update - refresh data without clearing first
+  const handleLocationUpdated = async () => {
+    setEditModalOpen(false);
+    setEditLocationId(null);
+    // Refresh the data after update
+    await fetchLocations();
+    // Also trigger parent refresh if callback provided
+    if (onRefresh) {
+      onRefresh();
+    }
   };
 
   if (isLoading) {
@@ -140,11 +162,7 @@ export function LocationTable({ filters, page, onPageChange }: Props) {
         locationId={editLocationId}
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
-        onUpdated={() => {
-          setEditModalOpen(false);
-          setLocations([]);
-          onPageChange(page);
-        }}
+        onUpdated={handleLocationUpdated}
       />
       <ConfirmDeleteModal
         open={deleteModalOpen}

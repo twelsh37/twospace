@@ -2,7 +2,7 @@
 // Locations Management Page
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
 import {
@@ -20,6 +20,8 @@ export default function LocationsPage() {
   });
   const [page, setPage] = useState(1);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  // Add a refresh trigger to force re-render of the table
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleFilterChange = (
     key: keyof LocationFilterState,
@@ -37,6 +39,11 @@ export default function LocationsPage() {
   const handlePageChange = (pageNumber: number) => {
     setPage(pageNumber);
   };
+
+  // Function to trigger a refresh of the table data
+  const handleRefresh = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -64,7 +71,8 @@ export default function LocationsPage() {
         onOpenChange={setAddModalOpen}
         onAdded={() => {
           setAddModalOpen(false);
-          setFilters({ ...filters });
+          // Trigger a refresh after adding a new location
+          handleRefresh();
           if (
             typeof window !== "undefined" &&
             (window as unknown as { mutateDashboard?: () => void })
@@ -85,9 +93,11 @@ export default function LocationsPage() {
       <div className="rounded-md border">
         <Suspense fallback={<LocationsLoadingSkeleton />}>
           <LocationTable
+            key={`${refreshTrigger}-${page}-${filters.location}-${filters.isActive}`}
             filters={filters}
             page={page}
             onPageChange={handlePageChange}
+            onRefresh={handleRefresh}
           />
         </Suspense>
       </div>
