@@ -13,19 +13,16 @@ import { eq, desc } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
-type RouteContext = {
-  params: {
-    assetNumber: string;
-  };
-};
-
 /**
  * GET /api/assets/{assetNumber}
  * Fetches detailed information for a single asset.
  */
-export async function GET(request: Request, context: RouteContext) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ assetNumber: string }> }
+) {
   try {
-    const { assetNumber } = context.params;
+    const { assetNumber } = await context.params;
 
     if (!assetNumber) {
       return NextResponse.json(
@@ -79,17 +76,17 @@ export async function GET(request: Request, context: RouteContext) {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { assetNumber: string } }
+  context: { params: Promise<{ assetNumber: string }> }
 ) {
   try {
-    const { assetNumber } = params;
+    const { assetNumber } = await context.params;
     if (!assetNumber) {
       return NextResponse.json(
         { error: "Asset number is required" },
         { status: 400 }
       );
     }
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     // Only allow updating fields that exist in the assetsTable
     const allowedFields = [
       "type",
@@ -101,10 +98,13 @@ export async function PATCH(
       "department",
       "assignedTo",
       "employeeId",
-    ];
-    const updateData: Record<string, any> = {};
+    ] as const;
+
+    const updateData: Record<string, unknown> = {};
     for (const key of allowedFields) {
-      if (key in body) updateData[key] = body[key];
+      if (key in body && body[key] !== undefined) {
+        updateData[key] = body[key];
+      }
     }
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(
@@ -132,10 +132,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { assetNumber: string } }
+  context: { params: Promise<{ assetNumber: string }> }
 ) {
   try {
-    const { assetNumber } = params;
+    const { assetNumber } = await context.params;
     if (!assetNumber) {
       return NextResponse.json(
         { error: "Asset number is required" },

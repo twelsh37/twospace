@@ -70,15 +70,26 @@ export async function createAssetHistory(
   changedBy: string,
   changeReason: string,
   previousState?: string,
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 ): Promise<void> {
   try {
     const historyEntry: NewAssetHistory = {
       assetId,
-      newState: newState as any,
+      newState: newState as
+        | "AVAILABLE"
+        | "SIGNED_OUT"
+        | "BUILT"
+        | "READY_TO_GO"
+        | "ISSUED",
       changedBy,
       changeReason,
-      previousState: previousState as any,
+      previousState: previousState as
+        | "AVAILABLE"
+        | "SIGNED_OUT"
+        | "BUILT"
+        | "READY_TO_GO"
+        | "ISSUED"
+        | undefined,
       details: details ? JSON.stringify(details) : null,
     };
 
@@ -103,21 +114,36 @@ export async function getActiveAssets(filters?: {
   offset?: number;
 }) {
   try {
-    let query = db
-      .select()
-      .from(assetsTable)
-      .where(isNull(assetsTable.deletedAt));
+    const conditions = [isNull(assetsTable.deletedAt)];
 
     // Apply filters if provided
     if (filters) {
-      const conditions = [];
-
       if (filters.type && filters.type !== "all") {
-        conditions.push(eq(assetsTable.type, filters.type as any));
+        conditions.push(
+          eq(
+            assetsTable.type,
+            filters.type as
+              | "MOBILE_PHONE"
+              | "TABLET"
+              | "DESKTOP"
+              | "LAPTOP"
+              | "MONITOR"
+          )
+        );
       }
 
       if (filters.state && filters.state !== "all") {
-        conditions.push(eq(assetsTable.state, filters.state as any));
+        conditions.push(
+          eq(
+            assetsTable.state,
+            filters.state as
+              | "AVAILABLE"
+              | "SIGNED_OUT"
+              | "BUILT"
+              | "READY_TO_GO"
+              | "ISSUED"
+          )
+        );
       }
 
       if (filters.locationId && filters.locationId !== "all") {
@@ -128,29 +154,31 @@ export async function getActiveAssets(filters?: {
         const searchTerm = `%${filters.search.toLowerCase()}%`;
         conditions.push(
           sql`(
-            LOWER(${assetsTable.assetNumber}) LIKE ${searchTerm} OR 
-            LOWER(${assetsTable.serialNumber}) LIKE ${searchTerm} OR 
-            LOWER(${assetsTable.description}) LIKE ${searchTerm} OR 
+            LOWER(${assetsTable.assetNumber}) LIKE ${searchTerm} OR
+            LOWER(${assetsTable.serialNumber}) LIKE ${searchTerm} OR
+            LOWER(${assetsTable.description}) LIKE ${searchTerm} OR
             LOWER(${assetsTable.assignedTo}) LIKE ${searchTerm}
           )`
         );
       }
-
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
     }
 
-    // Apply pagination
-    if (filters?.limit) {
-      query = query.limit(filters.limit);
-    }
+    // Build query with all conditions at once
+    const baseQuery = db
+      .select()
+      .from(assetsTable)
+      .where(and(...conditions));
 
-    if (filters?.offset) {
-      query = query.offset(filters.offset);
+    // Apply pagination if specified
+    if (filters?.limit && filters?.offset) {
+      return await baseQuery.limit(filters.limit).offset(filters.offset);
+    } else if (filters?.limit) {
+      return await baseQuery.limit(filters.limit);
+    } else if (filters?.offset) {
+      return await baseQuery.offset(filters.offset);
+    } else {
+      return await baseQuery;
     }
-
-    return await query;
   } catch (error) {
     console.error("Error getting active assets:", error);
     throw new Error("Failed to retrieve assets");
@@ -219,7 +247,7 @@ export async function softDeleteAsset(
     await db
       .update(assetsTable)
       .set({ deletedAt: now })
-      .where(eq(assetsTable.id, assetId));
+      .where(eq(assetsTable.assetNumber, assetId));
 
     // Create history entry
     await createAssetHistory(

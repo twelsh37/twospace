@@ -4,7 +4,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { usersTable } from "@/lib/db/schema";
-import { sql } from "drizzle-orm";
+//import { sql } from "drizzle-orm";
 
 export async function GET() {
   try {
