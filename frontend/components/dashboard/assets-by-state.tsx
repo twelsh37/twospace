@@ -83,7 +83,7 @@ export function AssetsByState({ data }: AssetsByStateProps) {
           Asset Lifecycle Distribution
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {stateData.map((item) => (
             <div key={item.state} className="space-y-3">
@@ -118,8 +118,8 @@ export function AssetsByState({ data }: AssetsByStateProps) {
           ))}
         </div>
 
-        {/* Summary Information */}
-        <div className="mt-6 pt-4 border-t">
+        {/* Reduced margin and padding to minimize space below the last asset card */}
+        <div className="mt-2 pt-2 border-t">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-lg font-semibold">
