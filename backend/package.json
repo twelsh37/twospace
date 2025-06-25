@@ -14,7 +14,8 @@
     "db:seed": "tsx lib/db/seed.ts",
     "db:optimize": "node scripts/optimize-database.js",
     "db:setup": "node scripts/setup-env.js",
-    "update:asset-prices": "tsx scripts/update-asset-prices.ts"
+    "update:asset-prices": "tsx scripts/update-asset-prices.ts",
+    "update:asset-descriptions": "tsx scripts/update-asset-descriptions.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
