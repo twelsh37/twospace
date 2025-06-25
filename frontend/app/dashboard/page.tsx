@@ -49,7 +49,12 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8">
+    // Add horizontal padding for a professional look, while keeping top and bottom padding as set above.
+    // Add a subtle light gray background to help cards stand out.
+    <div
+      className="flex-1 space-y-4 pt-4 md:pt-8 pb-0 px-4 md:px-8 bg-gray-50"
+      style={{ marginTop: "-30px" }}
+    >
       {/* Page Header */}
       <div className="flex items-center justify-end">
         <QuickActions />

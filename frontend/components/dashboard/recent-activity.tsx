@@ -90,14 +90,14 @@ export function RecentActivity({ data }: RecentActivityProps) {
 
   return (
     <>
-      <Card className="flex h-full flex-col">
+      <Card className="flex h-full flex-col shadow-md border border-gray-200 rounded-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
             Recent Activity
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-0">
           <div className="space-y-2">
             {data.map((activity) => (
               <Card
