@@ -10,7 +10,6 @@ export const ASSET_NUMBER_PREFIXES: Record<AssetType, string> = {
   [AssetType.DESKTOP]: "03",
   [AssetType.LAPTOP]: "04",
   [AssetType.MONITOR]: "05",
-  [AssetType.SHARED]: "06",
 };
 
 // Valid state transitions for different asset types
@@ -55,13 +54,6 @@ export const VALID_STATE_TRANSITIONS: Record<
     [AssetState.ISSUED]: [AssetState.READY_TO_GO],
     [AssetState.BUILT]: [], // Monitors don't use BUILT state
   },
-  [AssetType.SHARED]: {
-    [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
-    [AssetState.SIGNED_OUT]: [AssetState.READY_TO_GO, AssetState.AVAILABLE],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.SIGNED_OUT],
-    [AssetState.ISSUED]: [AssetState.READY_TO_GO],
-    [AssetState.BUILT]: [], // Shared assets don't use BUILT state
-  },
 };
 
 /**
@@ -93,7 +85,6 @@ export const ASSET_TYPE_LABELS: Record<AssetType, string> = {
   [AssetType.DESKTOP]: "Desktop",
   [AssetType.LAPTOP]: "Laptop",
   [AssetType.MONITOR]: "Monitor",
-  [AssetType.SHARED]: "Shared Asset",
 };
 
 // Initial placeholder locations
