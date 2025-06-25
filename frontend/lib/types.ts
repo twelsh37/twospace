@@ -8,7 +8,6 @@ export enum AssetType {
   DESKTOP = "DESKTOP",
   LAPTOP = "LAPTOP",
   MONITOR = "MONITOR",
-  SHARED = "SHARED",
 }
 
 export enum AssetState {
