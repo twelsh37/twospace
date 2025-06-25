@@ -1,7 +1,7 @@
 // frontend/components/locations/location-table.tsx
 // Table for displaying locations in the same style as the users table
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -63,8 +63,8 @@ export function LocationTable({
   const [deleteLocationId, setDeleteLocationId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Function to fetch locations - extracted for reuse
-  const fetchLocations = async () => {
+  // Memoize fetchLocations to avoid useEffect dependency warning
+  const fetchLocations = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
@@ -87,11 +87,11 @@ export function LocationTable({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filters, page]);
 
   useEffect(() => {
     fetchLocations();
-  }, [filters, page]);
+  }, [fetchLocations]);
 
   const handleLocationClick = (locationId: string) => {
     setSelectedLocationId(locationId);
