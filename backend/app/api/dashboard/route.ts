@@ -65,10 +65,7 @@ export async function GET() {
         })
         .from(assetHistoryTable)
         .leftJoin(usersTable, eq(assetHistoryTable.changedBy, usersTable.id))
-        .leftJoin(
-          assetsTable,
-          eq(assetHistoryTable.assetId, assetsTable.assetNumber)
-        )
+        .leftJoin(assetsTable, eq(assetHistoryTable.assetId, assetsTable.id))
         .orderBy(desc(assetHistoryTable.timestamp))
         .limit(5);
 
