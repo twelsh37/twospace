@@ -1,0 +1,104 @@
+// frontend/app/imports/page.tsx
+"use client";
+// Imports Page for bulk importing assets, users, and locations
+// This page provides an 'Import Data' button to open the import modal dialog
+
+import React, { useState } from "react";
+// Import the ImportModal component (to be created)
+import ImportModal from "@/components/imports/import-modal";
+import { Button } from "@/components/ui/button";
+
+// Main Imports Page component
+const ImportsPage: React.FC = () => {
+  // State to control modal visibility
+  const [modalOpen, setModalOpen] = useState(false);
+  // State to store imported data for display
+  const [importedData, setImportedData] = useState<any[]>([]);
+
+  // Handler to open the modal
+  const handleOpenModal = () => setModalOpen(true);
+  // Handler to close the modal
+  const handleCloseModal = () => setModalOpen(false);
+
+  // Handler to refresh data after successful import
+  const handleImportSuccess = async () => {
+    // Optionally, fetch the latest imported data from the backend
+    // For demo, just close the modal and show a placeholder refresh
+    // In a real app, you might fetch /api/assets/holding or similar
+    // Here, we fetch the last imported data from the import API (for demo)
+    try {
+      const res = await fetch("/api/import?last=true");
+      if (res.ok) {
+        const data = await res.json();
+        setImportedData(data.data || []);
+      } else {
+        setImportedData([]);
+      }
+    } catch {
+      setImportedData([]);
+    }
+  };
+
+  return (
+    <div className="p-8 max-w-2xl mx-auto">
+      {/* Page title */}
+      <h1 className="text-2xl font-bold mb-6">Bulk Import Data</h1>
+      {/* Explanatory text */}
+      <p className="mb-4 text-gray-600">
+        System Administrators can bulk import Assets, Users, or Locations using
+        CSV or XLSX files. Imported assets will appear in the holding area until
+        they are signed out and tagged.
+      </p>
+      {/* Import Data button */}
+      <Button onClick={handleOpenModal} className="mb-8">
+        Import Data
+      </Button>
+      {/* Import Modal (conditionally rendered) */}
+      {modalOpen && (
+        <ImportModal
+          open={modalOpen}
+          onClose={handleCloseModal}
+          onSuccess={async () => {
+            handleCloseModal();
+            await handleImportSuccess();
+          }}
+        />
+      )}
+      {/* Display imported data in a table if available */}
+      {importedData.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-2">Recently Imported Data</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border text-sm">
+              <thead>
+                <tr>
+                  {Object.keys(importedData[0]).map((key) => (
+                    <th
+                      key={key}
+                      className="border px-2 py-1 bg-gray-100 text-left"
+                    >
+                      {key}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {importedData.map((row, idx) => (
+                  <tr key={idx}>
+                    {Object.values(row).map((val, i) => (
+                      <td key={i} className="border px-2 py-1">
+                        {val as string}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ImportsPage;

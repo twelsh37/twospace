@@ -71,7 +71,7 @@ export function Sidebar() {
     },
     {
       title: "Import",
-      href: "/import",
+      href: "/imports",
       icon: Upload,
     },
     {
