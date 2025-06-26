@@ -15,11 +15,12 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 
-export type FilterKey = "type" | "state";
+export type FilterKey = "type" | "state" | "status";
 
 export interface FilterState {
   type: AssetType | "all";
   state: AssetState | "all";
+  status: string | "all";
 }
 
 interface AssetFiltersProps {
@@ -72,6 +73,22 @@ export function AssetFilters({
                   {label}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={filters.status}
+            onValueChange={(value) => onFilterChange("status", value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Asset Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="stock">Stock</SelectItem>
+              <SelectItem value="retired">Retired</SelectItem>
+              <SelectItem value="holding">Holding (Imported)</SelectItem>
             </SelectContent>
           </Select>
 

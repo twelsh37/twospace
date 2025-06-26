@@ -33,15 +33,19 @@ function AssetsPageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const filters: FilterState = {
+  // Controlled filter state
+  const [filters, setFilters] = useState<FilterState>(() => ({
     type: (searchParams.get("type") as AssetType) || "all",
     state: (searchParams.get("state") as AssetState) || "all",
-  };
+    status: searchParams.get("status") || "all",
+  }));
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
 
+  // Update both state and URL when a filter changes
   const handleFilterChange = (key: FilterKey, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
     const params = new URLSearchParams(searchParams.toString());
     if (value === "all") {
       params.delete(key);
@@ -49,12 +53,11 @@ function AssetsPageContent() {
       params.set(key, value);
     }
     params.set("page", "1");
-
-    const newQueryString = params.toString();
-    router.replace(`${pathname}?${newQueryString}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleClearFilters = () => {
+    setFilters({ type: "all", state: "all", status: "all" });
     router.push(pathname);
   };
 
@@ -137,7 +140,26 @@ function AssetsPageContent() {
       <div className="rounded-md border">
         <Suspense fallback={<AssetsLoadingSkeleton />}>
           <AssetTable
-            queryString={searchParams.toString()}
+            queryString={(() => {
+              const params = new URLSearchParams(searchParams.toString());
+              // Remove status from query string if 'all' is selected
+              if (filters.status === "all") {
+                params.delete("status");
+              } else if (filters.status) {
+                params.set("status", filters.status);
+              }
+              if (filters.type === "all") {
+                params.delete("type");
+              } else if (filters.type) {
+                params.set("type", filters.type);
+              }
+              if (filters.state === "all") {
+                params.delete("state");
+              } else if (filters.state) {
+                params.set("state", filters.state);
+              }
+              return params.toString();
+            })()}
             onPageChange={handlePageChange}
           />
         </Suspense>

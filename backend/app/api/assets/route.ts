@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const sortOrder = searchParams.get("sortOrder") || "desc";
+    const status = searchParams.get("status") || "all";
 
     console.log("GET /api/assets - Filters:", {
       type,
@@ -55,6 +56,7 @@ export async function GET(request: NextRequest) {
       limit,
       sortBy,
       sortOrder,
+      status,
     });
 
     // Calculate offset for pagination
@@ -69,6 +71,23 @@ export async function GET(request: NextRequest) {
 
     if (state !== "all") {
       whereConditions.push(eq(assetsTable.state, state as "AVAILABLE"));
+    }
+
+    // By default, exclude holding assets unless status filter is set
+    if (status === "all") {
+      whereConditions.push(
+        eq(
+          assetsTable.status,
+          "active" as typeof import("@/lib/db/schema").assetStatusEnum.enumValues[number]
+        )
+      );
+    } else {
+      whereConditions.push(
+        eq(
+          assetsTable.status,
+          status as typeof import("@/lib/db/schema").assetStatusEnum.enumValues[number]
+        )
+      );
     }
 
     if (locationId !== "all") {

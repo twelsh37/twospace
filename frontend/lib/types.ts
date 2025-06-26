@@ -40,6 +40,7 @@ export interface Asset {
   department: string | null;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
+  status: string; // Asset status (active, stock, retired, holding)
 }
 
 export type User = {
