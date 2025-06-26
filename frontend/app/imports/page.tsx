@@ -26,15 +26,12 @@ const ImportsPage: React.FC = () => {
 
   // Handler to refresh data after successful import
   const handleImportSuccess = async () => {
-    // Optionally, fetch the latest imported data from the backend
-    // For demo, just close the modal and show a placeholder refresh
-    // In a real app, you might fetch /api/assets/holding or similar
-    // Here, we fetch the last imported data from the import API (for demo)
+    // Fetch the latest imported assets with status 'holding' from the backend
     try {
-      const res = await fetch("/api/import?last=true");
+      const res = await fetch("/api/assets?status=holding&limit=20");
       if (res.ok) {
         const data = await res.json();
-        setImportedData(data.data || []);
+        setImportedData(data.data.assets || []);
       } else {
         setImportedData([]);
       }
