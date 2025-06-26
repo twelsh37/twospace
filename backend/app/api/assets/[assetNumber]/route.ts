@@ -46,12 +46,12 @@ export async function GET(
     }
     const asset = assetResult[0];
 
-    // Fetch the last update history for the asset
+    // Fetch the last update history for the asset using its UUID id
     const lastHistory = await db
       .select({ updatedBy: usersTable.name })
       .from(assetHistoryTable)
       .leftJoin(usersTable, eq(assetHistoryTable.changedBy, usersTable.id))
-      .where(eq(assetHistoryTable.assetId, asset.assetNumber))
+      .where(eq(assetHistoryTable.assetId, asset.id))
       .orderBy(desc(assetHistoryTable.timestamp))
       .limit(1);
 

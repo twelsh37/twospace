@@ -13,7 +13,11 @@ const ImportsPage: React.FC = () => {
   // State to control modal visibility
   const [modalOpen, setModalOpen] = useState(false);
   // State to store imported data for display
-  const [importedData, setImportedData] = useState<any[]>([]);
+  // The imported data is an array of objects, where each object represents a row from the imported CSV/XLSX file.
+  // The keys are column names and the values are dynamic (string, number, boolean, etc.), so we use Record<string, unknown> for type safety.
+  const [importedData, setImportedData] = useState<Record<string, unknown>[]>(
+    []
+  );
 
   // Handler to open the modal
   const handleOpenModal = () => setModalOpen(true);

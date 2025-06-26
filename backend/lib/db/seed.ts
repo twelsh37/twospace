@@ -333,6 +333,7 @@ async function seedDatabase() {
               officeLocations[
                 Math.floor(Math.random() * officeLocations.length)
               ].id,
+            status: "active",
           };
         } else {
           asset = {
@@ -344,6 +345,7 @@ async function seedDatabase() {
             purchasePrice: (Math.random() * 1500 + 300).toFixed(2),
             assignmentType: "INDIVIDUAL",
             locationId: itStoreRoom.id,
+            status: "stock",
           };
         }
         assetsToInsert.push(asset);
@@ -353,11 +355,11 @@ async function seedDatabase() {
         .insert(assetsTable)
         .values(assetsToInsert)
         .returning({
-          assetNumber: assetsTable.assetNumber,
+          id: assetsTable.id,
           state: assetsTable.state,
         });
       const historyToInsert = insertedAssets.map((asset) => ({
-        assetId: asset.assetNumber,
+        assetId: asset.id,
         newState: asset.state,
         changedBy: adminUser.id,
         changeReason: "Asset created during database seeding.",
