@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { getApiBaseUrl } from "@/lib/config";
 import { AssetEditModal } from "./asset-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 
