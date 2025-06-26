@@ -2,7 +2,13 @@
 // Dashboard Statistics Cards Component
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, Clock, CheckCircle, ArrowRightCircle } from "lucide-react";
+import {
+  Package,
+  Clock,
+  CheckCircle,
+  ArrowRightCircle,
+  Rocket,
+} from "lucide-react";
 
 type StatCard = {
   title: string;
@@ -25,6 +31,7 @@ export function DashboardStats({
   };
 
   const availableCount = getCountByState("AVAILABLE");
+  const readyToGoCount = getCountByState("READY_TO_GO");
   const issuedCount = getCountByState("ISSUED");
 
   const stats: StatCard[] = [
@@ -39,6 +46,12 @@ export function DashboardStats({
       value: availableCount.toLocaleString(),
       description: "Assets in stock, ready to be issued.",
       icon: CheckCircle,
+    },
+    {
+      title: "Ready To Go",
+      value: readyToGoCount.toLocaleString(),
+      description: "Ready To Go stock.",
+      icon: Rocket,
     },
     {
       title: "Issued",
