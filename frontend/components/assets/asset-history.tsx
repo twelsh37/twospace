@@ -23,6 +23,24 @@ type AssetHistoryType = {
   details?: Record<string, unknown>;
 };
 
+// Utility function to map asset state to solid background color classes
+const getStateColorClass = (state: AssetState) => {
+  switch (state) {
+    case AssetState.AVAILABLE:
+      return "bg-blue-600 text-white";
+    case AssetState.SIGNED_OUT:
+      return "bg-teal-600 text-white";
+    case AssetState.BUILT:
+      return "bg-orange-500 text-white";
+    case AssetState.READY_TO_GO:
+      return "bg-purple-600 text-white";
+    case AssetState.ISSUED:
+      return "bg-green-600 text-white";
+    default:
+      return "bg-gray-400 text-white";
+  }
+};
+
 export function AssetHistory({ assetId }: AssetHistoryProps) {
   // TODO: Fetch asset history from API
   const history: AssetHistoryType[] = [
@@ -119,17 +137,21 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
                       <div className="flex items-center space-x-2">
                         {entry.previousState && (
                           <>
-                            <Badge variant="outline" className="text-xs">
+                            <Badge
+                              className={
+                                "text-xs " +
+                                getStateColorClass(entry.previousState)
+                              }
+                            >
                               {ASSET_STATE_LABELS[entry.previousState]}
                             </Badge>
                             <ArrowRight className="h-3 w-3 text-muted-foreground" />
                           </>
                         )}
                         <Badge
-                          variant={
-                            entry.previousState ? "default" : "secondary"
+                          className={
+                            "text-xs " + getStateColorClass(entry.newState)
                           }
-                          className="text-xs"
                         >
                           {ASSET_STATE_LABELS[entry.newState]}
                         </Badge>

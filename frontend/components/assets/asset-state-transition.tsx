@@ -15,6 +15,24 @@ interface AssetStateTransitionProps {
   assetId: string;
 }
 
+// Utility function to map asset state to solid background color classes
+const getStateColorClass = (state: AssetState) => {
+  switch (state) {
+    case AssetState.AVAILABLE:
+      return "bg-blue-600 text-white";
+    case AssetState.SIGNED_OUT:
+      return "bg-teal-600 text-white";
+    case AssetState.BUILT:
+      return "bg-orange-500 text-white";
+    case AssetState.READY_TO_GO:
+      return "bg-purple-600 text-white";
+    case AssetState.ISSUED:
+      return "bg-green-600 text-white";
+    default:
+      return "bg-gray-400 text-white";
+  }
+};
+
 export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -56,7 +74,9 @@ export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
         {/* Current State */}
         <div className="flex items-center space-x-2">
           <span className="text-sm font-medium">Current State:</span>
-          <Badge variant="outline">{ASSET_STATE_LABELS[asset.state]}</Badge>
+          <Badge className={getStateColorClass(asset.state)}>
+            {ASSET_STATE_LABELS[asset.state]}
+          </Badge>
         </div>
 
         {/* Available Transitions */}
@@ -70,11 +90,11 @@ export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
                   className="flex items-center justify-between p-3 border rounded-lg"
                 >
                   <div className="flex items-center space-x-3">
-                    <Badge variant="outline">
+                    <Badge className={getStateColorClass(asset.state)}>
                       {ASSET_STATE_LABELS[asset.state]}
                     </Badge>
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                    <Badge variant="default">
+                    <Badge className={getStateColorClass(nextState)}>
                       {ASSET_STATE_LABELS[nextState]}
                     </Badge>
                   </div>

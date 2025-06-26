@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { AssetState } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { TrendingUp } from "lucide-react";
+import { getStateColorClass } from "@/lib/constants";
 
 type AssetsByStateProps = {
   data: { state: string; count: number }[];
@@ -41,23 +42,6 @@ export function AssetsByState({ data }: AssetsByStateProps) {
     return stateData.find((s) => s.state === state)?.count || 0;
   };
 
-  const getStateColor = (state: AssetState) => {
-    switch (state) {
-      case AssetState.AVAILABLE:
-        return "text-blue-600 bg-blue-100";
-      case AssetState.ISSUED:
-        return "text-red-600 bg-red-100";
-      case AssetState.READY_TO_GO:
-        return "text-green-600 bg-green-100";
-      case AssetState.SIGNED_OUT:
-        return "text-yellow-600 bg-yellow-100";
-      case AssetState.BUILT:
-        return "text-purple-600 bg-purple-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
   const getProgressColor = (state: AssetState) => {
     switch (state) {
       case AssetState.AVAILABLE:
@@ -90,7 +74,7 @@ export function AssetsByState({ data }: AssetsByStateProps) {
               {/* State Header */}
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-medium px-2 py-1 rounded-full ${getStateColor(
+                  className={`text-xs font-medium px-2 py-1 rounded-full ${getStateColorClass(
                     item.state
                   )}`}
                 >
