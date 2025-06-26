@@ -38,6 +38,12 @@ export const assignmentTypeEnum = pgEnum("assignment_type", [
 
 export const userRoleEnum = pgEnum("user_role", ["ADMIN", "USER"]);
 
+export const assetStatusEnum = pgEnum("asset_status", [
+  "holding",
+  "active",
+  "retired",
+]);
+
 // Users table for authentication and user management
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -85,6 +91,7 @@ export const assetsTable = pgTable("assets", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }), // Soft delete
+  status: assetStatusEnum("status").notNull().default("holding"),
 });
 
 // Asset history for audit trail

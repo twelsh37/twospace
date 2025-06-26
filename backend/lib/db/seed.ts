@@ -149,7 +149,7 @@ async function seedDatabase() {
       .insert(usersTable)
       .values({
         name: "System Administrator",
-        email: "admin@company.com",
+        email: "admin@theaiaa.co.uk",
         employeeId: "ADMIN001",
         department: "IT Department",
         role: "ADMIN",
