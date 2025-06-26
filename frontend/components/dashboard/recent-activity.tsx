@@ -22,6 +22,7 @@ type RecentActivityProps = {
     timestamp: string;
     userName: string;
     assetDescription: string | null;
+    assetNumber?: string;
   }[];
 };
 
@@ -90,7 +91,7 @@ export function RecentActivity({ data }: RecentActivityProps) {
 
   return (
     <>
-      <Card className="flex h-full flex-col shadow-md border border-gray-200 rounded-lg">
+      <Card className="flex h-full flex-col shadow-md border border-gray-200 rounded-lg justify-between">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
@@ -98,11 +99,11 @@ export function RecentActivity({ data }: RecentActivityProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="pb-0">
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2 h-full justify-between">
             {data.map((activity) => (
               <Card
                 key={activity.id}
-                className="p-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                className="p-2 hover:bg-muted/50 cursor-pointer transition-colors shadow-none border border-gray-100"
                 onClick={() => handleActivityClick(activity.assetId)}
               >
                 <div className="flex items-center justify-between">
@@ -113,7 +114,7 @@ export function RecentActivity({ data }: RecentActivityProps) {
                       )}`}
                     />
                     <span className="truncate font-medium text-sm">
-                      {activity.assetId}
+                      {activity.assetNumber || activity.assetId}
                     </span>
                     <Badge
                       className={

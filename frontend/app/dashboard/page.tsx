@@ -68,17 +68,23 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7">
-        {/* Left Column */}
-        <div className="col-span-1 space-y-4 lg:col-span-4">
-          <AssetsByType data={data} />
-          <AssetsByState data={data.assetsByState} />
+      {/* Main Content Grid - Two columns: left (stacked), right (full height) */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 items-stretch">
+        {/* Left Column: Stack Assets by Type and Asset Lifecycle Distribution */}
+        <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">
+          <div className="flex-1">
+            <AssetsByType data={data} />
+          </div>
+          <div className="flex-1">
+            <AssetsByState data={data.assetsByState} />
+          </div>
         </div>
 
-        {/* Right Column (Recent Activity) */}
-        <div className="col-span-1 lg:col-span-3">
-          <RecentActivity data={data.recentActivity} />
+        {/* Right Column: Recent Activity fills height of both left cards */}
+        <div className="col-span-1 lg:col-span-3 h-full flex flex-col">
+          <div className="flex-1 h-full">
+            <RecentActivity data={data.recentActivity} />
+          </div>
         </div>
       </div>
     </div>

@@ -56,6 +56,7 @@ export async function GET() {
         .select({
           id: assetHistoryTable.id,
           assetId: assetHistoryTable.assetId,
+          assetNumber: assetsTable.assetNumber,
           newState: assetHistoryTable.newState,
           type: assetsTable.type,
           changeReason: assetHistoryTable.changeReason,
