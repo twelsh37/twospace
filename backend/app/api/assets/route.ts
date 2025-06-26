@@ -66,26 +66,29 @@ export async function GET(request: NextRequest) {
     const whereConditions = [isNull(assetsTable.deletedAt)];
 
     if (type !== "all") {
-      whereConditions.push(eq(assetsTable.type, type as "LAPTOP"));
+      whereConditions.push(
+        eq(
+          assetsTable.type,
+          type as (typeof assetsTable.type.enumValues)[number]
+        )
+      );
     }
 
     if (state !== "all") {
-      whereConditions.push(eq(assetsTable.state, state as "AVAILABLE"));
-    }
-
-    // By default, exclude holding assets unless status filter is set
-    if (status === "all") {
       whereConditions.push(
         eq(
-          assetsTable.status,
-          "active" as typeof import("@/lib/db/schema").assetStatusEnum.enumValues[number]
+          assetsTable.state,
+          state as (typeof assetsTable.state.enumValues)[number]
         )
       );
-    } else {
+    }
+
+    // Only filter by status if not 'all'
+    if (status !== "all") {
       whereConditions.push(
         eq(
           assetsTable.status,
-          status as typeof import("@/lib/db/schema").assetStatusEnum.enumValues[number]
+          status as (typeof assetsTable.status.enumValues)[number]
         )
       );
     }

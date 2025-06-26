@@ -32,11 +32,42 @@ export function AssetsByState({ data }: AssetsByStateProps) {
     );
   }
 
-  const stateData = data.map((item) => ({
-    state: item.state as AssetState,
-    count: item.count,
-    percentage: (item.count / totalAssets) * 100,
-  }));
+  // Map backend status to frontend AssetState for color/label
+  function mapStatusToAssetState(
+    status: string
+  ): AssetState | "HOLDING" | null {
+    switch (status) {
+      case "active":
+        return AssetState.ISSUED;
+      case "stock":
+        return AssetState.AVAILABLE;
+      case "holding":
+        return "HOLDING";
+      case "retired":
+        return null; // Not a lifecycle state
+      default:
+        return null;
+    }
+  }
+
+  // Add color and label for 'HOLDING' pseudo-state
+  function getLifecycleStateColorClass(state: AssetState | "HOLDING") {
+    if (state === "HOLDING") return "bg-gray-700 text-white";
+    return getStateColorClass(state as AssetState);
+  }
+  const LIFECYCLE_STATE_LABELS: Record<AssetState | "HOLDING", string> = {
+    ...ASSET_STATE_LABELS,
+    HOLDING: "Holding (Imported)",
+  };
+
+  const stateData = data
+    .map((item) => ({
+      mappedState: mapStatusToAssetState(item.state),
+      state: item.state,
+      count: item.count,
+      percentage: (item.count / totalAssets) * 100,
+    }))
+    .filter((item) => item.mappedState !== null);
 
   const getCountByState = (state: AssetState) => {
     return stateData.find((s) => s.state === state)?.count || 0;
@@ -74,11 +105,13 @@ export function AssetsByState({ data }: AssetsByStateProps) {
               {/* State Header */}
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-medium px-2 py-1 rounded-full ${getStateColorClass(
-                    item.state
+                  className={`text-xs font-medium px-2 py-1 rounded-full ${getLifecycleStateColorClass(
+                    item.mappedState as AssetState | "HOLDING"
                   )}`}
                 >
-                  {ASSET_STATE_LABELS[item.state] || item.state}
+                  {LIFECYCLE_STATE_LABELS[
+                    item.mappedState as AssetState | "HOLDING"
+                  ] || item.state}
                 </span>
               </div>
 
@@ -95,7 +128,9 @@ export function AssetsByState({ data }: AssetsByStateProps) {
                 <Progress
                   value={item.percentage}
                   className="h-2"
-                  indicatorClassName={getProgressColor(item.state)}
+                  indicatorClassName={getProgressColor(
+                    item.mappedState as AssetState
+                  )}
                 />
               </div>
             </div>
