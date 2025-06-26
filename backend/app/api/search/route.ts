@@ -62,7 +62,7 @@ export async function GET(request: Request) {
           .select({ updatedBy: usersTable.name })
           .from(assetHistoryTable)
           .leftJoin(usersTable, eq(assetHistoryTable.changedBy, usersTable.id))
-          .where(eq(assetHistoryTable.assetId, asset.assetNumber))
+          .where(eq(assetHistoryTable.assetId, asset.id))
           .orderBy(desc(assetHistoryTable.timestamp))
           .limit(1);
 

@@ -37,8 +37,10 @@ async function updateAssetPrices() {
     // Update all assets of this type
     const result = await db
       .update(assetsTable)
-      .set({ purchasePrice: price })
-      .where(eq(assetsTable.type, type))
+      .set({ purchasePrice: price.toString() })
+      .where(
+        eq(assetsTable.type, type as (typeof assetTypeEnum.enumValues)[number])
+      )
       .returning({ assetNumber: assetsTable.assetNumber });
     console.log(
       `  - ${type}: Set purchasePrice to £${price.toFixed(2)} for ${

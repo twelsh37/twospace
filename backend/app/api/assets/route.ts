@@ -270,9 +270,9 @@ export async function POST(request: NextRequest) {
       .values(newAssetData)
       .returning();
 
-    // Create initial history entry
+    // Use the asset's UUID id for asset history
     await createAssetHistory(
-      newAsset.assetNumber,
+      newAsset.id,
       "AVAILABLE",
       "system", // TODO: Replace with actual user ID from authentication
       "Asset created",
@@ -374,7 +374,7 @@ export async function PUT(request: NextRequest) {
         }
         for (const asset of assetsToUpdate) {
           await createAssetHistory(
-            asset.assetNumber,
+            asset.id,
             newState,
             "system-bulk",
             "Bulk state transition",
