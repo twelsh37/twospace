@@ -97,15 +97,6 @@ export function AssetsByType({ data }: AssetsByTypeProps) {
               {new Intl.NumberFormat("en-GB").format(totalAssets)}
             </span>
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-lg font-bold">Total Value</span>
-            <span className="text-lg font-bold">
-              {new Intl.NumberFormat("en-GB", {
-                style: "currency",
-                currency: "GBP",
-              }).format(data.totalValue)}
-            </span>
-          </div>
         </div>
       </CardContent>
     </Card>

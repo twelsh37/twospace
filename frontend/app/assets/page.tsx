@@ -2,7 +2,7 @@
 // Assets Management Page
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { AssetTable } from "@/components/assets/asset-table";
 import {
@@ -17,7 +17,6 @@ import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
 import { exportToCSV, exportToXLSX } from "@/lib/utils";
-import { useState } from "react";
 import { getApiBaseUrl } from "@/lib/config";
 
 export default function AssetsPage() {
@@ -39,6 +38,15 @@ function AssetsPageContent() {
     state: (searchParams.get("state") as AssetState) || "all",
     status: searchParams.get("status") || "all",
   }));
+
+  // Keep filters in sync with URL query params
+  useEffect(() => {
+    setFilters({
+      type: (searchParams.get("type") as AssetType) || "all",
+      state: (searchParams.get("state") as AssetState) || "all",
+      status: searchParams.get("status") || "all",
+    });
+  }, [searchParams]);
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);

@@ -189,8 +189,10 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {assets.map((asset: Asset) => (
-              <TableRow key={asset.assetNumber}>
+            {assets.map((asset: Asset, idx: number) => (
+              <TableRow
+                key={asset.assetNumber || asset.serialNumber || `row-${idx}`}
+              >
                 <TableCell className="font-medium">
                   <Link
                     href={`/assets/${asset.assetNumber}`}

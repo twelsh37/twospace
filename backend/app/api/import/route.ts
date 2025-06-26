@@ -66,6 +66,12 @@ function isAssignmentType(
   );
 }
 
+// Defensive date parsing for createdAt and updatedAt
+function parseValidDate(val: unknown) {
+  const d = new Date(String(val));
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Use Fetch API's formData to handle file uploads in App Router
@@ -148,12 +154,8 @@ export async function POST(req: NextRequest) {
           assignedTo: row.assignedTo ? String(row.assignedTo) : null,
           employeeId: row.employeeId ? String(row.employeeId) : null,
           department: row.department ? String(row.department) : null,
-          createdAt: row.createdAt
-            ? new Date(String(row.createdAt))
-            : new Date(),
-          updatedAt: row.updatedAt
-            ? new Date(String(row.updatedAt))
-            : new Date(),
+          createdAt: parseValidDate(row.createdAt),
+          updatedAt: parseValidDate(row.updatedAt),
           status: "holding",
         });
       }

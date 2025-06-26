@@ -38,11 +38,11 @@ export async function GET() {
 
       const assetsByStateResult = await tx
         .select({
-          state: assetsTable.state,
+          state: assetsTable.status,
           count: count(),
         })
         .from(assetsTable)
-        .groupBy(assetsTable.state);
+        .groupBy(assetsTable.status);
 
       const assetsByTypeResult = await tx
         .select({
@@ -56,6 +56,7 @@ export async function GET() {
         .select({
           id: assetHistoryTable.id,
           assetId: assetHistoryTable.assetId,
+          assetNumber: assetsTable.assetNumber,
           newState: assetHistoryTable.newState,
           type: assetsTable.type,
           changeReason: assetHistoryTable.changeReason,
@@ -69,13 +70,20 @@ export async function GET() {
         .orderBy(desc(assetHistoryTable.timestamp))
         .limit(5);
 
+      // Ensure all possible statuses are present, even if count is zero
+      const allStatuses = ["holding", "active", "retired", "stock"];
+      const assetsByState = allStatuses.map((status) => {
+        const found = assetsByStateResult.find((s) => s.state === status);
+        return { state: status, count: found ? found.count : 0 };
+      });
+
       // Format the results
       const dashboardData = {
         totalAssets: totalAssetsResult[0]?.value || 0,
         totalValue: parseFloat(totalValueResult[0]?.value || "0"),
         totalUsers: totalUsersResult[0]?.value || 0,
         totalLocations: totalLocationsResult[0]?.value || 0,
-        assetsByState: assetsByStateResult,
+        assetsByState,
         assetsByType: assetsByTypeResult,
         recentActivity: recentActivityResult.map((activity) => ({
           ...activity,
