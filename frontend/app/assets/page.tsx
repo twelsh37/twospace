@@ -17,7 +17,6 @@ import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
 import { exportToCSV, exportToXLSX } from "@/lib/utils";
-import { getApiBaseUrl } from "@/lib/config";
 
 export default function AssetsPage() {
   return (
@@ -81,9 +80,7 @@ function AssetsPageContent() {
     let dataToExport: Record<string, unknown>[] = [];
     // Always fetch all filtered data from backend
     try {
-      const response = await fetch(
-        `${getApiBaseUrl()}/api/assets?${searchParams.toString()}&all=1`
-      );
+      const response = await fetch(`${searchParams.toString()}&all=1`);
       const result = await response.json();
       dataToExport = result.data.assets;
     } catch {

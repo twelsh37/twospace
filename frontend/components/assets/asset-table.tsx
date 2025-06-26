@@ -69,12 +69,9 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
     const fetchAssets = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `${getApiBaseUrl()}/api/assets?${queryString}`,
-          {
-            cache: "no-store",
-          }
-        );
+        const response = await fetch(`/api/assets?${queryString}`, {
+          cache: "no-store",
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch assets");
         }

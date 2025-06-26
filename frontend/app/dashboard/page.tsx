@@ -11,20 +11,13 @@ import type { DashboardData } from "@/lib/types";
 // Function to fetch data from the backend API
 async function getDashboardData(): Promise<DashboardData | null> {
   try {
-    // Add this line to debug the environment variable:
-    console.log(
-      "Attempting to fetch from API URL:",
-      process.env.NEXT_PUBLIC_API_URL
-    );
-
-    // We can use a relative path here because of the proxy configured in next.config.ts
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`);
-
+    // Use absolute URL for server-side fetch
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/dashboard`);
     if (!res.ok) {
       console.error("Failed to fetch dashboard data:", res.statusText);
       return null;
     }
-
     const jsonResponse = await res.json();
     return jsonResponse.data;
   } catch (error) {
