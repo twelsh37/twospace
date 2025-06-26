@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AssetState, AssetType } from "@/lib/types";
-import { ASSET_STATE_LABELS } from "@/lib/constants";
+import { ASSET_STATE_LABELS, getStateColorClass } from "@/lib/constants";
 import { Activity } from "lucide-react";
 import { AssetDetailModal } from "@/components/assets/asset-detail-modal";
 import { Asset as DetailedAsset } from "@/components/search/search-results-modal";
@@ -115,7 +115,12 @@ export function RecentActivity({ data }: RecentActivityProps) {
                     <span className="truncate font-medium text-sm">
                       {activity.assetId}
                     </span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge
+                      className={
+                        "text-xs " +
+                        getStateColorClass(activity.newState as AssetState)
+                      }
+                    >
                       {ASSET_STATE_LABELS[activity.newState as AssetState] ||
                         activity.newState}
                     </Badge>

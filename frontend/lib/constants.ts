@@ -119,3 +119,22 @@ export const API_ENDPOINTS = {
   IMPORT: "/api/import",
   AUTH: "/api/auth",
 } as const;
+
+// Utility function to map asset state to solid background color classes (centralized for reuse)
+export function getStateColorClass(state: AssetState): string {
+  // AVAILABLE - Blue, SIGNED_OUT - Teal, BUILT - Orange, READY_TO_GO - Purple, ISSUED - Green
+  switch (state) {
+    case AssetState.AVAILABLE:
+      return "bg-blue-600 text-white";
+    case AssetState.SIGNED_OUT:
+      return "bg-teal-600 text-white";
+    case AssetState.BUILT:
+      return "bg-orange-500 text-white";
+    case AssetState.READY_TO_GO:
+      return "bg-purple-600 text-white";
+    case AssetState.ISSUED:
+      return "bg-green-600 text-white";
+    default:
+      return "bg-gray-400 text-white";
+  }
+}

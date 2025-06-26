@@ -29,20 +29,23 @@ import { getApiBaseUrl } from "@/lib/config";
 import { AssetEditModal } from "./asset-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 
-const getStateVariant = (state: AssetState) => {
+// Utility function to map asset state to solid background color classes
+const getStateColorClass = (state: AssetState) => {
+  // This function returns Tailwind classes for solid backgrounds and white text
+  // AVAILABLE - Blue, SIGNED_OUT - Teal, BUILT - Orange, READY_TO_GO - Purple, ISSUED - Green
   switch (state) {
     case AssetState.AVAILABLE:
-      return "secondary";
+      return "bg-blue-600 text-white";
     case AssetState.SIGNED_OUT:
-      return "outline";
+      return "bg-teal-600 text-white";
     case AssetState.BUILT:
-      return "default";
+      return "bg-orange-500 text-white";
     case AssetState.READY_TO_GO:
-      return "default";
+      return "bg-purple-600 text-white";
     case AssetState.ISSUED:
-      return "destructive";
+      return "bg-green-600 text-white";
     default:
-      return "secondary";
+      return "bg-gray-400 text-white";
   }
 };
 
@@ -203,7 +206,9 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                   {asset.description}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStateVariant(asset.state as AssetState)}>
+                  <Badge
+                    className={getStateColorClass(asset.state as AssetState)}
+                  >
                     {ASSET_STATE_LABELS[asset.state as AssetState]}
                   </Badge>
                 </TableCell>

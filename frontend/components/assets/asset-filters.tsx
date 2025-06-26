@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export type FilterKey = "type" | "state" | "status";
 
@@ -28,6 +29,24 @@ interface AssetFiltersProps {
   onFilterChange: (key: FilterKey, value: string) => void;
   onClearFilters: () => void;
 }
+
+// Utility function to map asset state to solid background color classes
+const getStateColorClass = (state: AssetState) => {
+  switch (state) {
+    case AssetState.AVAILABLE:
+      return "bg-blue-600 text-white";
+    case AssetState.SIGNED_OUT:
+      return "bg-teal-600 text-white";
+    case AssetState.BUILT:
+      return "bg-orange-500 text-white";
+    case AssetState.READY_TO_GO:
+      return "bg-purple-600 text-white";
+    case AssetState.ISSUED:
+      return "bg-green-600 text-white";
+    default:
+      return "bg-gray-400 text-white";
+  }
+};
 
 export function AssetFilters({
   filters,
@@ -70,7 +89,9 @@ export function AssetFilters({
               <SelectItem value="all">All States</SelectItem>
               {Object.entries(ASSET_STATE_LABELS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
-                  {label}
+                  <Badge className={getStateColorClass(key as AssetState)}>
+                    {label}
+                  </Badge>
                 </SelectItem>
               ))}
             </SelectContent>

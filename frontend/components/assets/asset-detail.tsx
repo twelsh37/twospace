@@ -11,6 +11,24 @@ interface AssetDetailProps {
   assetId: string;
 }
 
+// Utility function to map asset state to solid background color classes
+const getStateColorClass = (state: AssetState) => {
+  switch (state) {
+    case AssetState.AVAILABLE:
+      return "bg-blue-600 text-white";
+    case AssetState.SIGNED_OUT:
+      return "bg-teal-600 text-white";
+    case AssetState.BUILT:
+      return "bg-orange-500 text-white";
+    case AssetState.READY_TO_GO:
+      return "bg-purple-600 text-white";
+    case AssetState.ISSUED:
+      return "bg-green-600 text-white";
+    default:
+      return "bg-gray-400 text-white";
+  }
+};
+
 export function AssetDetail({ assetId }: AssetDetailProps) {
   // TODO: Fetch asset data from API
   const asset = {
@@ -35,7 +53,9 @@ export function AssetDetail({ assetId }: AssetDetailProps) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Asset Information
-          <Badge variant="outline">{ASSET_STATE_LABELS[asset.state]}</Badge>
+          <Badge className={getStateColorClass(asset.state)}>
+            {ASSET_STATE_LABELS[asset.state]}
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
