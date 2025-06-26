@@ -1,6 +1,6 @@
 assetNumber,type,state,serialNumber,description,purchasePrice,location,assignmentType,assignedTo,employeeId,department,createdAt,updatedAt
-01-00001,LAPTOP,AVAILABLE,SN12345,HP EliteBook 840 G7,1200,Headquarters - Floor 1,INDIVIDUAL,,,,2023-01-10T09:00:00Z,2023-01-10T09:00:00Z
-01-00002,DESKTOP,AVAILABLE,SN22345,Dell OptiPlex 7080,900,Headquarters - Floor 2,SHARED,,,,2023-01-12T10:00:00Z,2023-01-12T10:00:00Z
-01-00003,TABLET,AVAILABLE,SN32345,iPad Air 4,600,Branch Office - North,INDIVIDUAL,,,,2023-01-15T11:00:00Z,2023-01-15T11:00:00Z
-01-00004,MOBILE_PHONE,AVAILABLE,SN42345,iPhone 13,800,Warehouse - Main,INDIVIDUAL,,,,2023-01-18T12:00:00Z,2023-01-18T12:00:00Z
-01-00005,MONITOR,AVAILABLE,SN52345,Dell UltraSharp U2720Q,400,IT Department,SHARED,,,,2023-01-20T13:00:00Z,2023-01-20T13:00:00Z 
+01-00001,LAPTOP,Available Stock,SN12345,HP EliteBook 840 G7,1200,IT Department - store room,Unassigned,,,,2023-01-10T09:00:00Z,2023-01-10T09:00:00Z
+01-00002,DESKTOP,Available Stock,SN22345,Dell OptiPlex 7080,900,IT Department - store room,Unassigned,,,,2023-01-12T10:00:00Z,2023-01-12T10:00:00Z
+01-00003,TABLET,Available Stock,SN32345,iPad Air 4,600,IT Department - store room,Unassigned,,,,2023-01-15T11:00:00Z,2023-01-15T11:00:00Z
+01-00004,MOBILE_PHONE,Available Stock,SN42345,iPhone 13,800,IT Department - store room,Unassigned,,,,2023-01-18T12:00:00Z,2023-01-18T12:00:00Z
+01-00005,MONITOR,Available Stock,SN52345,Dell UltraSharp U2720Q,400,IT Department - store room,Unassigned,,,,2023-01-20T13:00:00Z,2023-01-20T13:00:00Z 
