@@ -1,6 +1,0 @@
-﻿assetNumber,type,state,serialNumber,description,purchasePrice,location,assignmentType,assignedTo,employeeId,department,createdAt,updatedAt
-01-00001,LAPTOP,Available Stock,SN16345,HP EliteBook 840 G7,1200,IT Department - store room,Unassigned,,,,2023-01-10T09:00:00Z,2023-01-10T09:00:00Z
-01-00002,DESKTOP,Available Stock,SN16346,Dell OptiPlex 7080,900,IT Department - store room,Unassigned,,,,2023-01-12T10:00:00Z,2023-01-12T10:00:00Z
-01-00003,TABLET,Available Stock,SN16347,iPad Air 4,600,IT Department - store room,Unassigned,,,,2023-01-15T11:00:00Z,2023-01-15T11:00:00Z
-01-00004,MOBILE_PHONE,Available Stock,SN16348,iPhone 13,800,IT Department - store room,Unassigned,,,,2023-01-18T12:00:00Z,2023-01-18T12:00:00Z
-01-00005,MONITOR,Available Stock,SN16349,Dell UltraSharp U2720Q,400,IT Department - store room,Unassigned,,,,2023-01-20T13:00:00Z,2023-01-20T13:00:00Z 
