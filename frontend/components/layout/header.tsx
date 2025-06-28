@@ -72,95 +72,89 @@ export function Header() {
 
   return (
     <>
-      <header className="flex items-center justify-between pl-0 pr-6 py-4 bg-background border-b">
-        {/* Wrap header content for visual spacing */}
-        <div className="flex w-full items-center justify-between px-6">
-          {/* Left Side - Search */}
-          <div className="flex items-center space-x-4">
-            <div className="relative w-64 md:w-96">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search assets, users, or locations..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
+      <header className="flex items-center justify-between px-6 py-4 bg-background border-b">
+        {/* Left Side - Search */}
+        <div className="flex items-center space-x-4">
+          <div className="relative w-64 md:w-96">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search assets, users, or locations..."
+              className="pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+        </div>
+
+        {/* Right Side - Actions and User */}
+        <div className="flex items-center space-x-4">
+          {/* Notifications */}
+          <div className="relative">
+            <Button variant="ghost" size="sm">
+              <Bell className="h-4 w-4" />
+            </Button>
+            {notifications > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              >
+                {notifications}
+              </Badge>
+            )}
           </div>
 
-          {/* Right Side - Actions and User */}
-          <div className="flex items-center space-x-4">
-            {/* Notifications */}
-            <div className="relative">
-              <Button variant="ghost" size="sm">
-                <Bell className="h-4 w-4" />
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>
+                    {user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
               </Button>
-              {notifications > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {notifications}
-                </Badge>
-              )}
-            </div>
+            </DropdownMenuTrigger>
 
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {user.name}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user.email}
+                  </p>
+                  <Badge variant="secondary" className="w-fit mt-1">
+                    {user.role}
+                  </Badge>
+                </div>
+              </DropdownMenuLabel>
 
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user.name}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
-                    <Badge variant="secondary" className="w-fit mt-1">
-                      {user.role}
-                    </Badge>
-                  </div>
-                </DropdownMenuLabel>
+              <DropdownMenuSeparator />
 
-                <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
 
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
 
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
+              <DropdownMenuSeparator />
 
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+              <DropdownMenuItem className="text-destructive">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       <SearchResultsModal

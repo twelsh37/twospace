@@ -1,5 +1,5 @@
-// backend/lib/db/index.ts
-// Database connection setup for Drizzle ORM with Supabase
+// frontend/lib/db/index.ts
+// Database connection setup for Drizzle ORM with Neon Postgres
 import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";

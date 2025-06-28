@@ -1,8 +1,8 @@
-# Phase 2 - Asset Management System with Drizzle ORM + Supabase
+# Phase 2 - Asset Management System with Drizzle ORM + Neon Postgres
 
 ## Overview
 
-Phase 2 has been successfully converted from raw PostgreSQL to use **Drizzle ORM** with **Supabase** as the database provider. This provides a modern, type-safe database layer with excellent developer experience.
+Phase 2 has been successfully converted from raw PostgreSQL to use **Drizzle ORM** with **Neon Postgres** as the database provider. This provides a modern, type-safe database layer with excellent developer experience.
 
 ## 🗃️ Database Architecture
 
@@ -10,11 +10,11 @@ Phase 2 has been successfully converted from raw PostgreSQL to use **Drizzle ORM
 
 The database layer has been completely restructured using Drizzle ORM:
 
-- **Schema Definition**: `backend/lib/db/schema.ts` - All table definitions with TypeScript types
-- **Database Connection**: `backend/lib/db/index.ts` - Supabase connection with pooling
-- **Utility Functions**: `backend/lib/db/utils.ts` - Helper functions for common operations
-- **Seeding**: `backend/lib/db/seed.ts` - Initial data population
-- **Configuration**: `backend/drizzle.config.ts` - Drizzle Kit configuration
+- **Schema Definition**: `frontend/lib/db/schema.ts` - All table definitions with TypeScript types
+- **Database Connection**: `frontend/lib/db/index.ts` - Neon Postgres connection with pooling
+- **Utility Functions**: `frontend/lib/db/utils.ts` - Helper functions for common operations
+- **Seeding**: `frontend/lib/db/seed.ts` - Initial data population
+- **Configuration**: `frontend/drizzle.config.ts` - Drizzle Kit configuration
 
 ### Database Tables
 
@@ -35,6 +35,68 @@ The database layer has been completely restructured using Drizzle ORM:
 - **Type-Safe Enums** - Asset types, states, assignment types, user roles
 - **Foreign Key Relations** - Proper relationships between tables
 - **JSONB Support** - For flexible data storage in history details
+
+## 📝 Database Schema with Drizzle ORM
+
+The database schema for this project is defined in [`frontend/lib/db/schema.ts`], using [Drizzle ORM](https://orm.drizzle.team/docs/overview) for type-safe, programmatic schema management. This file is the single source of truth for all database tables, enums, and type exports used throughout the application.
+
+### Structure of schema.ts
+
+- **Enum Definitions**: All enums (such as asset types, states, assignment types, user roles, and asset status) are defined using Drizzle's `pgEnum` helper. This ensures type safety and consistency across the app and database.
+- **Table Definitions**: Each table is defined using Drizzle's `pgTable` API, specifying columns, types, constraints, and relationships. All core tables (users, locations, assets, asset_history, asset_assignments, asset_sequences) are defined here.
+- **Type Exports**: At the end of the file, TypeScript types are exported using Drizzle's `$inferSelect` and `$inferInsert` helpers. This allows you to use fully type-safe objects in your application code and API routes.
+
+### Example: Enum and Table Definition
+
+```typescript
+// Enum for asset types
+export const assetTypeEnum = pgEnum("asset_type", [
+  "MOBILE_PHONE",
+  "TABLET",
+  "DESKTOP",
+  "LAPTOP",
+  "MONITOR",
+]);
+
+// Table for assets
+export const assetsTable = pgTable("assets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  assetNumber: varchar("asset_number", { length: 10 }).unique(),
+  type: assetTypeEnum("type").notNull(),
+  // ... other columns ...
+});
+```
+
+### Example: Type Inference
+
+```typescript
+// Use inferred types for type-safe queries
+import { assetsTable } from "@/lib/db/schema";
+
+export type Asset = typeof assetsTable.$inferSelect;
+export type NewAsset = typeof assetsTable.$inferInsert;
+
+// Example usage in a query
+const assets: Asset[] = await db.select().from(assetsTable);
+```
+
+### Extending the Schema
+
+- To add a new table or column, edit `schema.ts` and use Drizzle's API.
+- After making changes, generate a migration with:
+  ```bash
+  yarn db:generate
+  ```
+- Review and apply the migration as described in the [Migration Workflow](#migration-workflow) section.
+
+### Why Drizzle ORM?
+
+- **Type Safety**: All schema definitions and queries are fully type-checked by TypeScript.
+- **Single Source of Truth**: The schema file is the only place you need to update for database changes.
+- **Easy Migrations**: Drizzle Kit generates migration files based on changes to `schema.ts`.
+- **Developer Experience**: Autocomplete, refactoring, and error checking are all improved.
+
+For more details, see the comments in [`frontend/lib/db/schema.ts`].
 
 ## 🔧 Key Features Implemented
 
@@ -80,7 +142,7 @@ const assets: Asset[] = await getActiveAssets({
 ## 📁 File Structure
 
 ```
-backend/
+frontend/
 ├── lib/
 │   └── db/
 │       ├── schema.ts      # Drizzle schema definitions
@@ -100,23 +162,23 @@ backend/
 ### Prerequisites
 
 - Node.js 18+
-- Supabase account and project
-- PostgreSQL database (via Supabase)
+- Neon Postgres account and project
+- PostgreSQL database (via Neon)
 
 ### Setup Steps
 
 1. **Install Dependencies** (already done)
 
    ```bash
-   cd backend
+   cd frontend
    yarn install
    ```
 
 2. **Environment Configuration**
-   Create `.env.local` in the backend directory:
+   Create `.env.local` in the frontend directory:
 
    ```env
-   DATABASE_URL="postgresql://postgres:[password]@db.[reference].supabase.co:5432/postgres"
+   DATABASE_URL="postgresql://[user]:[password]@[host].neon.tech:5432/postgres"
    NODE_ENV="development"
    ```
 
@@ -127,12 +189,6 @@ backend/
    ```bash
    # Generate migration files
    yarn db:generate
-
-   # Push schema to database (for development)
-   yarn db:push
-
-   # Or run migrations (for production)
-   yarn db:migrate
    ```
 
 4. **Seed Initial Data**

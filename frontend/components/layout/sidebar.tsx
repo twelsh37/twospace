@@ -55,19 +55,28 @@ export function Sidebar() {
       title: "Assets",
       href: "/assets",
       icon: Package,
-      badge: isLoading ? "..." : stats.totalAssets?.toLocaleString() || "0",
+      badge:
+        isLoading || typeof window === "undefined"
+          ? "..."
+          : stats.totalAssets?.toLocaleString() || "0",
     },
     {
       title: "Users",
       href: "/users",
       icon: Users,
-      badge: isLoading ? "..." : stats.totalUsers?.toLocaleString() || "0",
+      badge:
+        isLoading || typeof window === "undefined"
+          ? "..."
+          : stats.totalUsers?.toLocaleString() || "0",
     },
     {
       title: "Locations",
       href: "/locations",
       icon: MapPin,
-      badge: isLoading ? "..." : stats.totalLocations?.toLocaleString() || "0",
+      badge:
+        isLoading || typeof window === "undefined"
+          ? "..."
+          : stats.totalLocations?.toLocaleString() || "0",
     },
     {
       title: "Import",
@@ -99,7 +108,7 @@ export function Sidebar() {
         )}
       >
         {/* Logo and Toggle */}
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 border-b">
           {!isCollapsed && (
             <div className="flex items-center space-x-2">
               <Package className="h-6 w-6 text-primary" />

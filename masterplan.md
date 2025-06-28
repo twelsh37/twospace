@@ -68,6 +68,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **Column Mapping**: Flexible mapping interface for supplier data to database fields
 - **Validation**: Data validation during import process
 - **Asset Number Generation**: Automatic sequential numbering for imported assets
+- **File Upload**: Users upload CSV/XLSX files directly; Vercel Blob Storage is not used for import data.
 
 ### 4. User Management
 
@@ -76,6 +77,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
   - **User**: All operations except record deletion
 - **User Import**: CSV/Excel import for bulk user onboarding
 - **User Properties**: Name, employee ID, department, role
+- **Authentication & Authorization**: Not yet implemented, but Clerk is planned for authentication/authorization.
 
 ### 5. Location Management
 
@@ -89,6 +91,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **User Tracking**: Record of who made each change
 - **Timestamp Recording**: Precise date/time of all modifications
 - **Change Details**: Comprehensive logging of all asset modifications
+- **Audit Trail View**: There will be a user-accessible audit trail area, showing who transitioned assets, with time/date and color-coded badges matching the app's color scheme.
 
 ### 7. Dashboard and Reporting
 
@@ -96,31 +99,28 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **Asset Status**: Current state distribution across all assets
 - **Location Summary**: Asset distribution by location
 - **Quick Actions**: Direct access to common operations
+- **Advanced Reporting & Analytics**: Planned for future implementation, including predictive analytics (e.g., hardware burndown rate) to help with stock management.
 
 ## High-Level Technical Stack
 
-### Frontend
+### Frontend & API
 
 - **Framework**: Next.js 15 with TypeScript
 - **UI Components**: Shadcn/ui component library
 - **Styling**: Tailwind CSS
 - **State Management**: React hooks and context
 - **Form Handling**: React Hook Form with Zod validation
-
-### Backend
-
-- **API**: Next.js API routes with TypeScript
-- **Database**: Vercel PostgreSQL
-- **ORM**: Prisma or Drizzle ORM
-- **Authentication**: NextAuth.js or Clerk
-- **File Upload**: Vercel Blob Storage for import files
-
-### Infrastructure
-
+- **API**: Next.js API routes (no separate backend service; all business logic and database access is handled in the Next.js frontend via API routes and server components)
+- **Database**: Neon Postgres
+- **ORM**: Drizzle ORM
+- **Authentication**: (Planned) Clerk for authentication/authorization
+- **File Upload**: Users upload CSV/XLSX files directly for import; Vercel Blob Storage is not used
 - **Hosting**: Vercel platform
 - **Package Manager**: Yarn
 - **Version Control**: Git
 - **Environment**: TypeScript throughout
+
+> **Note:** There is no separate backend service. All business logic, API endpoints, and database access are implemented in the Next.js frontend using API routes and server components. The project does not use Prisma, Supabase, or a traditional backend server.
 
 ## Conceptual Data Model
 
@@ -165,12 +165,13 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **Import Interface**: File upload and column mapping
 - **Reporting**: Asset statistics and status views
 - **User Management**: Role-based access control
+- **Audit Trail**: User-accessible view of asset transitions and changes
 
 ## Security Considerations
 
 ### Authentication and Authorization
 
-- Secure user authentication
+- Secure user authentication (planned; will use Clerk)
 - Role-based access control
 - Session management
 - API route protection
@@ -195,7 +196,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 
 - Project setup with Next.js, TypeScript, and Shadcn/ui
 - Database schema design and implementation
-- Basic authentication system
+- Basic authentication system (planned; will use Clerk)
 - Core asset CRUD operations
 
 ### Phase 2: Asset Lifecycle (Weeks 3-4)
@@ -222,7 +223,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 ### Phase 5: Reporting and Polish (Weeks 9-10)
 
 - Advanced dashboard features
-- Reporting capabilities
+- Reporting capabilities (planned)
 - UI/UX refinements
 - Testing and bug fixes
 
@@ -231,7 +232,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - Vercel deployment
 - Production environment setup
 - Documentation
-- User training materials
+- User training materials (to be created once the product is feature-complete)
 
 ## Potential Challenges and Solutions
 
@@ -251,7 +252,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 
 ### Solutions
 
-- Comprehensive testing strategy
+- Comprehensive testing strategy (Jest will be used for unit and feature testing)
 - Performance monitoring and optimization
 - User feedback integration
 - Iterative development approach
@@ -260,20 +261,20 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 
 ### Advanced Features
 
-- **Barcode/QR Code Integration**: Physical asset tagging and scanning
-- **Maintenance Scheduling**: Preventive maintenance tracking
-- **Depreciation Tracking**: Financial asset management
-- **Integration APIs**: Connect with procurement and HR systems
-- **Mobile App**: Native mobile application
-- **Advanced Analytics**: Predictive analytics and reporting
-- **Workflow Automation**: Automated approval processes
-- **Multi-tenant Support**: Support for multiple organizations
+- **Barcode/QR Code Integration**: Physical asset tagging and scanning (planned; will be added soon)
+- **Maintenance Scheduling**: Preventive maintenance tracking (possible future enhancement)
+- **Depreciation Tracking**: Not planned
+- **Integration APIs**: Connect with procurement and HR systems (possible future enhancement)
+- **Mobile App**: Native mobile application (planned for the future; currently mobile-first web)
+- **Advanced Analytics**: Predictive analytics and reporting (planned)
+- **Workflow Automation**: Automated approval processes (possible future enhancement)
+- **Multi-tenant Support**: Not planned
 
 ### Integration Opportunities
 
 - **Procurement Systems**: Automated asset creation from purchase orders
 - **HR Systems**: Automatic user assignment from employee data
-- **Accounting Systems**: Asset valuation and depreciation tracking
+- **Accounting Systems**: Asset valuation and depreciation tracking (not planned)
 - **IT Service Management**: Integration with help desk systems
 
 ## Success Metrics
