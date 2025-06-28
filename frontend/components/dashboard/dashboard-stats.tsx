@@ -3,7 +3,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Package,
   Clock,
   CheckCircle,
   ArrowRightCircle,
@@ -24,7 +23,6 @@ type DashboardStatsProps = {
 };
 
 export function DashboardStats({
-  totalAssets,
   assetsByState,
 }: DashboardStatsProps) {
   // const availableCount = getCountByState("AVAILABLE"); // No longer used
@@ -42,23 +40,33 @@ export function DashboardStats({
   const holdingCount =
     assetsByState.find((s) => s.state === "holding")?.count || 0;
 
+  // Get count for assets in 'BUILT' state
+  const builtCount = assetsByState.find((s) => s.state === "BUILT")?.count || 0;
+
   const stats: StatCard[] = [
     {
-      title: "Total Assets",
-      value: totalAssets.toLocaleString(),
-      description: "Total assets in the system.",
-      icon: Package,
+      title: "New Stock Awaiting Asseting",
+      value:
+        holdingCount > 0 ? holdingCount.toLocaleString() : "No Imported Assets",
+      description: "Assets in holding (imported) status.",
+      icon: Clock,
     },
     {
-      title: "Available",
+      title: "Available Stock",
       value: availableStockCount.toLocaleString(),
       description: "Assets in stock, ready to be issued.",
       icon: CheckCircle,
     },
     {
+      title: "Currently Building",
+      value: builtCount.toLocaleString(),
+      description: "Assets that are building",
+      icon: Rocket,
+    },
+    {
       title: "Ready To Go",
       value: readyToGoStockCount.toLocaleString(),
-      description: "Ready To Go stock.",
+      description: "Configured and Ready To Go",
       icon: Rocket,
     },
     {
@@ -67,27 +75,21 @@ export function DashboardStats({
       description: "Assets currently assigned out.",
       icon: ArrowRightCircle,
     },
-    {
-      title: "Holding",
-      value:
-        holdingCount > 0 ? holdingCount.toLocaleString() : "No Imported Assets",
-      description: "Assets in holding (imported) status.",
-      icon: Clock,
-    },
   ];
 
   // Helper to get the correct link for each card
   const getCardLink = (title: string) => {
     switch (title) {
-      case "Available":
+      case "New Stock Awaiting Asseting":
+        return "/assets?status=holding&state=all";
+      case "Available Stock":
         return "/assets?state=AVAILABLE";
+      case "Currently Building":
+        return "/assets?state=BUILT";
       case "Ready To Go":
         return "/assets?state=READY_TO_GO";
       case "Issued":
         return "/assets?state=ISSUED";
-      case "Holding":
-        return "/assets?status=holding&state=all";
-      case "Total Assets":
       default:
         return "/assets";
     }
