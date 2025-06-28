@@ -7,13 +7,16 @@ import { AssetsByType } from "@/components/dashboard/assets-by-type";
 import { AssetsByState } from "@/components/dashboard/assets-by-state";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import type { DashboardData } from "@/lib/types";
+import { headers } from "next/headers";
 
 // Function to fetch data from the backend API
 async function getDashboardData(): Promise<DashboardData | null> {
   try {
-    // Use absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/dashboard`);
+    // Use dynamic host/protocol for server-side fetch (required for production build)
+    const headersList = await headers();
+    const host = headersList.get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const res = await fetch(`${protocol}://${host}/api/dashboard`);
     if (!res.ok) {
       console.error("Failed to fetch dashboard data:", res.statusText);
       return null;
