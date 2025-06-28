@@ -42,6 +42,9 @@ export function DashboardStats({
   const holdingCount =
     assetsByState.find((s) => s.state === "holding")?.count || 0;
 
+  // Get count for assets in 'BUILT' state
+  const builtCount = assetsByState.find((s) => s.state === "BUILT")?.count || 0;
+
   const stats: StatCard[] = [
     {
       title: "Available Stock",
@@ -50,9 +53,15 @@ export function DashboardStats({
       icon: CheckCircle,
     },
     {
+      title: "Built",
+      value: builtCount.toLocaleString(),
+      description: "Assets that have been built.",
+      icon: Rocket,
+    },
+    {
       title: "Ready To Go",
       value: readyToGoStockCount.toLocaleString(),
-      description: "Ready To Go stock.",
+      description: "Configured and Ready To Go",
       icon: Rocket,
     },
     {
@@ -75,6 +84,8 @@ export function DashboardStats({
     switch (title) {
       case "Available Stock":
         return "/assets?state=AVAILABLE";
+      case "Built":
+        return "/assets?state=BUILT";
       case "Ready To Go":
         return "/assets?state=READY_TO_GO";
       case "Issued":
