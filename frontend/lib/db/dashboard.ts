@@ -86,6 +86,7 @@ export async function getDashboardData() {
         timestamp: activity.timestamp
           ? new Date(activity.timestamp).toISOString()
           : "",
+        assetNumber: activity.assetNumber ?? undefined,
       })),
     };
 

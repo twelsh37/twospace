@@ -6,7 +6,7 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { AssetsByType } from "@/components/dashboard/assets-by-type";
 import { AssetsByState } from "@/components/dashboard/assets-by-state";
 import { QuickActions } from "@/components/dashboard/quick-actions";
-import type { DashboardData } from "@/lib/types";
+//import type { DashboardData } from "@/lib/types";
 import { getDashboardData } from "@/lib/db/dashboard";
 
 export default async function DashboardPage() {
