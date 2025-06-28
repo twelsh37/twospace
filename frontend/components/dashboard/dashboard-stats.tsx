@@ -44,13 +44,7 @@ export function DashboardStats({
 
   const stats: StatCard[] = [
     {
-      title: "Total Assets",
-      value: totalAssets.toLocaleString(),
-      description: "Total assets in the system.",
-      icon: Package,
-    },
-    {
-      title: "Available",
+      title: "Available Stock",
       value: availableStockCount.toLocaleString(),
       description: "Assets in stock, ready to be issued.",
       icon: CheckCircle,
@@ -79,7 +73,7 @@ export function DashboardStats({
   // Helper to get the correct link for each card
   const getCardLink = (title: string) => {
     switch (title) {
-      case "Available":
+      case "Available Stock":
         return "/assets?state=AVAILABLE";
       case "Ready To Go":
         return "/assets?state=READY_TO_GO";
@@ -87,7 +81,6 @@ export function DashboardStats({
         return "/assets?state=ISSUED";
       case "Holding":
         return "/assets?status=holding&state=all";
-      case "Total Assets":
       default:
         return "/assets";
     }
