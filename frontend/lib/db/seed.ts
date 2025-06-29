@@ -269,7 +269,7 @@ async function seedDatabase() {
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
-      })
+      } as schema.NewUser)
       .onConflictDoNothing();
     console.log("   ✓ Locations, departments, and admin user seeded.");
 
