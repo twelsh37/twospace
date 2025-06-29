@@ -45,13 +45,29 @@ export const assetStatusEnum = pgEnum("asset_status", [
   "stock",
 ]);
 
+// Departments table for department management per location
+export const departmentsTable = pgTable("departments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  locationId: uuid("location_id")
+    .notNull()
+    .references(() => locationsTable.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 // Users table for authentication and user management
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   employeeId: varchar("employee_id", { length: 50 }).notNull().unique(),
-  department: varchar("department", { length: 255 }).notNull(),
+  locationId: uuid("location_id")
+    .notNull()
+    .references(() => locationsTable.id),
+  departmentId: uuid("department_id")
+    .notNull()
+    .references(() => departmentsTable.id),
   role: userRoleEnum("role").notNull().default("USER"),
   passwordHash: varchar("password_hash", { length: 255 }), // For future authentication
   isActive: boolean("is_active").notNull().default(true),
@@ -146,3 +162,5 @@ export type AssetHistory = typeof assetHistoryTable.$inferSelect;
 export type NewAssetHistory = typeof assetHistoryTable.$inferInsert;
 export type AssetAssignment = typeof assetAssignmentsTable.$inferSelect;
 export type NewAssetAssignment = typeof assetAssignmentsTable.$inferInsert;
+export type Department = typeof departmentsTable.$inferSelect;
+export type NewDepartment = typeof departmentsTable.$inferInsert;

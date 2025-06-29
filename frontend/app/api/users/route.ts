@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { usersTable } from "@/lib/db/schema";
+import { usersTable, departmentsTable } from "@/lib/db/schema";
 import { sql, eq, and } from "drizzle-orm";
 
 // GET /api/users - returns paginated users
@@ -20,8 +20,9 @@ export async function GET(request: NextRequest) {
 
     // Build where conditions for filters
     const whereConditions = [];
+    let joinDepartment = false;
     if (department !== "all") {
-      whereConditions.push(eq(usersTable.department, department));
+      joinDepartment = true;
     }
     if (role !== "all" && (role === "ADMIN" || role === "USER")) {
       whereConditions.push(eq(usersTable.role, role as "ADMIN" | "USER"));
@@ -29,19 +30,23 @@ export async function GET(request: NextRequest) {
 
     // Only select columns needed for the frontend table
     let users;
-    if (whereConditions.length > 0) {
+    if (joinDepartment) {
       users = await db
         .select({
           id: usersTable.id,
           name: usersTable.name,
           email: usersTable.email,
           role: usersTable.role,
-          department: usersTable.department,
+          department: departmentsTable.name,
           isActive: usersTable.isActive,
           employeeId: usersTable.employeeId,
         })
         .from(usersTable)
-        .where(and(...whereConditions))
+        .innerJoin(
+          departmentsTable,
+          eq(usersTable.departmentId, departmentsTable.id)
+        )
+        .where(and(eq(departmentsTable.name, department), ...whereConditions))
         .limit(limit)
         .offset(offset);
     } else {
@@ -51,26 +56,38 @@ export async function GET(request: NextRequest) {
           name: usersTable.name,
           email: usersTable.email,
           role: usersTable.role,
-          department: usersTable.department,
+          department: departmentsTable.name,
           isActive: usersTable.isActive,
           employeeId: usersTable.employeeId,
         })
         .from(usersTable)
+        .innerJoin(
+          departmentsTable,
+          eq(usersTable.departmentId, departmentsTable.id)
+        )
         .limit(limit)
         .offset(offset);
     }
 
     // Get total count for pagination (with filters)
     let totalCountResult;
-    if (whereConditions.length > 0) {
+    if (joinDepartment) {
       totalCountResult = await db
         .select({ count: sql<number>`count(*)` })
         .from(usersTable)
-        .where(and(...whereConditions));
+        .innerJoin(
+          departmentsTable,
+          eq(usersTable.departmentId, departmentsTable.id)
+        )
+        .where(and(eq(departmentsTable.name, department), ...whereConditions));
     } else {
       totalCountResult = await db
         .select({ count: sql<number>`count(*)` })
-        .from(usersTable);
+        .from(usersTable)
+        .innerJoin(
+          departmentsTable,
+          eq(usersTable.departmentId, departmentsTable.id)
+        );
     }
     const totalCount = totalCountResult[0]?.count || 0;
     const totalPages = Math.ceil(totalCount / limit);
