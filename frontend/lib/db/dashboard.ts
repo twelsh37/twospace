@@ -64,19 +64,57 @@ export async function getDashboardData() {
       .orderBy(desc(assetHistoryTable.timestamp))
       .limit(5);
 
-    // List all possible states for dashboard cards
+    // --- Canonical state mapping for dashboard cards ---
+    // Map all possible state variants (case, spelling) to canonical dashboard states
+    const stateVariantMap: Record<string, string> = {
+      // Holding/Imported
+      holding: "holding",
+      imported: "holding",
+      HOLDING: "holding",
+      IMPORTED: "holding",
+      // Available
+      available: "AVAILABLE",
+      AVAILABLE: "AVAILABLE",
+      stock: "AVAILABLE",
+      STOCK: "AVAILABLE",
+      // Built/Building
+      built: "BUILT",
+      BUILT: "BUILT",
+      building: "BUILT",
+      BUILDING: "BUILT",
+      // Ready To Go
+      ready_to_go: "READY_TO_GO",
+      READY_TO_GO: "READY_TO_GO",
+      readytogo: "READY_TO_GO",
+      "ready-to-go": "READY_TO_GO",
+      // Issued/Active
+      issued: "ISSUED",
+      ISSUED: "ISSUED",
+      active: "ISSUED",
+      ACTIVE: "ISSUED",
+    };
+
+    // Canonical states for dashboard cards (order matters for display)
     const allStates = [
       "holding", // imported/holding
       "AVAILABLE",
       "BUILT",
       "READY_TO_GO",
       "ISSUED",
-      // Add more states if needed
     ];
-    const assetsByState = allStates.map((state) => {
-      const found = assetsByStateResult.find((s) => s.state === state);
-      return { state, count: found ? found.count : 0 };
-    });
+
+    // Aggregate counts for each canonical state
+    const stateCounts: Record<string, number> = {};
+    for (const row of assetsByStateResult) {
+      // Map the DB state to canonical state (default to itself if not mapped)
+      const canonical = stateVariantMap[row.state] || row.state;
+      if (!stateCounts[canonical]) stateCounts[canonical] = 0;
+      stateCounts[canonical] += Number(row.count);
+    }
+    const assetsByState = allStates.map((state) => ({
+      state,
+      count: stateCounts[state] || 0,
+    }));
 
     // Format the results
     const dashboardData = {

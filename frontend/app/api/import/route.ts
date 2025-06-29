@@ -72,6 +72,39 @@ function parseValidDate(val: unknown) {
   return isNaN(d.getTime()) ? new Date() : d;
 }
 
+// --- Utility: Map state variants to canonical values for normalization ---
+function canonicalizeState(state: unknown): string {
+  if (!state || typeof state !== "string") return "AVAILABLE";
+  const map: Record<string, string> = {
+    // Holding/Imported
+    holding: "holding",
+    imported: "holding",
+    HOLDING: "holding",
+    IMPORTED: "holding",
+    // Available
+    available: "AVAILABLE",
+    AVAILABLE: "AVAILABLE",
+    stock: "AVAILABLE",
+    STOCK: "AVAILABLE",
+    // Built/Building
+    built: "BUILT",
+    BUILT: "BUILT",
+    building: "BUILT",
+    BUILDING: "BUILT",
+    // Ready To Go
+    ready_to_go: "READY_TO_GO",
+    READY_TO_GO: "READY_TO_GO",
+    readytogo: "READY_TO_GO",
+    "ready-to-go": "READY_TO_GO",
+    // Issued/Active
+    issued: "ISSUED",
+    ISSUED: "ISSUED",
+    active: "ISSUED",
+    ACTIVE: "ISSUED",
+  };
+  return map[state] || state;
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Use Fetch API's formData to handle file uploads in App Router
@@ -131,7 +164,11 @@ export async function POST(req: NextRequest) {
       for (const row of parsedData as Record<string, unknown>[]) {
         // Validate and map enums
         const typeValue = isAssetType(row.type) ? row.type : null;
-        const stateValue = isAssetState(row.state) ? row.state : "AVAILABLE";
+        // --- Normalize state using canonicalizeState utility ---
+        const normalizedState = canonicalizeState(row.state);
+        const stateValue = isAssetState(normalizedState)
+          ? normalizedState
+          : "AVAILABLE";
         const assignmentTypeValue = isAssignmentType(row.assignmentType)
           ? row.assignmentType
           : "INDIVIDUAL";

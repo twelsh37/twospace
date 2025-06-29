@@ -29,6 +29,7 @@ export const assetStateEnum = pgEnum("asset_state", [
   "BUILT", // Built and configured (phones, tablets, desktops, laptops only)
   "READY_TO_GO", // Ready To Go Stock (RTGS)
   "ISSUED", // Issued to individuals or locations
+  "holding", // Added for imported/holding assets (dashboard and seed logic)
 ]);
 
 export const assignmentTypeEnum = pgEnum("assignment_type", [

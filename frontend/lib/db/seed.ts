@@ -207,6 +207,39 @@ const DEPT_HARDWARE = {
   ],
 };
 
+// --- Utility: Map state variants to canonical values for normalization ---
+const canonicalizeState = (state: string | undefined): string => {
+  if (!state) return "AVAILABLE"; // Default for unassigned assets
+  const map: Record<string, string> = {
+    // Holding/Imported
+    holding: "holding",
+    imported: "holding",
+    HOLDING: "holding",
+    IMPORTED: "holding",
+    // Available
+    available: "AVAILABLE",
+    AVAILABLE: "AVAILABLE",
+    stock: "AVAILABLE",
+    STOCK: "AVAILABLE",
+    // Built/Building
+    built: "BUILT",
+    BUILT: "BUILT",
+    building: "BUILT",
+    BUILDING: "BUILT",
+    // Ready To Go
+    ready_to_go: "READY_TO_GO",
+    READY_TO_GO: "READY_TO_GO",
+    readytogo: "READY_TO_GO",
+    "ready-to-go": "READY_TO_GO",
+    // Issued/Active
+    issued: "ISSUED",
+    ISSUED: "ISSUED",
+    active: "ISSUED",
+    ACTIVE: "ISSUED",
+  };
+  return map[state] || state;
+};
+
 async function seedDatabase() {
   console.log("🌱 Starting database seed for a large company...");
   console.log(`   - Users to create: ${TOTAL_USERS}`);
@@ -361,27 +394,22 @@ async function seedDatabase() {
       );
     });
 
-    // --- Asset Distribution Percentages ---
-    const totalBlueprints = allUsers.length * (1 + 4); // 1 phone + 4 other assets per user (approx)
-    const availablePct = 0.01;
-    const builtPct = 0.001;
-    const readyToGoPct = 0.002;
-
-    // --- Generate blueprints for ISSUED assets ---
+    // --- Generate blueprints for ISSUED assets (assigned to users) ---
     const assetBlueprints: AssetBlueprint[] = [];
     const debugUserEmail = "linda.taylor@theaiaa.com";
     const debugUserAssets: AssetBlueprint[] = [];
     for (const user of allUsers) {
-      // Everyone gets a mobile phone
+      // Everyone gets a mobile phone (ISSUED)
       const phoneBlueprint = {
         type: "MOBILE_PHONE" as (typeof assetTypeEnum.enumValues)[number],
         assignedToUser: user,
         model: ASSET_MODELS.MOBILE_PHONE.model,
         price: ASSET_MODELS.MOBILE_PHONE.price,
+        state: "ISSUED", // Always ISSUED for user-assigned
       };
       assetBlueprints.push(phoneBlueprint);
       if (user.email === debugUserEmail) debugUserAssets.push(phoneBlueprint);
-      // Department-specific assets
+      // Department-specific assets (ISSUED)
       const dept = deptLocPairs.find(
         (d) => d.departmentId === user.departmentId
       );
@@ -424,6 +452,7 @@ async function seedDatabase() {
             assignedToUser: user,
             model: hw.model,
             price,
+            state: "ISSUED", // Always ISSUED for user-assigned
           };
           assetBlueprints.push(blueprint);
           if (user.email === debugUserEmail) debugUserAssets.push(blueprint);
@@ -442,21 +471,22 @@ async function seedDatabase() {
       console.log(`\n[DEBUG] No assets assigned to ${debugUserEmail}`);
     }
 
-    // --- Generate blueprints for STOCK assets (unassigned) ---
-    // Calculate how many of each state
-    const availableCount = Math.ceil(totalBlueprints * availablePct);
-    const builtCount = Math.ceil(totalBlueprints * builtPct);
-    const readyToGoCount = Math.ceil(totalBlueprints * readyToGoPct);
-    // For each state, create assets for each model
+    // --- Generate blueprints for STOCK assets (unassigned, in IT Department - store room) ---
+    // Do NOT create any 'holding' state assets here. 'holding' assets are only created via the /imports functionality.
+    // If there are no assets in 'holding', the dashboard card will display 'No Assets to Import'.
+    // Only create AVAILABLE, BUILT, and READY_TO_GO stock assets.
+    // Calculate stock percentages based on total user-assigned assets
+    const issuedCount = assetBlueprints.length;
+    const availableCount = Math.ceil(issuedCount * 0.01);
+    const builtCount = Math.ceil(issuedCount * 0.001);
+    const readyToGoCount = Math.ceil(issuedCount * 0.002);
     function createStockBlueprints(
       state: string,
       count: number
     ): AssetBlueprint[] {
       const stock: AssetBlueprint[] = [];
-      // For each asset type/model
       for (const [typeKey, modelData] of Object.entries(ASSET_MODELS)) {
         const type = typeKey as keyof typeof ASSET_MODELS;
-        // Type guard: only process if type is a valid asset type
         if (
           !["MOBILE_PHONE", "TABLET", "DESKTOP", "LAPTOP", "MONITOR"].includes(
             type
@@ -546,12 +576,14 @@ async function seedDatabase() {
         const description = blueprint.model || type.replace(/_/g, " ");
         const serialNumber = `SN-${assetNumber}`; // Guaranteed unique serial number
         let asset: schema.NewAsset;
+        // --- Normalize state using canonicalizeState utility ---
+        const normalizedState = canonicalizeState(blueprint.state);
         if (blueprint.assignedToUser) {
           const user = blueprint.assignedToUser;
           asset = {
             assetNumber,
             type,
-            state: (blueprint.state as schema.Asset["state"]) || "ISSUED",
+            state: normalizedState as schema.Asset["state"],
             serialNumber,
             description,
             purchasePrice: blueprint.price?.toFixed(2) || "0.00",
@@ -565,13 +597,13 @@ async function seedDatabase() {
           asset = {
             assetNumber,
             type,
-            state: (blueprint.state as schema.Asset["state"]) || "AVAILABLE",
+            state: normalizedState as schema.Asset["state"],
             serialNumber,
             description,
             purchasePrice: blueprint.price?.toFixed(2) || "0.00",
             assignmentType: "INDIVIDUAL",
             locationId: itStoreRoom.id,
-            status: blueprint.state === "AVAILABLE" ? "stock" : "holding",
+            status: normalizedState === "AVAILABLE" ? "stock" : "holding",
           };
         }
         assetsToInsert.push(asset);
