@@ -8,20 +8,17 @@ import { AssetsByState } from "@/components/dashboard/assets-by-state";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 //import type { DashboardData } from "@/lib/types";
 import { getDashboardData } from "@/lib/db/dashboard";
+import { headers } from "next/headers";
 
 export default async function DashboardPage() {
   // Directly call the shared dashboard data function
   const data = await getDashboardData();
 
-  // Fetch building-by-type data from the API using an absolute URL (required in server components)
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
-
+  // Use host header for robust absolute URL (works on Vercel and locally)
+  const host = (await headers()).get("host");
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
   const buildingByTypeRes = await fetch(
-    `${baseUrl}/api/assets/building-by-type`,
+    `${protocol}://${host}/api/assets/building-by-type`,
     { cache: "no-store" }
   );
   const buildingByType = buildingByTypeRes.ok
