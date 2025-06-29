@@ -13,6 +13,21 @@ export default async function DashboardPage() {
   // Directly call the shared dashboard data function
   const data = await getDashboardData();
 
+  // Fetch building-by-type data from the API using an absolute URL (required in server components)
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
+  const buildingByTypeRes = await fetch(
+    `${baseUrl}/api/assets/building-by-type`,
+    { cache: "no-store" }
+  );
+  const buildingByType = buildingByTypeRes.ok
+    ? await buildingByTypeRes.json()
+    : [];
+
   // Handle case where data fetching fails
   if (!data) {
     return (
@@ -47,13 +62,16 @@ export default async function DashboardPage() {
 
       {/* Main Content Grid - Two columns: left (stacked), right (full height) */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 items-stretch">
-        {/* Left Column: Stack Assets by Type and Asset Lifecycle Distribution */}
+        {/* Left Column: Stack Assets by Type and Building Assets */}
         <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">
           <div className="flex-1">
             <AssetsByType data={data} />
           </div>
           <div className="flex-1">
-            <AssetsByState data={data.assetsByState} />
+            <AssetsByState
+              data={data.assetsByState}
+              buildingByType={buildingByType}
+            />
           </div>
         </div>
 
