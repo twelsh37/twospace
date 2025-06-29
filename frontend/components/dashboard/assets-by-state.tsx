@@ -2,8 +2,8 @@
 // Assets by State Component for Dashboard
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { AssetState } from "@/lib/types";
+//import { Progress } from "@/components/ui/progress";
+import { AssetState, AssetType } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { TrendingUp } from "lucide-react";
 import { getStateColorClass } from "@/lib/constants";
@@ -75,27 +75,6 @@ export function AssetsByState({
     }))
     .filter((item) => item.mappedState !== null);
 
-  const getCountByState = (state: AssetState) => {
-    return stateData.find((s) => s.state === state)?.count || 0;
-  };
-
-  const getProgressColor = (state: AssetState) => {
-    switch (state) {
-      case AssetState.AVAILABLE:
-        return "bg-blue-500";
-      case AssetState.ISSUED:
-        return "bg-red-500";
-      case AssetState.READY_TO_GO:
-        return "bg-green-500";
-      case AssetState.SIGNED_OUT:
-        return "bg-yellow-500";
-      case AssetState.BUILT:
-        return "bg-purple-500";
-      default:
-        return "bg-gray-500";
-    }
-  };
-
   // Color map for asset type badges
   const typeColorMap: Record<string, string> = {
     MOBILE_PHONE: "bg-purple-500 text-white",
@@ -114,64 +93,71 @@ export function AssetsByState({
         </CardTitle>
       </CardHeader>
       <CardContent className="pb-0">
-        {/* Building by Type breakdown */}
+        {/* Building by Type counters in a 2x2 grid (matrix) for compact layout */}
         {buildingByType.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-4">
-            {/* For each type, show badge and count in a single row */}
-            {buildingByType.map((item) => (
-              <div key={item.type} className="flex items-center gap-2 text-sm">
-                <Badge
-                  className={
-                    typeColorMap[item.type] || "bg-gray-400 text-white"
-                  }
+          <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-4">
+            {/* Only show buildable asset types (exclude Monitor) */}
+            {buildingByType
+              .filter((item) => item.type !== "MONITOR")
+              .map((item) => (
+                <div
+                  key={item.type}
+                  className="flex flex-col items-center justify-center min-w-[70px]"
                 >
-                  {ASSET_TYPE_LABELS[item.type] || item.type}
-                </Badge>
-                <span className="font-semibold">{item.count}</span>
-              </div>
-            ))}
+                  <Badge
+                    className={
+                      typeColorMap[item.type] || "bg-gray-400 text-white"
+                    }
+                  >
+                    {ASSET_TYPE_LABELS[item.type as AssetType] || item.type}
+                  </Badge>
+                  <span className="text-2xl font-bold mt-2 text-center">
+                    {item.count}
+                  </span>
+                </div>
+              ))}
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {stateData.map((item) => (
-            <div key={item.state} className="space-y-3">
-              {/* State Header */}
-              <div className="flex items-center justify-between">
-                <span
-                  className={`text-xs font-medium px-2 py-1 rounded-full ${getLifecycleStateColorClass(
-                    item.mappedState as AssetState | "HOLDING"
-                  )}`}
-                >
-                  {LIFECYCLE_STATE_LABELS[
-                    item.mappedState as AssetState | "HOLDING"
-                  ] || item.state}
-                </span>
-              </div>
-
-              {/* Count and Percentage */}
-              <div>
-                <div className="text-2xl font-bold">{item.count}</div>
-                <div className="text-sm text-muted-foreground">
-                  {item.percentage.toFixed(1)}% of total
+          {/* Removed Holding (Imported) counter and progress bar for Building Assets card */}
+          {stateData
+            .filter(
+              (item) =>
+                item.mappedState !== "HOLDING" &&
+                item.mappedState !== null &&
+                item.mappedState !== undefined
+            )
+            .map((item) => (
+              <div key={item.state} className="space-y-3">
+                {/* State Header */}
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${getLifecycleStateColorClass(
+                      item.mappedState as AssetState | "HOLDING"
+                    )}`}
+                  >
+                    {LIFECYCLE_STATE_LABELS[
+                      item.mappedState as AssetState | "HOLDING"
+                    ] || item.state}
+                  </span>
                 </div>
-              </div>
 
-              {/* Progress Bar */}
-              <div className="space-y-1">
-                <Progress
-                  value={item.percentage}
-                  className="h-2"
-                  indicatorClassName={getProgressColor(
-                    item.mappedState as AssetState
-                  )}
-                />
+                {/* Count and Percentage */}
+                <div>
+                  <div className="text-2xl font-bold">{item.count}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {item.percentage.toFixed(1)}% of total
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                {/* Progress bar removed for Building Assets card */}
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
-        {/* Reduced margin and padding to minimize space below the last asset card */}
-        <div className="mt-2 pt-2 border-t">
+        {/* Removed summary row (Ready to Deploy, In Processing, In Use, Utilization Rate) for Building Assets card */}
+        {/* <div className="mt-2 pt-2 border-t">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-lg font-semibold">
@@ -206,7 +192,7 @@ export function AssetsByState({
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

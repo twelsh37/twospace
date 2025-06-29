@@ -6,7 +6,6 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { AssetsByType } from "@/components/dashboard/assets-by-type";
 import { AssetsByState } from "@/components/dashboard/assets-by-state";
 import { QuickActions } from "@/components/dashboard/quick-actions";
-import { BuildingAssetsCard } from "@/components/dashboard/building-assets-card";
 //import type { DashboardData } from "@/lib/types";
 import { getDashboardData } from "@/lib/db/dashboard";
 
@@ -59,18 +58,16 @@ export default async function DashboardPage() {
           totalAssets={data.totalAssets}
           assetsByState={data.assetsByState}
         />
-        <BuildingAssetsCard buildingByType={buildingByType} />
       </div>
 
       {/* Main Content Grid - Two columns: left (stacked), right (full height) */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 items-stretch">
-        {/* Left Column: Stack Assets by Type and Asset Lifecycle Distribution */}
+        {/* Left Column: Stack Assets by Type and Building Assets */}
         <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">
           <div className="flex-1">
             <AssetsByType data={data} />
           </div>
           <div className="flex-1">
-            {/* Pass buildingByType to AssetsByState for Building Assets breakdown */}
             <AssetsByState
               data={data.assetsByState}
               buildingByType={buildingByType}
