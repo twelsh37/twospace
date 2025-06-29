@@ -7,12 +7,18 @@ import { AssetState } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { TrendingUp } from "lucide-react";
 import { getStateColorClass } from "@/lib/constants";
+import { Badge } from "@/components/ui/badge";
+import { ASSET_TYPE_LABELS } from "@/lib/constants";
 
 type AssetsByStateProps = {
   data: { state: string; count: number }[];
+  buildingByType?: { type: string; count: number }[];
 };
 
-export function AssetsByState({ data }: AssetsByStateProps) {
+export function AssetsByState({
+  data,
+  buildingByType = [],
+}: AssetsByStateProps) {
   const totalAssets = data.reduce((sum, item) => sum + item.count, 0);
 
   // Fallback for when there are no assets to avoid division by zero
@@ -22,7 +28,7 @@ export function AssetsByState({ data }: AssetsByStateProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Asset Lifecycle Distribution
+            Building Assets
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -90,15 +96,42 @@ export function AssetsByState({ data }: AssetsByStateProps) {
     }
   };
 
+  // Color map for asset type badges
+  const typeColorMap: Record<string, string> = {
+    MOBILE_PHONE: "bg-purple-500 text-white",
+    TABLET: "bg-pink-500 text-white",
+    DESKTOP: "bg-orange-500 text-white",
+    LAPTOP: "bg-blue-500 text-white",
+    MONITOR: "bg-green-500 text-white",
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
-          Asset Lifecycle Distribution
+          Building Assets
         </CardTitle>
       </CardHeader>
       <CardContent className="pb-0">
+        {/* Building by Type breakdown */}
+        {buildingByType.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-4">
+            {/* For each type, show badge and count in a single row */}
+            {buildingByType.map((item) => (
+              <div key={item.type} className="flex items-center gap-2 text-sm">
+                <Badge
+                  className={
+                    typeColorMap[item.type] || "bg-gray-400 text-white"
+                  }
+                >
+                  {ASSET_TYPE_LABELS[item.type] || item.type}
+                </Badge>
+                <span className="font-semibold">{item.count}</span>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {stateData.map((item) => (
             <div key={item.state} className="space-y-3">

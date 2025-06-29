@@ -6,12 +6,28 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { AssetsByType } from "@/components/dashboard/assets-by-type";
 import { AssetsByState } from "@/components/dashboard/assets-by-state";
 import { QuickActions } from "@/components/dashboard/quick-actions";
+import { BuildingAssetsCard } from "@/components/dashboard/building-assets-card";
 //import type { DashboardData } from "@/lib/types";
 import { getDashboardData } from "@/lib/db/dashboard";
 
 export default async function DashboardPage() {
   // Directly call the shared dashboard data function
   const data = await getDashboardData();
+
+  // Fetch building-by-type data from the API using an absolute URL (required in server components)
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
+  const buildingByTypeRes = await fetch(
+    `${baseUrl}/api/assets/building-by-type`,
+    { cache: "no-store" }
+  );
+  const buildingByType = buildingByTypeRes.ok
+    ? await buildingByTypeRes.json()
+    : [];
 
   // Handle case where data fetching fails
   if (!data) {
@@ -43,6 +59,7 @@ export default async function DashboardPage() {
           totalAssets={data.totalAssets}
           assetsByState={data.assetsByState}
         />
+        <BuildingAssetsCard buildingByType={buildingByType} />
       </div>
 
       {/* Main Content Grid - Two columns: left (stacked), right (full height) */}
@@ -53,7 +70,11 @@ export default async function DashboardPage() {
             <AssetsByType data={data} />
           </div>
           <div className="flex-1">
-            <AssetsByState data={data.assetsByState} />
+            {/* Pass buildingByType to AssetsByState for Building Assets breakdown */}
+            <AssetsByState
+              data={data.assetsByState}
+              buildingByType={buildingByType}
+            />
           </div>
         </div>
 
