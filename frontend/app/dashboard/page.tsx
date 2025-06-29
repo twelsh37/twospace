@@ -16,7 +16,9 @@ export default async function DashboardPage() {
 
   // Use host header for robust absolute URL (works on Vercel and locally)
   const host = (await headers()).get("host");
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const isLocalhost =
+    host?.startsWith("localhost") || host?.startsWith("127.0.0.1");
+  const protocol = isLocalhost ? "http" : "https";
   const buildingByTypeRes = await fetch(
     `${protocol}://${host}/api/assets/building-by-type`,
     { cache: "no-store" }
