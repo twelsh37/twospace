@@ -2,12 +2,7 @@
 // Dashboard Statistics Cards Component
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Clock,
-  CheckCircle,
-  ArrowRightCircle,
-  Rocket,
-} from "lucide-react";
+import { Clock, CheckCircle, ArrowRightCircle, Rocket } from "lucide-react";
 import Link from "next/link";
 
 type StatCard = {
@@ -22,26 +17,52 @@ type DashboardStatsProps = {
   assetsByState: { state: string; count: number }[];
 };
 
-export function DashboardStats({
-  assetsByState,
-}: DashboardStatsProps) {
+export function DashboardStats({ assetsByState }: DashboardStatsProps) {
   // const availableCount = getCountByState("AVAILABLE"); // No longer used
+  // Helper function to find count by possible state variants
+  function getCountByStateVariants(variants: string[]) {
+    for (const variant of variants) {
+      const found = assetsByState.find((s) => s.state === variant);
+      if (found) return found.count;
+    }
+    return 0;
+  }
+
   // Get count for assets in 'stock' status (Available Stock)
-  const availableStockCount =
-    assetsByState.find((s) => s.state === "stock")?.count || 0;
-  // Get count for assets in 'READY_TO_GO' status (if used as a status)
-  const readyToGoStockCount =
-    assetsByState.find((s) => s.state === "READY_TO_GO")?.count || 0;
+  const availableStockCount = getCountByStateVariants([
+    "stock",
+    "STOCK",
+    "available",
+    "AVAILABLE",
+  ]);
+  // Get count for assets in 'READY_TO_GO' status (handle possible variants)
+  const readyToGoStockCount = getCountByStateVariants([
+    "READY_TO_GO",
+    "ready_to_go",
+    "readytogo",
+    "ready-to-go",
+  ]);
   // Get count for assets in 'active' status (Issued)
-  const issuedCountStatus =
-    assetsByState.find((s) => s.state === "active")?.count || 0;
-
+  const issuedCountStatus = getCountByStateVariants([
+    "active",
+    "ACTIVE",
+    "issued",
+    "ISSUED",
+  ]);
   // Get count for assets in 'holding' status
-  const holdingCount =
-    assetsByState.find((s) => s.state === "holding")?.count || 0;
-
-  // Get count for assets in 'BUILT' state
-  const builtCount = assetsByState.find((s) => s.state === "BUILT")?.count || 0;
+  const holdingCount = getCountByStateVariants([
+    "holding",
+    "HOLDING",
+    "imported",
+    "IMPORTED",
+  ]);
+  // Get count for assets in 'BUILT' state (handle possible variants)
+  const builtCount = getCountByStateVariants([
+    "BUILT",
+    "built",
+    "building",
+    "BUILDING",
+  ]);
 
   const stats: StatCard[] = [
     {

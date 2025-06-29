@@ -32,11 +32,11 @@ export async function getDashboardData() {
 
     const assetsByStateResult = await tx
       .select({
-        state: assetsTable.status,
+        state: assetsTable.state,
         count: count(),
       })
       .from(assetsTable)
-      .groupBy(assetsTable.status);
+      .groupBy(assetsTable.state);
 
     const assetsByTypeResult = await tx
       .select({
@@ -64,11 +64,18 @@ export async function getDashboardData() {
       .orderBy(desc(assetHistoryTable.timestamp))
       .limit(5);
 
-    // Ensure all possible statuses are present, even if count is zero
-    const allStatuses = ["holding", "active", "retired", "stock"];
-    const assetsByState = allStatuses.map((status) => {
-      const found = assetsByStateResult.find((s) => s.state === status);
-      return { state: status, count: found ? found.count : 0 };
+    // List all possible states for dashboard cards
+    const allStates = [
+      "holding", // imported/holding
+      "AVAILABLE",
+      "BUILT",
+      "READY_TO_GO",
+      "ISSUED",
+      // Add more states if needed
+    ];
+    const assetsByState = allStates.map((state) => {
+      const found = assetsByStateResult.find((s) => s.state === state);
+      return { state, count: found ? found.count : 0 };
     });
 
     // Format the results
