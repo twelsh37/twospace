@@ -31,6 +31,7 @@ interface User {
   email: string;
   role: string;
   department: string;
+  location: string;
   isActive: boolean;
   employeeId: string;
 }
@@ -57,16 +58,11 @@ export function UserDetailModal({
     setLoading(true);
     async function fetchUserAndAssets() {
       try {
-        // Fetch user details
+        // Fetch user details and assets in one call
         const userRes = await fetch(`/api/users/${userId}`);
         const userJson = await userRes.json();
         setUser(userJson.data || null);
-        // Fetch assets assigned to this user
-        const assetsRes = await fetch(
-          `/api/assets?assignedTo=${userJson.data?.name}`
-        );
-        const assetsJson = await assetsRes.json();
-        setAssets(assetsJson.data?.assets || []);
+        setAssets(userJson.assets || []);
       } catch {
         setUser(null);
         setAssets([]);
@@ -95,11 +91,8 @@ export function UserDetailModal({
               <div className="text-lg font-semibold">{user.name}</div>
               <div className="text-sm text-muted-foreground">{user.email}</div>
               <div className="flex flex-wrap gap-2 text-sm">
-                <Badge variant="secondary">Role: {user.role}</Badge>
+                <Badge variant="secondary">Location: {user.location}</Badge>
                 <Badge variant="secondary">Department: {user.department}</Badge>
-                <Badge variant={user.isActive ? "default" : "destructive"}>
-                  {user.isActive ? "Active" : "Inactive"}
-                </Badge>
                 <Badge variant="secondary">
                   Employee ID: {user.employeeId}
                 </Badge>
@@ -108,34 +101,34 @@ export function UserDetailModal({
             {/* Assigned Assets */}
             <div>
               <div className="font-semibold mb-2">Assigned Assets</div>
-              {assets.length === 0 ? (
-                <div className="text-muted-foreground text-sm">
-                  No assets assigned.
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Asset Number</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>State</TableHead>
-                      <TableHead>Location</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {assets.map((asset) => (
-                      <TableRow key={asset.assetNumber}>
-                        <TableCell>{asset.assetNumber}</TableCell>
-                        <TableCell>{asset.type}</TableCell>
-                        <TableCell>{asset.description}</TableCell>
-                        <TableCell>{asset.state}</TableCell>
-                        <TableCell>{asset.location}</TableCell>
+              <div className="max-h-80 overflow-y-auto">
+                {assets.length === 0 ? (
+                  <div className="text-muted-foreground text-sm">
+                    No assets assigned.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Asset Number</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>State</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                    </TableHeader>
+                    <TableBody>
+                      {assets.map((asset) => (
+                        <TableRow key={asset.assetNumber}>
+                          <TableCell>{asset.assetNumber}</TableCell>
+                          <TableCell>{asset.type}</TableCell>
+                          <TableCell>{asset.description}</TableCell>
+                          <TableCell>{asset.state}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
             </div>
           </div>
         ) : (
