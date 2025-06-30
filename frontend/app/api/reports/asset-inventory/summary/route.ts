@@ -53,11 +53,26 @@ export async function GET() {
     for (const row of byTypeInReadyToGoRows) {
       byTypeInReadyToGo[row.type as string] = Number(row.count);
     }
+    // Group by year (createdAt)
+    // This groups assets by the year they were created (createdAt field)
+    const byYearRows = await db
+      .select({
+        year: sql<string>`EXTRACT(YEAR FROM ${assetsTable.createdAt})`,
+        count: sql<number>`count(*)`,
+      })
+      .from(assetsTable)
+      .where(isNull(assetsTable.deletedAt))
+      .groupBy(sql`EXTRACT(YEAR FROM ${assetsTable.createdAt})`);
+    const byYear: Record<string, number> = {};
+    for (const row of byYearRows) {
+      byYear[row.year] = Number(row.count);
+    }
     return NextResponse.json({
       byType,
       byState,
       byTypeInBuilt,
       byTypeInReadyToGo,
+      byYear,
     });
   } catch {
     return NextResponse.json(

@@ -722,6 +722,171 @@ function AssetInventoryReport() {
   );
 }
 
+// --- Lifecycle Management Report: Distribution of Assets by Year ---
+function LifecycleManagementReport() {
+  // State for year data
+  const [yearCounts, setYearCounts] = React.useState<{
+    [year: string]: number;
+  }>({});
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  // Add printTime state for 'Prepared on' line (matches AssetInventoryReport)
+  const [printTime, setPrintTime] = React.useState<string>("");
+  React.useEffect(() => {
+    setPrintTime(
+      new Date().toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    );
+  }, []);
+
+  // Fetch summary data (byYear) on mount
+  React.useEffect(() => {
+    async function fetchYearSummary() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/reports/asset-inventory/summary");
+        const json = await res.json();
+        if (!json.byYear) throw new Error(json.error || "No year data");
+        setYearCounts(json.byYear);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchYearSummary();
+  }, []);
+
+  // Prepare data for the bar chart
+  const years = Object.keys(yearCounts).sort();
+  const data = {
+    labels: years,
+    datasets: [
+      {
+        label: "Assets",
+        data: years.map((year) => yearCounts[year]),
+        backgroundColor: "#2563EB",
+      },
+    ],
+  };
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: "Distribution of Assets by Year" },
+    },
+    animation: {
+      duration: 1200,
+      easing: "easeOutQuart" as const,
+    },
+    scales: {
+      x: { title: { display: true, text: "Year" } },
+      y: {
+        title: { display: true, text: "Number of Assets" },
+        beginAtZero: true,
+      },
+    },
+  };
+
+  // Render loading, error, or chart + table
+  return (
+    <div style={{ padding: "1rem" }}>
+      {/* Page Header - match Asset Inventory page */}
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Lifecycle Management Report
+        </h2>
+        <p className="text-muted-foreground">Prepared on: {printTime || "—"}</p>
+      </div>
+      {loading ? (
+        <div>Loading chart...</div>
+      ) : error ? (
+        <div style={{ color: "red" }}>Error: {error}</div>
+      ) : (
+        <div
+          style={{
+            padding: "1rem",
+            border: "1px solid #eee",
+            borderRadius: 8,
+            background: "#fafbfc",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginTop: "2.5rem",
+            marginBottom: "2.5rem",
+            width: 400,
+            boxSizing: "border-box",
+          }}
+        >
+          {/* Bar chart for assets by year (no card title) */}
+          <div
+            style={{
+              width: "100%",
+              margin: 0,
+              marginBottom: "1rem",
+              height: 200,
+            }}
+          >
+            <Bar
+              data={data}
+              options={{
+                ...options,
+                plugins: { ...options.plugins, title: { display: false } },
+                scales: {
+                  ...options.scales,
+                  x: { ...options.scales.x, title: { display: false } },
+                  y: { ...options.scales.y, title: { display: false } },
+                },
+              }}
+            />
+          </div>
+          {/* Table of values beneath the chart */}
+          <div style={{ width: "100%", marginTop: "2rem" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "12px",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Year
+                  </th>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Count
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {years.map((year) => (
+                  <tr key={year}>
+                    <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      {year}
+                    </td>
+                    <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      {new Intl.NumberFormat().format(yearCounts[year])}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Main Reports Page
 function ReportsPageContent() {
   // Read the selected report from the query string (?report=CategoryName)
@@ -734,6 +899,8 @@ function ReportsPageContent() {
   // Render the selected report
   function renderReport() {
     if (selected === "Asset Inventory") return <AssetInventoryReport />;
+    if (selected === "Lifecycle Management")
+      return <LifecycleManagementReport />;
     return <ReportPlaceholder title={selected} />;
   }
 
