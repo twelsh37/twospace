@@ -184,7 +184,7 @@ function AssetInventoryReport() {
         /* Import Roboto for print */
         @import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
         @media print {
-          /* Only print the report content */
+          /* Print layout matches user mockup exactly: centered report, left-aligned title/date, chart and table centered and proportional, generous whitespace */
           body, html {
             background: #fff !important;
             font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
@@ -192,6 +192,7 @@ function AssetInventoryReport() {
             padding: 0;
             width: 100vw;
             height: 100vh;
+            overflow: visible !important;
           }
           .print-hide, header, nav, .sidebar, .search-bar, .notification, .user-menu {
             display: none !important;
@@ -199,38 +200,47 @@ function AssetInventoryReport() {
           .print-report-root {
             background: #fff !important;
             margin: 0 auto;
-            padding: 2.5cm 2cm 2cm 2cm;
+            margin-top: 2.5cm;
+            margin-bottom: 2.5cm;
+            padding: 0;
+            max-width: 700px;
             width: 100%;
             min-height: 100vh;
             box-sizing: border-box;
             page-break-after: avoid;
+            overflow: visible !important;
           }
           @page { size: A4 portrait; margin: 1.5cm; }
           .print-title {
             font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 0.2rem;
-            text-align: center;
+            margin-top: 0;
+            text-align: left;
           }
           .print-meta {
             font-size: 1.1rem;
             color: #555;
             margin-bottom: 2.2rem;
-            text-align: center;
+            text-align: left;
+          }
+          .print-section {
+            display: block;
+            margin-bottom: 2.5rem;
+            page-break-inside: avoid;
           }
           .print-chart {
-            width: 100%;
-            max-width: 100%;
-            height: 320px;
+            width: 90%;
+            max-width: 600px;
+            height: 260px !important;
             margin: 0 auto 2.5rem auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
           }
           .print-table {
-            width: 100%;
+            width: 90%;
+            max-width: 600px;
             margin: 0 auto;
-            margin-top: 2.5rem;
+            margin-top: 0;
           }
           .print-table table {
             width: 100%;
@@ -241,6 +251,11 @@ function AssetInventoryReport() {
           .print-table th, .print-table td {
             border: 1px solid #ccc;
             padding: 0.7rem 1rem;
+            text-align: left;
+          }
+          h2 {
+            font-size: 1.2rem;
+            margin: 0.7rem 0 0.5rem 0;
             text-align: left;
           }
         }
@@ -267,50 +282,55 @@ function AssetInventoryReport() {
           <div className="print-meta">
             Prepared on: {printTime || "(will be set when printed)"}
           </div>
-          {/* Chart in upper half */}
-          <div className="print-chart">
-            <Bar data={data} options={options} />
-          </div>
-          {/* Table beneath chart with whitespace */}
-          <div className="print-table">
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: 0,
-              }}
-            >
-              <thead>
-                <tr>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Asset Type
-                  </th>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Count
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {labels.map((type) => (
-                  <tr key={type}>
-                    <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      {type}
-                    </td>
-                    <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      {new Intl.NumberFormat().format(assetCounts[type])}
-                    </td>
+          {/* Asset Inventory Section */}
+          <div className="print-section">
+            <div className="print-chart">
+              <Bar data={data} options={options} />
+            </div>
+            <div className="print-table">
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: 0,
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Asset Type
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Count
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {labels.map((type) => (
+                    <tr key={type}>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {type}
+                      </td>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {new Intl.NumberFormat().format(assetCounts[type])}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-          {/* Assets by State chart and table below */}
-          <div style={{ marginTop: "2.5rem" }}>
+          {/* Assets by State Section */}
+          <div className="print-section">
             <h2
               style={{
                 fontWeight: "bold",
-                fontSize: "1.5rem",
-                marginBottom: "1rem",
+                fontSize: "1.1rem",
+                marginBottom: "0.5rem",
               }}
             >
               Assets by State
