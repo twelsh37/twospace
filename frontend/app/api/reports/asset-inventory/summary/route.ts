@@ -27,7 +27,38 @@ export async function GET() {
     for (const row of byStateRows) {
       byState[row.state as string] = Number(row.count);
     }
-    return NextResponse.json({ byType, byState });
+    // Group by type for assets in BUILT state
+    const byTypeInBuiltRows = await db
+      .select({ type: assetsTable.type, count: sql<number>`count(*)` })
+      .from(assetsTable)
+      .where(
+        sql`${isNull(assetsTable.deletedAt)} and ${assetsTable.state} = 'BUILT'`
+      )
+      .groupBy(assetsTable.type);
+    const byTypeInBuilt: Record<string, number> = {};
+    for (const row of byTypeInBuiltRows) {
+      byTypeInBuilt[row.type as string] = Number(row.count);
+    }
+    // Group by type for assets in READY_TO_GO state
+    const byTypeInReadyToGoRows = await db
+      .select({ type: assetsTable.type, count: sql<number>`count(*)` })
+      .from(assetsTable)
+      .where(
+        sql`${isNull(assetsTable.deletedAt)} and ${
+          assetsTable.state
+        } = 'READY_TO_GO'`
+      )
+      .groupBy(assetsTable.type);
+    const byTypeInReadyToGo: Record<string, number> = {};
+    for (const row of byTypeInReadyToGoRows) {
+      byTypeInReadyToGo[row.type as string] = Number(row.count);
+    }
+    return NextResponse.json({
+      byType,
+      byState,
+      byTypeInBuilt,
+      byTypeInReadyToGo,
+    });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch summary" },
