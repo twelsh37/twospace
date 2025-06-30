@@ -67,17 +67,21 @@ function AssetInventoryReport() {
     {}
   );
   // Always set printTime to the time the report is generated, in British format (DD/MM/YYYY, 24-hour clock)
-  const [printTime, setPrintTime] = useState<string>(
-    new Date().toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    })
-  );
+  // Fix hydration error: set printTime only on the client
+  const [printTime, setPrintTime] = useState<string>("");
+  useEffect(() => {
+    setPrintTime(
+      new Date().toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    );
+  }, []);
   // Add state for new breakdowns
   const [byTypeInBuilt, setByTypeInBuilt] = useState<{
     [type: string]: number;
@@ -85,6 +89,8 @@ function AssetInventoryReport() {
   const [byTypeInReadyToGo, setByTypeInReadyToGo] = useState<{
     [type: string]: number;
   }>({});
+  // State for export loading
+  const [exportLoading, setExportLoading] = useState(false);
 
   // Fetch summary data for the charts and tables
   useEffect(() => {
@@ -96,18 +102,6 @@ function AssetInventoryReport() {
           throw new Error(json.error || "Failed to fetch summary");
         setAssetCounts(json.byType);
         setStateCounts(json.byState);
-        // Set the printTime to now when data is loaded, in British format
-        setPrintTime(
-          new Date().toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-          })
-        );
         // Set new breakdowns
         setByTypeInBuilt(json.byTypeInBuilt || {});
         setByTypeInReadyToGo(json.byTypeInReadyToGo || {});
@@ -137,6 +131,31 @@ function AssetInventoryReport() {
         window.print();
       }
     }, 100); // Give time for printTime to update
+  };
+
+  // Export handler: fetch PDF from API and trigger download
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      // Use the new pages/api route for PDF export
+      const res = await fetch("/api/reports/pdf");
+      if (!res.ok) throw new Error("Failed to generate PDF");
+      const blob = await res.blob();
+      // Create a download link for the PDF
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "asset-inventory-report.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to export PDF. Please try again.");
+      console.error(err);
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   // Prepare chart and table data for asset type
@@ -222,7 +241,7 @@ function AssetInventoryReport() {
         <h2 className="text-3xl font-bold tracking-tight">
           Asset Inventory Report
         </h2>
-        <p className="text-muted-foreground">Prepared on: {printTime}</p>
+        <p className="text-muted-foreground">Prepared on: {printTime || "—"}</p>
       </div>
       {/* Four charts/tables in a single horizontal row, using full page width */}
       <div
@@ -638,21 +657,22 @@ function AssetInventoryReport() {
         >
           Print
         </button>
-        {/* TODO: Enable and implement export functionality */}
+        {/* Export PDF functionality */}
         <button
-          disabled
+          onClick={handleExport}
+          disabled={exportLoading}
           style={{
             padding: "0.5rem 1.5rem",
             borderRadius: 6,
-            border: "1px solid #ccc",
-            background: "#eee",
-            color: "#888",
+            border: "1px solid #2563EB",
+            background: exportLoading ? "#ccc" : "#2563EB",
+            color: "white",
             fontWeight: 600,
             fontSize: 16,
-            cursor: "not-allowed",
+            cursor: exportLoading ? "not-allowed" : "pointer",
           }}
         >
-          Export
+          {exportLoading ? "Exporting..." : "Export"}
         </button>
       </div>
     </div>
