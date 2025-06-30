@@ -304,176 +304,78 @@ function AssetInventoryReport() {
             Asset Inventory Report
           </div>
           <div className="print-meta">Prepared on: {printTime}</div>
-          {/* Asset Inventory Section */}
-          <div className="print-section" style={{ marginBottom: "3rem" }}>
-            {/* Heading for Assets by Type, styled like Assets by State */}
-            <h2
+          {/* Four charts/tables in a single horizontal row, using full page width */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "2rem",
+              marginTop: "2.5rem",
+              marginBottom: "2.5rem",
+              width: "100vw",
+              maxWidth: "100vw",
+              overflowX: "auto",
+              justifyContent: "center",
+              paddingLeft: "2vw",
+              paddingRight: "2vw",
+              boxSizing: "border-box",
+            }}
+          >
+            {/* Assets by Type */}
+            <div
               style={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
+                flex: "1 1 0",
+                padding: "1rem",
+                border: "1px solid #eee",
+                borderRadius: 8,
+                background: "#fafbfc",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
             >
-              Assets by Type
-            </h2>
-            {/* Chart and Table for Asset Types are grouped together, but need more space between them for clarity */}
-            <div className="print-chart" style={{ marginBottom: "2rem" }}>
-              <Bar data={data} options={options} />
-            </div>
-            <div className="print-table">
-              <table
+              <h2
                 style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
+                  fontWeight: "bold",
+                  fontSize: "1.1rem",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
                 }}
               >
-                <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Asset Type
-                    </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {labels.map((type) => (
-                    <tr key={type}>
-                      <td
+                Assets by Type
+              </h2>
+              <div
+                className="print-chart"
+                style={{ marginBottom: "1rem", width: "100%" }}
+              >
+                <Bar data={data} options={options} />
+              </div>
+              <div className="print-table" style={{ width: "100%" }}>
+                {/* Font size reduced to match chart labels for compact layout */}
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: 0,
+                    fontSize: "12px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
                         style={{ border: "1px solid #ccc", padding: "0.5rem" }}
                       >
-                        {type}
-                      </td>
-                      <td
+                        Asset Type
+                      </th>
+                      <th
                         style={{ border: "1px solid #ccc", padding: "0.5rem" }}
                       >
-                        {new Intl.NumberFormat().format(assetCounts[type])}
-                      </td>
+                        Count
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {/* Assets by State Section - add extra margin to separate from above group */}
-          <div className="print-section" style={{ marginTop: "3rem" }}>
-            <h2
-              style={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Assets by State
-            </h2>
-            <div className="print-chart" style={{ marginBottom: "2rem" }}>
-              <Bar data={stateData} options={stateOptions} />
-            </div>
-            <div className="print-table">
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Asset State
-                    </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stateLabels.map((state) => (
-                    <tr key={state}>
-                      <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        {state}
-                      </td>
-                      <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        {new Intl.NumberFormat().format(stateCounts[state])}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {/* Assets in Build State Section */}
-          <div className="print-section" style={{ marginTop: "3rem" }}>
-            <h2
-              style={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Assets in Build State
-            </h2>
-            <div className="print-chart" style={{ marginBottom: "2rem" }}>
-              <Bar
-                data={{
-                  labels: Object.keys(byTypeInBuilt).sort(),
-                  datasets: [
-                    {
-                      data: Object.keys(byTypeInBuilt)
-                        .sort()
-                        .map((type) => byTypeInBuilt[type]),
-                      backgroundColor: Object.keys(byTypeInBuilt)
-                        .sort()
-                        .map((type) => {
-                          switch (type) {
-                            case "LAPTOP":
-                              return "#3B82F6";
-                            case "MONITOR":
-                              return "#22C55E";
-                            case "MOBILE_PHONE":
-                              return "#A21CAF";
-                            case "DESKTOP":
-                              return "#F59E42";
-                            case "TABLET":
-                              return "#EC4899";
-                            default:
-                              return "#6B7280";
-                          }
-                        }),
-                    },
-                  ],
-                }}
-                options={options}
-              />
-            </div>
-            <div className="print-table">
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Asset Type
-                    </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(byTypeInBuilt)
-                    .sort()
-                    .map((type) => (
+                  </thead>
+                  <tbody>
+                    {labels.map((type) => (
                       <tr key={type}>
                         <td
                           style={{
@@ -489,88 +391,77 @@ function AssetInventoryReport() {
                             padding: "0.5rem",
                           }}
                         >
-                          {new Intl.NumberFormat().format(byTypeInBuilt[type])}
+                          {new Intl.NumberFormat().format(assetCounts[type])}
                         </td>
                       </tr>
                     ))}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          {/* Assets Ready to Go Section */}
-          <div className="print-section" style={{ marginTop: "3rem" }}>
-            <h2
+            {/* Assets by State */}
+            <div
               style={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
+                flex: "1 1 0",
+                padding: "1rem",
+                border: "1px solid #eee",
+                borderRadius: 8,
+                background: "#fafbfc",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
             >
-              Assets Ready to Go
-            </h2>
-            <div className="print-chart" style={{ marginBottom: "2rem" }}>
-              <Bar
-                data={{
-                  labels: Object.keys(byTypeInReadyToGo).sort(),
-                  datasets: [
-                    {
-                      data: Object.keys(byTypeInReadyToGo)
-                        .sort()
-                        .map((type) => byTypeInReadyToGo[type]),
-                      backgroundColor: Object.keys(byTypeInReadyToGo)
-                        .sort()
-                        .map((type) => {
-                          switch (type) {
-                            case "LAPTOP":
-                              return "#3B82F6";
-                            case "MONITOR":
-                              return "#22C55E";
-                            case "MOBILE_PHONE":
-                              return "#A21CAF";
-                            case "DESKTOP":
-                              return "#F59E42";
-                            case "TABLET":
-                              return "#EC4899";
-                            default:
-                              return "#6B7280";
-                          }
-                        }),
-                    },
-                  ],
-                }}
-                options={options}
-              />
-            </div>
-            <div className="print-table">
-              <table
+              <h2
                 style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
+                  fontWeight: "bold",
+                  fontSize: "1.1rem",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
                 }}
               >
-                <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Asset Type
-                    </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(byTypeInReadyToGo)
-                    .sort()
-                    .map((type) => (
-                      <tr key={type}>
+                Assets by State
+              </h2>
+              <div
+                className="print-chart"
+                style={{ marginBottom: "1rem", width: "100%" }}
+              >
+                <Bar data={stateData} options={stateOptions} />
+              </div>
+              <div className="print-table" style={{ width: "100%" }}>
+                {/* Font size reduced to match chart labels for compact layout */}
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: 0,
+                    fontSize: "12px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        Asset State
+                      </th>
+                      <th
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        Count
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stateLabels.map((state) => (
+                      <tr key={state}>
                         <td
                           style={{
                             border: "1px solid #ccc",
                             padding: "0.5rem",
                           }}
                         >
-                          {type}
+                          {state}
                         </td>
                         <td
                           style={{
@@ -578,14 +469,237 @@ function AssetInventoryReport() {
                             padding: "0.5rem",
                           }}
                         >
-                          {new Intl.NumberFormat().format(
-                            byTypeInReadyToGo[type]
-                          )}
+                          {new Intl.NumberFormat().format(stateCounts[state])}
                         </td>
                       </tr>
                     ))}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* Assets in Build State */}
+            <div
+              style={{
+                flex: "1 1 0",
+                padding: "1rem",
+                border: "1px solid #eee",
+                borderRadius: 8,
+                background: "#fafbfc",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <h2
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "1.1rem",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                }}
+              >
+                Assets in Build State
+              </h2>
+              <div
+                className="print-chart"
+                style={{ marginBottom: "1rem", width: "100%" }}
+              >
+                <Bar
+                  data={{
+                    labels: Object.keys(byTypeInBuilt).sort(),
+                    datasets: [
+                      {
+                        data: Object.keys(byTypeInBuilt)
+                          .sort()
+                          .map((type) => byTypeInBuilt[type]),
+                        backgroundColor: Object.keys(byTypeInBuilt)
+                          .sort()
+                          .map((type) => {
+                            switch (type) {
+                              case "LAPTOP":
+                                return "#3B82F6";
+                              case "MONITOR":
+                                return "#22C55E";
+                              case "MOBILE_PHONE":
+                                return "#A21CAF";
+                              case "DESKTOP":
+                                return "#F59E42";
+                              case "TABLET":
+                                return "#EC4899";
+                              default:
+                                return "#6B7280";
+                            }
+                          }),
+                      },
+                    ],
+                  }}
+                  options={options}
+                />
+              </div>
+              <div className="print-table" style={{ width: "100%" }}>
+                {/* Font size reduced to match chart labels for compact layout */}
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: 0,
+                    fontSize: "12px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        Asset Type
+                      </th>
+                      <th
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        Count
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.keys(byTypeInBuilt)
+                      .sort()
+                      .map((type) => (
+                        <tr key={type}>
+                          <td
+                            style={{
+                              border: "1px solid #ccc",
+                              padding: "0.5rem",
+                            }}
+                          >
+                            {type}
+                          </td>
+                          <td
+                            style={{
+                              border: "1px solid #ccc",
+                              padding: "0.5rem",
+                            }}
+                          >
+                            {new Intl.NumberFormat().format(
+                              byTypeInBuilt[type]
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* Assets Ready to Go */}
+            <div
+              style={{
+                flex: "1 1 0",
+                padding: "1rem",
+                border: "1px solid #eee",
+                borderRadius: 8,
+                background: "#fafbfc",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <h2
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "1.1rem",
+                  marginBottom: "0.5rem",
+                  textAlign: "center",
+                }}
+              >
+                Assets Ready to Go
+              </h2>
+              <div
+                className="print-chart"
+                style={{ marginBottom: "1rem", width: "100%" }}
+              >
+                <Bar
+                  data={{
+                    labels: Object.keys(byTypeInReadyToGo).sort(),
+                    datasets: [
+                      {
+                        data: Object.keys(byTypeInReadyToGo)
+                          .sort()
+                          .map((type) => byTypeInReadyToGo[type]),
+                        backgroundColor: Object.keys(byTypeInReadyToGo)
+                          .sort()
+                          .map((type) => {
+                            switch (type) {
+                              case "LAPTOP":
+                                return "#3B82F6";
+                              case "MONITOR":
+                                return "#22C55E";
+                              case "MOBILE_PHONE":
+                                return "#A21CAF";
+                              case "DESKTOP":
+                                return "#F59E42";
+                              case "TABLET":
+                                return "#EC4899";
+                              default:
+                                return "#6B7280";
+                            }
+                          }),
+                      },
+                    ],
+                  }}
+                  options={options}
+                />
+              </div>
+              <div className="print-table" style={{ width: "100%" }}>
+                {/* Font size reduced to match chart labels for compact layout */}
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: 0,
+                    fontSize: "12px",
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        Asset Type
+                      </th>
+                      <th
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        Count
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.keys(byTypeInReadyToGo)
+                      .sort()
+                      .map((type) => (
+                        <tr key={type}>
+                          <td
+                            style={{
+                              border: "1px solid #ccc",
+                              padding: "0.5rem",
+                            }}
+                          >
+                            {type}
+                          </td>
+                          <td
+                            style={{
+                              border: "1px solid #ccc",
+                              padding: "0.5rem",
+                            }}
+                          >
+                            {new Intl.NumberFormat().format(
+                              byTypeInReadyToGo[type]
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
