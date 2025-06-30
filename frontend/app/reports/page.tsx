@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 // filepath: frontend/app/reports/page.tsx
 // Main Reports Page for IT Asset Management System
@@ -92,6 +93,12 @@ function AssetInventoryReport() {
   // State for export loading
   const [exportLoading, setExportLoading] = useState(false);
 
+  // Use the correct ref type for react-chartjs-2 Bar components (ChartJS | null)
+  const chartTypeRef = useRef<ChartJS | null>(null);
+  const chartStateRef = useRef<ChartJS | null>(null);
+  const chartBuiltRef = useRef<ChartJS | null>(null);
+  const chartReadyRef = useRef<ChartJS | null>(null);
+
   // Fetch summary data for the charts and tables
   useEffect(() => {
     async function fetchSummary() {
@@ -133,15 +140,37 @@ function AssetInventoryReport() {
     }, 100); // Give time for printTime to update
   };
 
-  // Export handler: fetch PDF from API and trigger download
+  // Export handler: get chart images and send to API
   const handleExport = async () => {
     setExportLoading(true);
     try {
-      // Use the new pages/api route for PDF export
-      const res = await fetch("/api/reports/pdf");
+      // Get chart images as data URLs
+      const chart1 = chartTypeRef.current?.toBase64Image() || "";
+      const chart2 = chartStateRef.current?.toBase64Image() || "";
+      const chart3 = chartBuiltRef.current?.toBase64Image() || "";
+      const chart4 = chartReadyRef.current?.toBase64Image() || "";
+      // Send to API with real table data
+      const res = await fetch("/api/reports/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chart1,
+          chart2,
+          chart3,
+          chart4,
+          assetTypes: Object.keys(assetCounts).sort(),
+          assetCounts,
+          stateTypes: Object.keys(stateCounts).sort(),
+          stateCounts,
+          builtTypes: Object.keys(byTypeInBuilt).sort(),
+          byTypeInBuilt,
+          readyTypes: Object.keys(byTypeInReadyToGo).sort(),
+          byTypeInReadyToGo,
+        }),
+      });
       if (!res.ok) throw new Error("Failed to generate PDF");
       const blob = await res.blob();
-      // Create a download link for the PDF
+      // Download the PDF as before
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -284,7 +313,12 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
-            <Bar data={data} options={options} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <Bar
+              ref={chartTypeRef as unknown as React.RefObject<any>}
+              data={data}
+              options={options}
+            />
           </div>
           <div
             className="print-table"
@@ -361,7 +395,12 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
-            <Bar data={stateData} options={stateOptions} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <Bar
+              ref={chartStateRef as unknown as React.RefObject<any>}
+              data={stateData}
+              options={stateOptions}
+            />
           </div>
           <div
             className="print-table"
@@ -438,7 +477,9 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Bar
+              ref={chartBuiltRef as unknown as React.RefObject<any>}
               data={{
                 labels: Object.keys(byTypeInBuilt).sort(),
                 datasets: [
@@ -547,7 +588,9 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Bar
+              ref={chartReadyRef as unknown as React.RefObject<any>}
               data={{
                 labels: Object.keys(byTypeInReadyToGo).sort(),
                 datasets: [
