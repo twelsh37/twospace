@@ -3,6 +3,7 @@
 
 import puppeteer, { type Browser } from "puppeteer";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
+import { ChartConfiguration } from "chart.js";
 
 // Helper to fetch summary data from the same API as the web report
 async function fetchSummaryData(baseUrl: string) {
@@ -17,13 +18,15 @@ async function generateBarChart({ labels, data, colors }: BarChartParams) {
   const width = 600,
     height = 250;
   const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
-  const config = {
-    type: "bar" as const,
+  const config: ChartConfiguration<"bar"> = {
+    type: "bar",
     data: { labels, datasets: [{ data, backgroundColor: colors }] },
     options: {
       plugins: { legend: { display: false }, title: { display: false } },
       scales: {
-        x: { ticks: { font: { size: 14, weight: "bold" } } },
+        x: {
+          ticks: { font: { size: 14, weight: "bold" as const } },
+        },
         y: { beginAtZero: true },
       },
     },
@@ -224,7 +227,8 @@ export async function generateAssetInventoryPDF(
       margin: { top: "20mm", right: "10mm", bottom: "20mm", left: "10mm" },
     });
     await browser.close();
-    return pdfBuffer;
+    // Convert Uint8Array to Buffer for Node.js compatibility
+    return Buffer.from(pdfBuffer);
   } catch (err) {
     if (browser) await browser.close();
     throw err;

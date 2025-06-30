@@ -25,13 +25,13 @@ function UsersPageContent() {
 
   // Filters and pagination state
   const filters: UserFilterState = {
-    department: searchParams.get("department") || "all",
-    role: searchParams.get("role") || "all",
+    department: searchParams?.get("department") || "all",
+    role: searchParams?.get("role") || "all",
   };
-  const page = parseInt(searchParams.get("page") || "1", 10);
+  const page = parseInt(searchParams?.get("page") || "1", 10);
 
   const handleFilterChange = (key: keyof UserFilterState, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     if (value === "all") {
       params.delete(key);
     } else {
@@ -42,11 +42,11 @@ function UsersPageContent() {
   };
 
   const handleClearFilters = () => {
-    router.push(pathname);
+    router.push(pathname ?? "/");
   };
 
   const handlePageChange = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     params.set("page", pageNumber.toString());
     router.replace(`${pathname}?${params.toString()}`);
   };

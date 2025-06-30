@@ -3,6 +3,7 @@
 // This page is NOT shown to users directly. It is rendered by Puppeteer for PDF export.
 
 import React from "react";
+import Image from "next/image";
 
 // Helper to get current date/time in British format (DD/MM/YYYY HH:mm)
 function getBritishDateTime() {
@@ -141,10 +142,14 @@ export default function PDFReportView() {
             <div className="pdf-section">
               <h2>Assets by Type</h2>
               {chart1 ? (
-                <img
+                <Image
                   className="pdf-chart-img"
                   src={chart1}
                   alt="Assets by Type Chart"
+                  width={400}
+                  height={120}
+                  unoptimized
+                  style={{ width: "100%", height: "120px" }}
                 />
               ) : (
                 <div className="pdf-chart-placeholder">
@@ -158,10 +163,14 @@ export default function PDFReportView() {
             <div className="pdf-section">
               <h2>Assets by State</h2>
               {chart2 ? (
-                <img
+                <Image
                   className="pdf-chart-img"
                   src={chart2}
                   alt="Assets by State Chart"
+                  width={400}
+                  height={120}
+                  unoptimized
+                  style={{ width: "100%", height: "120px" }}
                 />
               ) : (
                 <div className="pdf-chart-placeholder">
@@ -174,10 +183,14 @@ export default function PDFReportView() {
             <div className="pdf-section">
               <h2>Assets in Build State</h2>
               {chart3 ? (
-                <img
+                <Image
                   className="pdf-chart-img"
                   src={chart3}
                   alt="Assets in Build State Chart"
+                  width={400}
+                  height={120}
+                  unoptimized
+                  style={{ width: "100%", height: "120px" }}
                 />
               ) : (
                 <div className="pdf-chart-placeholder">
@@ -190,10 +203,14 @@ export default function PDFReportView() {
             <div className="pdf-section">
               <h2>Assets Ready to Go</h2>
               {chart4 ? (
-                <img
+                <Image
                   className="pdf-chart-img"
                   src={chart4}
                   alt="Assets Ready to Go Chart"
+                  width={400}
+                  height={120}
+                  unoptimized
+                  style={{ width: "100%", height: "120px" }}
                 />
               ) : (
                 <div className="pdf-chart-placeholder">

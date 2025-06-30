@@ -32,18 +32,19 @@ function AssetsPageContent() {
   const searchParams = useSearchParams();
 
   // Controlled filter state
+  // Use optional chaining to avoid errors if searchParams is null
   const [filters, setFilters] = useState<FilterState>(() => ({
-    type: (searchParams.get("type") as AssetType) || "all",
-    state: (searchParams.get("state") as AssetState) || "all",
-    status: searchParams.get("status") || "all",
+    type: (searchParams?.get("type") as AssetType) || "all",
+    state: (searchParams?.get("state") as AssetState) || "all",
+    status: searchParams?.get("status") || "all",
   }));
 
   // Keep filters in sync with URL query params
   useEffect(() => {
     setFilters({
-      type: (searchParams.get("type") as AssetType) || "all",
-      state: (searchParams.get("state") as AssetState) || "all",
-      status: searchParams.get("status") || "all",
+      type: (searchParams?.get("type") as AssetType) || "all",
+      state: (searchParams?.get("state") as AssetState) || "all",
+      status: searchParams?.get("status") || "all",
     });
   }, [searchParams]);
 
@@ -53,7 +54,8 @@ function AssetsPageContent() {
   // Update both state and URL when a filter changes
   const handleFilterChange = (key: FilterKey, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-    const params = new URLSearchParams(searchParams.toString());
+    // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     if (value === "all") {
       params.delete(key);
     } else {
@@ -65,11 +67,13 @@ function AssetsPageContent() {
 
   const handleClearFilters = () => {
     setFilters({ type: "all", state: "all", status: "all" });
-    router.push(pathname);
+    // Ensure pathname is a string; fallback to root if null
+    router.push(pathname ?? "/");
   };
 
   const handlePageChange = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     params.set("page", pageNumber.toString());
     router.replace(`${pathname}?${params.toString()}`);
   };
@@ -80,7 +84,10 @@ function AssetsPageContent() {
     let dataToExport: Record<string, unknown>[] = [];
     // Always fetch all filtered data from backend
     try {
-      const response = await fetch(`${searchParams.toString()}&all=1`);
+      // Use a proper API path and handle possible null for searchParams
+      const response = await fetch(
+        `/api/assets?${searchParams?.toString() ?? ""}&all=1`
+      );
       const result = await response.json();
       dataToExport = result.data.assets;
     } catch {
@@ -146,7 +153,10 @@ function AssetsPageContent() {
         <Suspense fallback={<AssetsLoadingSkeleton />}>
           <AssetTable
             queryString={(() => {
-              const params = new URLSearchParams(searchParams.toString());
+              // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
+              const params = new URLSearchParams(
+                searchParams?.toString() ?? ""
+              );
               // Remove status from query string if 'all' is selected
               if (filters.status === "all") {
                 params.delete("status");

@@ -5,7 +5,7 @@
 // Uses Chart.js for graphs (Asset Inventory as example).
 // Includes Print, Email, Share, and Export buttons.
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -680,10 +680,11 @@ function AssetInventoryReport() {
 }
 
 // Main Reports Page
-export default function ReportsPage() {
+function ReportsPageContent() {
   // Read the selected report from the query string (?report=CategoryName)
   const searchParams = useSearchParams();
-  const reportParam = searchParams.get("report") || "";
+  // Use optional chaining to avoid errors if searchParams is null
+  const reportParam = searchParams?.get("report") || "";
   // Default to 'Asset Inventory' if not specified or invalid
   const selected = REPORTS.includes(reportParam) ? reportParam : REPORTS[0];
 
@@ -698,5 +699,14 @@ export default function ReportsPage() {
       {/* Render selected report */}
       {renderReport()}
     </div>
+  );
+}
+
+// Wrap in Suspense to satisfy Next.js requirements for useSearchParams
+export default function ReportsPage() {
+  return (
+    <Suspense fallback={<div>Loading report...</div>}>
+      <ReportsPageContent />
+    </Suspense>
   );
 }

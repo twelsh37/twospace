@@ -147,8 +147,9 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => {
+            // Use optional chaining to avoid errors if pathname is null
             const isActive =
-              pathname === item.href || pathname.startsWith(item.href + "/");
+              pathname === item.href || pathname?.startsWith(item.href + "/");
 
             // Add flyout to Reports entry
             if (item.title === "Reports") {
