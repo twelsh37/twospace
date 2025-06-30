@@ -67,7 +67,10 @@ function AssetInventoryReport() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [printTime, setPrintTime] = useState<string | null>(null);
+  // Always set printTime to the time the report is generated
+  const [printTime, setPrintTime] = useState<string>(
+    new Date().toLocaleString()
+  );
 
   // Fetch summary data for the charts and tables
   useEffect(() => {
@@ -81,6 +84,8 @@ function AssetInventoryReport() {
           throw new Error(json.error || "Failed to fetch summary");
         setAssetCounts(json.byType);
         setStateCounts(json.byState);
+        // Set the printTime to now when data is loaded
+        setPrintTime(new Date().toLocaleString());
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -277,14 +282,32 @@ function AssetInventoryReport() {
       {/* Printable content */}
       {!loading && !error && (
         <div ref={printRef} className="print-report-root">
-          {/* Report Heading */}
-          <div className="print-title">Asset Inventory Report</div>
-          <div className="print-meta">
-            Prepared on: {printTime || "(will be set when printed)"}
+          {/* Main heading: larger and bolder for emphasis */}
+          <div
+            className="print-title"
+            style={{
+              fontSize: "2.5rem",
+              fontWeight: 900,
+              marginBottom: "0.5rem",
+            }}
+          >
+            Asset Inventory Report
           </div>
+          <div className="print-meta">Prepared on: {printTime}</div>
           {/* Asset Inventory Section */}
-          <div className="print-section">
-            <div className="print-chart">
+          <div className="print-section" style={{ marginBottom: "3rem" }}>
+            {/* Heading for Assets by Type, styled like Assets by State */}
+            <h2
+              style={{
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Assets by Type
+            </h2>
+            {/* Chart and Table for Asset Types are grouped together, but need more space between them for clarity */}
+            <div className="print-chart" style={{ marginBottom: "2rem" }}>
               <Bar data={data} options={options} />
             </div>
             <div className="print-table">
@@ -324,8 +347,8 @@ function AssetInventoryReport() {
               </table>
             </div>
           </div>
-          {/* Assets by State Section */}
-          <div className="print-section">
+          {/* Assets by State Section - add extra margin to separate from above group */}
+          <div className="print-section" style={{ marginTop: "3rem" }}>
             <h2
               style={{
                 fontWeight: "bold",
@@ -335,7 +358,7 @@ function AssetInventoryReport() {
             >
               Assets by State
             </h2>
-            <div className="print-chart">
+            <div className="print-chart" style={{ marginBottom: "2rem" }}>
               <Bar data={stateData} options={stateOptions} />
             </div>
             <div className="print-table">
