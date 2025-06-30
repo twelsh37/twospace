@@ -1,3 +1,7 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap");
+/* File: frontend/app/globals.css
+   Reasoning: Set Roboto as the default font for the entire application for a modern, clean, and consistent look. */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -119,4 +123,14 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html,
+body {
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
+}
+
+/* Apply Roboto to all elements by default for consistency */
+* {
+  font-family: inherit;
 }
