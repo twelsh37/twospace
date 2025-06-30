@@ -240,6 +240,22 @@ const canonicalizeState = (state: string | undefined): string => {
   return map[state] || state;
 };
 
+// --- Utility: Generate random date in a given range, with optional bias toward recent dates ---
+/**
+ * Returns a random date between start and end.
+ * If biasRecent is true, uses a quadratic distribution for more recent dates.
+ */
+function randomDateInRange(start: Date, end: Date, biasRecent = false): Date {
+  const startMs = start.getTime();
+  const endMs = end.getTime();
+  let t = Math.random();
+  if (biasRecent) {
+    t = 1 - Math.sqrt(1 - t); // More recent dates are more likely
+  }
+  const dateMs = startMs + (endMs - startMs) * t;
+  return new Date(dateMs);
+}
+
 async function seedDatabase() {
   console.log("🌱 Starting database seed for a large company...");
   console.log(`   - Users to create: ${TOTAL_USERS}`);
@@ -564,7 +580,17 @@ async function seedDatabase() {
         )}...`
       );
 
-      for (const blueprint of batchBlueprints) {
+      // --- Asset createdAt date logic ---
+      // First 50 assets: random date between 5 and 4 years ago
+      // Rest: random date between 4 years ago and now, biased toward recent
+      const now = new Date();
+      const fourYearsAgo = new Date();
+      fourYearsAgo.setFullYear(now.getFullYear() - 4);
+      const fiveYearsAgo = new Date();
+      fiveYearsAgo.setFullYear(now.getFullYear() - 5);
+      for (let j = 0; j < batchBlueprints.length; j++) {
+        const blueprint = batchBlueprints[j];
+        const globalIdx = i + j;
         const type = blueprint.type!;
         const currentSequence = sequenceMap.get(type) || 1;
         const assetNumber = `${assetTypePrefixes[type]}-${String(
@@ -578,6 +604,15 @@ async function seedDatabase() {
         let asset: schema.NewAsset;
         // --- Normalize state using canonicalizeState utility ---
         const normalizedState = canonicalizeState(blueprint.state);
+        // --- Assign createdAt date ---
+        let createdAt: Date;
+        if (globalIdx < 50) {
+          // First 50 assets: random date between 5 and 4 years ago
+          createdAt = randomDateInRange(fiveYearsAgo, fourYearsAgo, false);
+        } else {
+          // Rest: random date between 4 years ago and now, biased toward recent
+          createdAt = randomDateInRange(fourYearsAgo, now, true);
+        }
         if (blueprint.assignedToUser) {
           const user = blueprint.assignedToUser;
           asset = {
@@ -592,6 +627,7 @@ async function seedDatabase() {
             employeeId: user.employeeId,
             locationId: user.locationId,
             status: "active",
+            createdAt, // <-- Set createdAt
           };
         } else {
           asset = {
@@ -604,6 +640,7 @@ async function seedDatabase() {
             assignmentType: "INDIVIDUAL",
             locationId: itStoreRoom.id,
             status: normalizedState === "AVAILABLE" ? "stock" : "holding",
+            createdAt, // <-- Set createdAt
           };
         }
         assetsToInsert.push(asset);
