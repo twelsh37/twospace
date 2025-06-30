@@ -263,11 +263,14 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%" }}
+            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
             <Bar data={data} options={options} />
           </div>
-          <div className="print-table" style={{ width: "100%" }}>
+          <div
+            className="print-table"
+            style={{ width: "100%", marginTop: "2rem" }}
+          >
             {/* Font size reduced to match chart labels for compact layout */}
             <table
               style={{
@@ -337,11 +340,14 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%" }}
+            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
             <Bar data={stateData} options={stateOptions} />
           </div>
-          <div className="print-table" style={{ width: "100%" }}>
+          <div
+            className="print-table"
+            style={{ width: "100%", marginTop: "2rem" }}
+          >
             {/* Font size reduced to match chart labels for compact layout */}
             <table
               style={{
@@ -411,7 +417,7 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%" }}
+            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
             <Bar
               data={{
@@ -445,7 +451,10 @@ function AssetInventoryReport() {
               options={options}
             />
           </div>
-          <div className="print-table" style={{ width: "100%" }}>
+          <div
+            className="print-table"
+            style={{ width: "100%", marginTop: "2rem" }}
+          >
             {/* Font size reduced to match chart labels for compact layout */}
             <table
               style={{
@@ -517,7 +526,7 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%" }}
+            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
             <Bar
               data={{
@@ -551,7 +560,10 @@ function AssetInventoryReport() {
               options={options}
             />
           </div>
-          <div className="print-table" style={{ width: "100%" }}>
+          <div
+            className="print-table"
+            style={{ width: "100%", marginTop: "2rem" }}
+          >
             {/* Font size reduced to match chart labels for compact layout */}
             <table
               style={{
@@ -608,7 +620,7 @@ function AssetInventoryReport() {
           marginTop: "2rem",
           display: "flex",
           gap: "1rem",
-          justifyContent: "flex-start",
+          justifyContent: "flex-end",
         }}
       >
         <button
@@ -626,6 +638,7 @@ function AssetInventoryReport() {
         >
           Print
         </button>
+        {/* TODO: Enable and implement export functionality */}
         <button
           disabled
           style={{
@@ -639,37 +652,7 @@ function AssetInventoryReport() {
             cursor: "not-allowed",
           }}
         >
-          Email (coming soon)
-        </button>
-        <button
-          disabled
-          style={{
-            padding: "0.5rem 1.5rem",
-            borderRadius: 6,
-            border: "1px solid #ccc",
-            background: "#eee",
-            color: "#888",
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: "not-allowed",
-          }}
-        >
-          Share (coming soon)
-        </button>
-        <button
-          disabled
-          style={{
-            padding: "0.5rem 1.5rem",
-            borderRadius: 6,
-            border: "1px solid #ccc",
-            background: "#eee",
-            color: "#888",
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: "not-allowed",
-          }}
-        >
-          Export (coming soon)
+          Export
         </button>
       </div>
     </div>
