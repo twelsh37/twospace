@@ -1,11 +1,11 @@
 // frontend/app/api/reports/asset-inventory/summary/route.ts
 // API endpoint to return asset counts grouped by type and by state
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db, assetsTable } from "@/lib/db";
 import { isNull, sql } from "drizzle-orm";
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     // Group by type
     const byTypeRows = await db
@@ -28,9 +28,9 @@ export async function GET(_req: NextRequest) {
       byState[row.state as string] = Number(row.count);
     }
     return NextResponse.json({ byType, byState });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: "Failed to fetch asset summary" },
+      { error: "Failed to fetch summary" },
       { status: 500 }
     );
   }

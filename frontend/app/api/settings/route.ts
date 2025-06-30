@@ -18,7 +18,7 @@ export async function GET() {
     return NextResponse.json({
       reportCacheDuration: settings[0].reportCacheDuration,
     });
-  } catch (error) {
+  } catch  {
     return NextResponse.json(
       { error: "Failed to fetch settings" },
       { status: 500 }
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({
       reportCacheDuration: updated[0].reportCacheDuration,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to update settings" },
       { status: 500 }

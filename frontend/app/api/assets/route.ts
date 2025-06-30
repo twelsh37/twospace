@@ -29,7 +29,7 @@ const corsHeaders = {
 // In-memory cache for asset GET requests, keyed by query string
 const assetCache: Map<
   string,
-  { data: any; timestamp: number; duration: number }
+  { data: unknown; timestamp: number; duration: number }
 > = new Map();
 
 // Helper to get cache duration from settings (fetch from DB)

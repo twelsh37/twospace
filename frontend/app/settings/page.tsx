@@ -26,7 +26,7 @@ export default function SettingsPage() {
         } else {
           setError("Failed to load settings");
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load settings");
       } finally {
         setLoading(false);
@@ -53,7 +53,7 @@ export default function SettingsPage() {
       } else {
         setError(json.error || "Failed to save settings");
       }
-    } catch (err) {
+    } catch {
       setError("Failed to save settings");
     } finally {
       setSaving(false);
