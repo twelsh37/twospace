@@ -16,6 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useSearchParams } from "next/navigation";
 
 // Register Chart.js components
 ChartJS.register(
@@ -65,11 +66,17 @@ function AssetInventoryReport() {
   const [stateCounts, setStateCounts] = useState<{ [state: string]: number }>(
     {}
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  // Always set printTime to the time the report is generated
+  // Always set printTime to the time the report is generated, in British format (DD/MM/YYYY, 24-hour clock)
   const [printTime, setPrintTime] = useState<string>(
-    new Date().toLocaleString()
+    new Date().toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    })
   );
   // Add state for new breakdowns
   const [byTypeInBuilt, setByTypeInBuilt] = useState<{
@@ -82,8 +89,6 @@ function AssetInventoryReport() {
   // Fetch summary data for the charts and tables
   useEffect(() => {
     async function fetchSummary() {
-      setLoading(true);
-      setError(null);
       try {
         const res = await fetch("/api/reports/asset-inventory/summary");
         const json = await res.json();
@@ -91,15 +96,23 @@ function AssetInventoryReport() {
           throw new Error(json.error || "Failed to fetch summary");
         setAssetCounts(json.byType);
         setStateCounts(json.byState);
-        // Set the printTime to now when data is loaded
-        setPrintTime(new Date().toLocaleString());
+        // Set the printTime to now when data is loaded, in British format
+        setPrintTime(
+          new Date().toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          })
+        );
         // Set new breakdowns
         setByTypeInBuilt(json.byTypeInBuilt || {});
         setByTypeInReadyToGo(json.byTypeInReadyToGo || {});
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
+        console.error("Error fetching summary:", err);
       }
     }
     fetchSummary();
@@ -107,8 +120,18 @@ function AssetInventoryReport() {
 
   // Print handler (prints the chart and table)
   const handlePrint = () => {
-    // Capture print time
-    setPrintTime(new Date().toLocaleString());
+    // Capture print time in British format
+    setPrintTime(
+      new Date().toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    );
     setTimeout(() => {
       if (printRef.current) {
         window.print();
@@ -193,525 +216,473 @@ function AssetInventoryReport() {
   };
 
   return (
-    <div>
-      {/* Print-specific styles and Roboto font */}
-      <style>{`
-        /* Import Roboto for print */
-        @import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
-        @media print {
-          /* Print layout matches user mockup exactly: centered report, left-aligned title/date, chart and table centered and proportional, generous whitespace */
-          body, html {
-            background: #fff !important;
-            font-family: 'Roboto', Arial, Helvetica, sans-serif !important;
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: visible !important;
-          }
-          .print-hide, header, nav, .sidebar, .search-bar, .notification, .user-menu {
-            display: none !important;
-          }
-          .print-report-root {
-            background: #fff !important;
-            margin: 0 auto;
-            margin-top: 2.5cm;
-            margin-bottom: 2.5cm;
-            padding: 0;
-            max-width: 700px;
-            width: 100%;
-            min-height: 100vh;
-            box-sizing: border-box;
-            page-break-after: avoid;
-            overflow: visible !important;
-          }
-          @page { size: A4 portrait; margin: 1.5cm; }
-          .print-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 0.2rem;
-            margin-top: 0;
-            text-align: left;
-          }
-          .print-meta {
-            font-size: 1.1rem;
-            color: #555;
-            margin-bottom: 2.2rem;
-            text-align: left;
-          }
-          .print-section {
-            display: block;
-            margin-bottom: 2.5rem;
-            page-break-inside: avoid;
-          }
-          .print-chart {
-            width: 90%;
-            max-width: 600px;
-            height: 260px !important;
-            margin: 0 auto 2.5rem auto;
-            display: block;
-          }
-          .print-table {
-            width: 90%;
-            max-width: 600px;
-            margin: 0 auto;
-            margin-top: 0;
-          }
-          .print-table table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 1rem;
-            background: #fff;
-          }
-          .print-table th, .print-table td {
-            border: 1px solid #ccc;
-            padding: 0.7rem 1rem;
-            text-align: left;
-          }
-          h2 {
-            font-size: 1.2rem;
-            margin: 0.7rem 0 0.5rem 0;
-            text-align: left;
-          }
-        }
-        .print-report-root { font-family: 'Roboto', Arial, Helvetica, sans-serif; }
-      `}</style>
-      {/* Action buttons */}
-      <div
-        className="print-hide"
-        style={{ marginBottom: "1rem", display: "flex", gap: "1rem" }}
-      >
-        <button onClick={handlePrint}>Print</button>
-        <button disabled>Email (coming soon)</button>
-        <button disabled>Share (coming soon)</button>
-        <button disabled>Export (coming soon)</button>
+    <div style={{ padding: "1rem" }}>
+      {/* Page Header - match Assets page */}
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Asset Inventory Report
+        </h2>
+        <p className="text-muted-foreground">Prepared on: {printTime}</p>
       </div>
-      {/* Loading and error states */}
-      {loading && <p>Loading asset data...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {/* Printable content */}
-      {!loading && !error && (
-        <div ref={printRef} className="print-report-root">
-          {/* Main heading: larger and bolder for emphasis */}
-          <div
-            className="print-title"
+      {/* Four charts/tables in a single horizontal row, using full page width */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "2rem",
+          marginTop: "2.5rem",
+          marginBottom: "2.5rem",
+          width: "100%",
+          overflowX: "auto",
+          justifyContent: "flex-start",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* Assets by Type */}
+        <div
+          style={{
+            flex: "1 1 0",
+            padding: "1rem",
+            border: "1px solid #eee",
+            borderRadius: 8,
+            background: "#fafbfc",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h2
             style={{
-              fontSize: "2.5rem",
-              fontWeight: 900,
+              fontWeight: "bold",
+              fontSize: "1.1rem",
               marginBottom: "0.5rem",
+              textAlign: "center",
             }}
           >
-            Asset Inventory Report
-          </div>
-          <div className="print-meta">Prepared on: {printTime}</div>
-          {/* Four charts/tables in a single horizontal row, using full page width */}
+            Assets by Type
+          </h2>
           <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "2rem",
-              marginTop: "2.5rem",
-              marginBottom: "2.5rem",
-              width: "100vw",
-              maxWidth: "100vw",
-              overflowX: "auto",
-              justifyContent: "center",
-              paddingLeft: "2vw",
-              paddingRight: "2vw",
-              boxSizing: "border-box",
-            }}
+            className="print-chart"
+            style={{ marginBottom: "1rem", width: "100%" }}
           >
-            {/* Assets by Type */}
-            <div
+            <Bar data={data} options={options} />
+          </div>
+          <div className="print-table" style={{ width: "100%" }}>
+            {/* Font size reduced to match chart labels for compact layout */}
+            <table
               style={{
-                flex: "1 1 0",
-                padding: "1rem",
-                border: "1px solid #eee",
-                borderRadius: 8,
-                background: "#fafbfc",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: 0,
+                fontSize: "12px",
               }}
             >
-              <h2
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "1.1rem",
-                  marginBottom: "0.5rem",
-                  textAlign: "center",
-                }}
-              >
-                Assets by Type
-              </h2>
-              <div
-                className="print-chart"
-                style={{ marginBottom: "1rem", width: "100%" }}
-              >
-                <Bar data={data} options={options} />
-              </div>
-              <div className="print-table" style={{ width: "100%" }}>
-                {/* Font size reduced to match chart labels for compact layout */}
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    marginTop: 0,
-                    fontSize: "12px",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Asset Type
-                      </th>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Count
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {labels.map((type) => (
-                      <tr key={type}>
-                        <td
-                          style={{
-                            border: "1px solid #ccc",
-                            padding: "0.5rem",
-                          }}
-                        >
-                          {type}
-                        </td>
-                        <td
-                          style={{
-                            border: "1px solid #ccc",
-                            padding: "0.5rem",
-                          }}
-                        >
-                          {new Intl.NumberFormat().format(assetCounts[type])}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* Assets by State */}
-            <div
-              style={{
-                flex: "1 1 0",
-                padding: "1rem",
-                border: "1px solid #eee",
-                borderRadius: 8,
-                background: "#fafbfc",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <h2
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "1.1rem",
-                  marginBottom: "0.5rem",
-                  textAlign: "center",
-                }}
-              >
-                Assets by State
-              </h2>
-              <div
-                className="print-chart"
-                style={{ marginBottom: "1rem", width: "100%" }}
-              >
-                <Bar data={stateData} options={stateOptions} />
-              </div>
-              <div className="print-table" style={{ width: "100%" }}>
-                {/* Font size reduced to match chart labels for compact layout */}
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    marginTop: 0,
-                    fontSize: "12px",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Asset State
-                      </th>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Count
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stateLabels.map((state) => (
-                      <tr key={state}>
-                        <td
-                          style={{
-                            border: "1px solid #ccc",
-                            padding: "0.5rem",
-                          }}
-                        >
-                          {state}
-                        </td>
-                        <td
-                          style={{
-                            border: "1px solid #ccc",
-                            padding: "0.5rem",
-                          }}
-                        >
-                          {new Intl.NumberFormat().format(stateCounts[state])}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* Assets in Build State */}
-            <div
-              style={{
-                flex: "1 1 0",
-                padding: "1rem",
-                border: "1px solid #eee",
-                borderRadius: 8,
-                background: "#fafbfc",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <h2
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "1.1rem",
-                  marginBottom: "0.5rem",
-                  textAlign: "center",
-                }}
-              >
-                Assets in Build State
-              </h2>
-              <div
-                className="print-chart"
-                style={{ marginBottom: "1rem", width: "100%" }}
-              >
-                <Bar
-                  data={{
-                    labels: Object.keys(byTypeInBuilt).sort(),
-                    datasets: [
-                      {
-                        data: Object.keys(byTypeInBuilt)
-                          .sort()
-                          .map((type) => byTypeInBuilt[type]),
-                        backgroundColor: Object.keys(byTypeInBuilt)
-                          .sort()
-                          .map((type) => {
-                            switch (type) {
-                              case "LAPTOP":
-                                return "#3B82F6";
-                              case "MONITOR":
-                                return "#22C55E";
-                              case "MOBILE_PHONE":
-                                return "#A21CAF";
-                              case "DESKTOP":
-                                return "#F59E42";
-                              case "TABLET":
-                                return "#EC4899";
-                              default:
-                                return "#6B7280";
-                            }
-                          }),
-                      },
-                    ],
-                  }}
-                  options={options}
-                />
-              </div>
-              <div className="print-table" style={{ width: "100%" }}>
-                {/* Font size reduced to match chart labels for compact layout */}
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    marginTop: 0,
-                    fontSize: "12px",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Asset Type
-                      </th>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Count
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.keys(byTypeInBuilt)
-                      .sort()
-                      .map((type) => (
-                        <tr key={type}>
-                          <td
-                            style={{
-                              border: "1px solid #ccc",
-                              padding: "0.5rem",
-                            }}
-                          >
-                            {type}
-                          </td>
-                          <td
-                            style={{
-                              border: "1px solid #ccc",
-                              padding: "0.5rem",
-                            }}
-                          >
-                            {new Intl.NumberFormat().format(
-                              byTypeInBuilt[type]
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* Assets Ready to Go */}
-            <div
-              style={{
-                flex: "1 1 0",
-                padding: "1rem",
-                border: "1px solid #eee",
-                borderRadius: 8,
-                background: "#fafbfc",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <h2
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "1.1rem",
-                  marginBottom: "0.5rem",
-                  textAlign: "center",
-                }}
-              >
-                Assets Ready to Go
-              </h2>
-              <div
-                className="print-chart"
-                style={{ marginBottom: "1rem", width: "100%" }}
-              >
-                <Bar
-                  data={{
-                    labels: Object.keys(byTypeInReadyToGo).sort(),
-                    datasets: [
-                      {
-                        data: Object.keys(byTypeInReadyToGo)
-                          .sort()
-                          .map((type) => byTypeInReadyToGo[type]),
-                        backgroundColor: Object.keys(byTypeInReadyToGo)
-                          .sort()
-                          .map((type) => {
-                            switch (type) {
-                              case "LAPTOP":
-                                return "#3B82F6";
-                              case "MONITOR":
-                                return "#22C55E";
-                              case "MOBILE_PHONE":
-                                return "#A21CAF";
-                              case "DESKTOP":
-                                return "#F59E42";
-                              case "TABLET":
-                                return "#EC4899";
-                              default:
-                                return "#6B7280";
-                            }
-                          }),
-                      },
-                    ],
-                  }}
-                  options={options}
-                />
-              </div>
-              <div className="print-table" style={{ width: "100%" }}>
-                {/* Font size reduced to match chart labels for compact layout */}
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    marginTop: 0,
-                    fontSize: "12px",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Asset Type
-                      </th>
-                      <th
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
-                      >
-                        Count
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.keys(byTypeInReadyToGo)
-                      .sort()
-                      .map((type) => (
-                        <tr key={type}>
-                          <td
-                            style={{
-                              border: "1px solid #ccc",
-                              padding: "0.5rem",
-                            }}
-                          >
-                            {type}
-                          </td>
-                          <td
-                            style={{
-                              border: "1px solid #ccc",
-                              padding: "0.5rem",
-                            }}
-                          >
-                            {new Intl.NumberFormat().format(
-                              byTypeInReadyToGo[type]
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+              <thead>
+                <tr>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Asset Type
+                  </th>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Count
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {labels.map((type) => (
+                  <tr key={type}>
+                    <td
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                      }}
+                    >
+                      {type}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                      }}
+                    >
+                      {new Intl.NumberFormat().format(assetCounts[type])}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
+        {/* Assets by State */}
+        <div
+          style={{
+            flex: "1 1 0",
+            padding: "1rem",
+            border: "1px solid #eee",
+            borderRadius: 8,
+            background: "#fafbfc",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+              marginBottom: "0.5rem",
+              textAlign: "center",
+            }}
+          >
+            Assets by State
+          </h2>
+          <div
+            className="print-chart"
+            style={{ marginBottom: "1rem", width: "100%" }}
+          >
+            <Bar data={stateData} options={stateOptions} />
+          </div>
+          <div className="print-table" style={{ width: "100%" }}>
+            {/* Font size reduced to match chart labels for compact layout */}
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: 0,
+                fontSize: "12px",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Asset State
+                  </th>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Count
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {stateLabels.map((state) => (
+                  <tr key={state}>
+                    <td
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                      }}
+                    >
+                      {state}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                      }}
+                    >
+                      {new Intl.NumberFormat().format(stateCounts[state])}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Assets in Build State */}
+        <div
+          style={{
+            flex: "1 1 0",
+            padding: "1rem",
+            border: "1px solid #eee",
+            borderRadius: 8,
+            background: "#fafbfc",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+              marginBottom: "0.5rem",
+              textAlign: "center",
+            }}
+          >
+            Assets in Build State
+          </h2>
+          <div
+            className="print-chart"
+            style={{ marginBottom: "1rem", width: "100%" }}
+          >
+            <Bar
+              data={{
+                labels: Object.keys(byTypeInBuilt).sort(),
+                datasets: [
+                  {
+                    data: Object.keys(byTypeInBuilt)
+                      .sort()
+                      .map((type) => byTypeInBuilt[type]),
+                    backgroundColor: Object.keys(byTypeInBuilt)
+                      .sort()
+                      .map((type) => {
+                        switch (type) {
+                          case "LAPTOP":
+                            return "#3B82F6";
+                          case "MONITOR":
+                            return "#22C55E";
+                          case "MOBILE_PHONE":
+                            return "#A21CAF";
+                          case "DESKTOP":
+                            return "#F59E42";
+                          case "TABLET":
+                            return "#EC4899";
+                          default:
+                            return "#6B7280";
+                        }
+                      }),
+                  },
+                ],
+              }}
+              options={options}
+            />
+          </div>
+          <div className="print-table" style={{ width: "100%" }}>
+            {/* Font size reduced to match chart labels for compact layout */}
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: 0,
+                fontSize: "12px",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Asset Type
+                  </th>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Count
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(byTypeInBuilt)
+                  .sort()
+                  .map((type) => (
+                    <tr key={type}>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "0.5rem",
+                        }}
+                      >
+                        {type}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "0.5rem",
+                        }}
+                      >
+                        {new Intl.NumberFormat().format(byTypeInBuilt[type])}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Assets Ready to Go */}
+        <div
+          style={{
+            flex: "1 1 0",
+            padding: "1rem",
+            border: "1px solid #eee",
+            borderRadius: 8,
+            background: "#fafbfc",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <h2
+            style={{
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+              marginBottom: "0.5rem",
+              textAlign: "center",
+            }}
+          >
+            Assets Ready to Go
+          </h2>
+          <div
+            className="print-chart"
+            style={{ marginBottom: "1rem", width: "100%" }}
+          >
+            <Bar
+              data={{
+                labels: Object.keys(byTypeInReadyToGo).sort(),
+                datasets: [
+                  {
+                    data: Object.keys(byTypeInReadyToGo)
+                      .sort()
+                      .map((type) => byTypeInReadyToGo[type]),
+                    backgroundColor: Object.keys(byTypeInReadyToGo)
+                      .sort()
+                      .map((type) => {
+                        switch (type) {
+                          case "LAPTOP":
+                            return "#3B82F6";
+                          case "MONITOR":
+                            return "#22C55E";
+                          case "MOBILE_PHONE":
+                            return "#A21CAF";
+                          case "DESKTOP":
+                            return "#F59E42";
+                          case "TABLET":
+                            return "#EC4899";
+                          default:
+                            return "#6B7280";
+                        }
+                      }),
+                  },
+                ],
+              }}
+              options={options}
+            />
+          </div>
+          <div className="print-table" style={{ width: "100%" }}>
+            {/* Font size reduced to match chart labels for compact layout */}
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: 0,
+                fontSize: "12px",
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Asset Type
+                  </th>
+                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    Count
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(byTypeInReadyToGo)
+                  .sort()
+                  .map((type) => (
+                    <tr key={type}>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "0.5rem",
+                        }}
+                      >
+                        {type}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "0.5rem",
+                        }}
+                      >
+                        {new Intl.NumberFormat().format(
+                          byTypeInReadyToGo[type]
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {/* Action buttons moved to bottom, left-aligned with title */}
+      <div
+        className="print-hide"
+        style={{
+          marginTop: "2rem",
+          display: "flex",
+          gap: "1rem",
+          justifyContent: "flex-start",
+        }}
+      >
+        <button
+          onClick={handlePrint}
+          style={{
+            padding: "0.5rem 1.5rem",
+            borderRadius: 6,
+            border: "1px solid #2563EB",
+            background: "#2563EB",
+            color: "white",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "pointer",
+          }}
+        >
+          Print
+        </button>
+        <button
+          disabled
+          style={{
+            padding: "0.5rem 1.5rem",
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            background: "#eee",
+            color: "#888",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "not-allowed",
+          }}
+        >
+          Email (coming soon)
+        </button>
+        <button
+          disabled
+          style={{
+            padding: "0.5rem 1.5rem",
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            background: "#eee",
+            color: "#888",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "not-allowed",
+          }}
+        >
+          Share (coming soon)
+        </button>
+        <button
+          disabled
+          style={{
+            padding: "0.5rem 1.5rem",
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            background: "#eee",
+            color: "#888",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "not-allowed",
+          }}
+        >
+          Export (coming soon)
+        </button>
+      </div>
     </div>
   );
 }
 
 // Main Reports Page
 export default function ReportsPage() {
-  // Track selected report
-  const [selected, setSelected] = useState(REPORTS[0]);
+  // Read the selected report from the query string (?report=CategoryName)
+  const searchParams = useSearchParams();
+  const reportParam = searchParams.get("report") || "";
+  // Default to 'Asset Inventory' if not specified or invalid
+  const selected = REPORTS.includes(reportParam) ? reportParam : REPORTS[0];
 
   // Render the selected report
   function renderReport() {
@@ -720,39 +691,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem" }}>
-      <h1
-        style={{ fontWeight: "bold", fontSize: "2rem", marginBottom: "1.5rem" }}
-      >
-        Reports
-      </h1>
-      {/* Navigation for report types */}
-      <nav
-        style={{
-          marginBottom: "2rem",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-        }}
-      >
-        {REPORTS.map((report) => (
-          <button
-            key={report}
-            onClick={() => setSelected(report)}
-            style={{
-              padding: "0.5rem 1rem",
-              borderRadius: 6,
-              border:
-                selected === report ? "2px solid #0070f3" : "1px solid #ccc",
-              background: selected === report ? "#e6f0fa" : "#fff",
-              fontWeight: selected === report ? "bold" : "normal",
-              cursor: "pointer",
-            }}
-          >
-            {report}
-          </button>
-        ))}
-      </nav>
+    <div style={{ padding: "1rem" }}>
       {/* Render selected report */}
       {renderReport()}
     </div>

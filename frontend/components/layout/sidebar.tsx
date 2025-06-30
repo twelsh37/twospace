@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +42,9 @@ export function useDashboardStats() {
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showReportsFlyout, setShowReportsFlyout] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { stats, isLoading, mutate } = useDashboardStats();
 
   const navItems: NavItem[] = [
@@ -95,6 +97,19 @@ export function Sidebar() {
     },
   ];
 
+  const reportCategories = [
+    "Asset Inventory",
+    "Lifecycle Management",
+    "Financial",
+    "Compliance",
+    "Utilization",
+    "Maintenance",
+    "Software License",
+    "Security",
+    "End-of-Life",
+    "Audit",
+  ];
+
   // Expose mutate function globally for revalidation
   (globalThis as Record<string, unknown>).mutateDashboard = mutate;
 
@@ -134,6 +149,72 @@ export function Sidebar() {
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
+
+            // Add flyout to Reports entry
+            if (item.title === "Reports") {
+              return (
+                <div
+                  key={item.href}
+                  style={{ position: "relative" }}
+                  onMouseEnter={() => setShowReportsFlyout(true)}
+                  onMouseLeave={() => setShowReportsFlyout(false)}
+                >
+                  <Link href={item.href}>
+                    <div
+                      className={cn(
+                        "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                        isActive &&
+                          "bg-accent text-accent-foreground font-medium",
+                        isCollapsed && "justify-center px-2"
+                      )}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <item.icon className="h-4 w-4" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                  {/* Flyout menu for report categories */}
+                  {showReportsFlyout && !isCollapsed && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "100%",
+                        top: 0,
+                        zIndex: 20,
+                        minWidth: 200,
+                        background: "#fff",
+                        border: "1px solid #eee",
+                        borderRadius: 8,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                        padding: "0.5rem 0",
+                      }}
+                    >
+                      {reportCategories.map((cat) => (
+                        <div
+                          key={cat}
+                          onClick={() => {
+                            router.push(
+                              `/reports?report=${encodeURIComponent(cat)}`
+                            );
+                            setShowReportsFlyout(false);
+                          }}
+                          style={{
+                            padding: "0.5rem 1rem",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            fontWeight: 500,
+                          }}
+                          onMouseDown={(e) => e.preventDefault()}
+                        >
+                          {cat}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
 
             return (
               <Link key={item.href} href={item.href}>
