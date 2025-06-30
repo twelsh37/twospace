@@ -1,8 +1,38 @@
-CREATE TYPE "public"."asset_state" AS ENUM('AVAILABLE', 'SIGNED_OUT', 'BUILT', 'READY_TO_GO', 'ISSUED', 'holding');--> statement-breakpoint
-CREATE TYPE "public"."asset_status" AS ENUM('holding', 'active', 'retired', 'stock');--> statement-breakpoint
-CREATE TYPE "public"."asset_type" AS ENUM('MOBILE_PHONE', 'TABLET', 'DESKTOP', 'LAPTOP', 'MONITOR');--> statement-breakpoint
-CREATE TYPE "public"."assignment_type" AS ENUM('INDIVIDUAL', 'SHARED');--> statement-breakpoint
-CREATE TYPE "public"."user_role" AS ENUM('ADMIN', 'USER');--> statement-breakpoint
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_state') THEN
+    CREATE TYPE "public"."asset_state" AS ENUM('AVAILABLE', 'SIGNED_OUT', 'BUILT', 'READY_TO_GO', 'ISSUED', 'holding');
+  END IF;
+END$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_status') THEN
+    CREATE TYPE "public"."asset_status" AS ENUM('holding', 'active', 'retired', 'stock');
+  END IF;
+END$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_type') THEN
+    CREATE TYPE "public"."asset_type" AS ENUM('MOBILE_PHONE', 'TABLET', 'DESKTOP', 'LAPTOP', 'MONITOR');
+  END IF;
+END$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'assignment_type') THEN
+    CREATE TYPE "public"."assignment_type" AS ENUM('INDIVIDUAL', 'SHARED');
+  END IF;
+END$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+    CREATE TYPE "public"."user_role" AS ENUM('ADMIN', 'USER');
+  END IF;
+END$$;
+
 CREATE TABLE "asset_assignments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"asset_id" uuid NOT NULL,

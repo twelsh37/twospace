@@ -17,7 +17,8 @@
     "update:asset-prices": "tsx scripts/update-asset-prices.ts",
     "update:asset-descriptions": "tsx scripts/update-asset-descriptions.ts",
     "db:clear-test-data": "tsx scripts/clear-test-data.ts",
-    "db:drop-tables": "tsx scripts/drop-all-tables.ts"
+    "db:drop-tables": "tsx scripts/drop-all-tables.ts",
+    "db:seed-settings": "tsx scripts/seed-settings.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
@@ -32,6 +33,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@vercel/postgres": "^0.10.0",
     "chart.js": "^4.5.0",
+    "chartjs-node-canvas": "^5.0.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -17,6 +17,7 @@ import {
 import { db, assetsTable, locationsTable } from "@/lib/db";
 import { generateAssetNumber, createAssetHistory } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
+import { settingsTable } from "@/lib/db/schema";
 
 // Define standard CORS headers for reusability
 const corsHeaders = {
@@ -24,6 +25,25 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
+
+// In-memory cache for asset GET requests, keyed by query string
+const assetCache: Map<
+  string,
+  { data: any; timestamp: number; duration: number }
+> = new Map();
+
+// Helper to get cache duration from settings (fetch from DB)
+async function getCacheDurationFromSettings(): Promise<number> {
+  try {
+    const settings = await db.select().from(settingsTable).limit(1);
+    if (settings.length && settings[0].reportCacheDuration) {
+      return settings[0].reportCacheDuration * 60 * 1000; // convert minutes to ms
+    }
+  } catch {
+    // Fallback to default if error
+  }
+  return 30 * 60 * 1000; // 30 minutes default
+}
 
 /**
  * GET /api/assets
@@ -33,6 +53,15 @@ export async function GET(request: NextRequest) {
   const start = Date.now(); // Start timing
   try {
     const { searchParams } = new URL(request.url);
+    const cacheKey = request.url.split("?")[1] || "__no_query__";
+    // Get cache duration from settings if available
+    const cacheDuration = await getCacheDurationFromSettings();
+    const now = Date.now();
+    const cached = assetCache.get(cacheKey);
+    if (cached && now - cached.timestamp < cacheDuration) {
+      // Return cached data
+      return NextResponse.json(cached.data, { headers: corsHeaders });
+    }
 
     // Extract query parameters
     const type = searchParams.get("type") || "all";
@@ -174,6 +203,11 @@ export async function GET(request: NextRequest) {
       timingMs: durationMs, // Add timing info
     };
 
+    assetCache.set(cacheKey, {
+      data: response,
+      timestamp: now,
+      duration: cacheDuration,
+    });
     return NextResponse.json(response, { headers: corsHeaders });
   } catch (error) {
     const durationMs = Date.now() - start;

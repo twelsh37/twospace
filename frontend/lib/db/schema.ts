@@ -152,6 +152,13 @@ export const assetSequencesTable = pgTable("asset_sequences", {
   nextSequence: integer("next_sequence").notNull().default(1),
 });
 
+// Settings table for system-wide configuration (single row)
+export const settingsTable = pgTable("settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  reportCacheDuration: integer("report_cache_duration").notNull().default(30), // in minutes
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 // Type exports for use in application
 export type User = typeof usersTable.$inferSelect;
 export type NewUser = typeof usersTable.$inferInsert;
