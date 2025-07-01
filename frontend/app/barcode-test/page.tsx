@@ -6,25 +6,8 @@
 import React, { useState, useEffect } from "react";
 import { BarcodeScanner } from "@/components/ui/barcode-scanner";
 import { BarcodeSearchWithResults } from "@/components/search/barcode-search";
-import { AssetFormWithBarcode } from "@/components/assets/asset-form-with-barcode";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AssetType, AssetState, AssignmentType } from "@/lib/types";
-
-// Define Asset interface for the test page
-interface Asset {
-  assetNumber?: string;
-  type: AssetType;
-  state: AssetState;
-  serialNumber: string;
-  description: string;
-  purchasePrice: string;
-  location: string;
-  assignmentType: AssignmentType;
-  assignedTo?: string;
-  employeeId?: string;
-  department?: string;
-}
 
 // Client-side only component to avoid hydration errors
 function SystemInfoCard() {
@@ -97,9 +80,9 @@ export default function BarcodeTestPage() {
     setTimeout(() => setShowSuccess(false), 1200); // Show for 1.2s
   };
 
-  const handleAssetSubmit = async (asset: Partial<Asset>) => {
-    console.log("Asset submitted:", asset);
-    alert("Asset form submitted! Check console for details.");
+  // Log all barcodes scanned in Asset Search as well
+  const handleBarcodeScanned = (barcode: string) => {
+    setScannedBarcodes((prev) => [...prev, barcode]);
   };
 
   return (
@@ -139,9 +122,8 @@ export default function BarcodeTestPage() {
 
       {/* --- Tabs for other test modes --- */}
       <Tabs defaultValue="search" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="search">Asset Search</TabsTrigger>
-          <TabsTrigger value="form">Asset Form</TabsTrigger>
           <TabsTrigger value="history">Scan History</TabsTrigger>
         </TabsList>
 
@@ -155,24 +137,8 @@ export default function BarcodeTestPage() {
                 Test asset lookup by scanning asset barcodes. This will search
                 for assets in your system.
               </p>
-              <BarcodeSearchWithResults />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="form" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Asset Form with Barcode Scanning</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Test the asset creation form with integrated barcode scanning
-                for asset numbers and serial numbers.
-              </p>
-              <AssetFormWithBarcode
-                mode="create"
-                onSubmit={handleAssetSubmit}
+              <BarcodeSearchWithResults
+                onBarcodeScanned={handleBarcodeScanned}
               />
             </CardContent>
           </Card>
