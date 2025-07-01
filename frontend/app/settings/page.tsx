@@ -3,6 +3,8 @@
 
 "use client";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { FaBarcode } from "react-icons/fa";
 
 export default function SettingsPage() {
   const [cacheDuration, setCacheDuration] = useState(30);
@@ -466,6 +468,61 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* --- Tools Section --- */}
+      <div
+        style={{
+          border: "1px solid #e5e7eb",
+          borderRadius: 10,
+          padding: "1.5rem",
+          maxWidth: 500,
+          background: "#fff",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+          marginBottom: 32,
+        }}
+      >
+        <h2
+          style={{
+            fontWeight: "bold",
+            fontSize: "1.2rem",
+            marginBottom: "1.5rem",
+            textAlign: "left",
+            letterSpacing: 0.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <FaBarcode style={{ marginRight: 8 }} /> Tools
+        </h2>
+        <div style={{ marginBottom: 16 }}>
+          <strong>Barcode Scanner Test</strong>
+          <p style={{ margin: "8px 0 0 0", color: "#555" }}>
+            Test your barcode scanner and verify it works with the system.
+            Useful for setup, troubleshooting, and training.
+          </p>
+        </div>
+        <Link href="/barcode-test">
+          <button
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              padding: "8px 18px",
+              fontWeight: 600,
+              fontSize: 16,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <FaBarcode /> Go to Barcode Test
+          </button>
+        </Link>
+      </div>
+
       {/* Save Button - absolutely positioned bottom right of the container */}
       <div style={{ position: "absolute", right: 32, bottom: 32 }}>
         <button
