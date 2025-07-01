@@ -38,13 +38,13 @@ import { UserAssetsModal } from "@/components/users/user-assets-modal";
 // Utility function to map asset state to solid background color classes
 const getStateColorClass = (state: AssetState) => {
   // This function returns Tailwind classes for solid backgrounds and white text
-  // AVAILABLE - Blue, SIGNED_OUT - Teal, BUILT - Orange, READY_TO_GO - Purple, ISSUED - Green
+  // AVAILABLE - Blue, SIGNED_OUT - Teal, BUILDING - Orange, READY_TO_GO - Purple, ISSUED - Green
   switch (state) {
     case AssetState.AVAILABLE:
       return "bg-blue-600 text-white";
     case AssetState.SIGNED_OUT:
       return "bg-teal-600 text-white";
-    case AssetState.BUILT:
+    case AssetState.BUILDING:
       return "bg-orange-500 text-white";
     case AssetState.READY_TO_GO:
       return "bg-purple-600 text-white";

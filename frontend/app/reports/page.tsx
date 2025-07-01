@@ -84,7 +84,7 @@ function AssetInventoryReport() {
     );
   }, []);
   // Add state for new breakdowns
-  const [byTypeInBuilt, setByTypeInBuilt] = useState<{
+  const [byTypeInBuilding, setByTypeInBuilding] = useState<{
     [type: string]: number;
   }>({});
   const [byTypeInReadyToGo, setByTypeInReadyToGo] = useState<{
@@ -96,7 +96,7 @@ function AssetInventoryReport() {
   // Use generic refs for Bar charts to avoid type errors
   const chartTypeRef = useRef(null);
   const chartStateRef = useRef(null);
-  const chartBuiltRef = useRef(null);
+  const chartBuildingRef = useRef(null);
   const chartReadyRef = useRef(null);
 
   // Fetch summary data for the charts and tables
@@ -110,7 +110,7 @@ function AssetInventoryReport() {
         setAssetCounts(json.byType);
         setStateCounts(json.byState);
         // Set new breakdowns
-        setByTypeInBuilt(json.byTypeInBuilt || {});
+        setByTypeInBuilding(json.byTypeInBuilding || {});
         setByTypeInReadyToGo(json.byTypeInReadyToGo || {});
       } catch (err: unknown) {
         console.error("Error fetching summary:", err);
@@ -147,7 +147,7 @@ function AssetInventoryReport() {
       // Get chart images as data URLs
       const chart1 = (chartTypeRef as any).current?.toBase64Image() || "";
       const chart2 = (chartStateRef as any).current?.toBase64Image() || "";
-      const chart3 = (chartBuiltRef as any).current?.toBase64Image() || "";
+      const chart3 = (chartBuildingRef as any).current?.toBase64Image() || "";
       const chart4 = (chartReadyRef as any).current?.toBase64Image() || "";
       // Send to API with real table data
       const res = await fetch("/api/reports/pdf", {
@@ -162,8 +162,8 @@ function AssetInventoryReport() {
           assetCounts,
           stateTypes: Object.keys(stateCounts).sort(),
           stateCounts,
-          builtTypes: Object.keys(byTypeInBuilt).sort(),
-          byTypeInBuilt,
+          buildingTypes: Object.keys(byTypeInBuilding).sort(),
+          byTypeInBuilding,
           readyTypes: Object.keys(byTypeInReadyToGo).sort(),
           byTypeInReadyToGo,
         }),
@@ -238,7 +238,7 @@ function AssetInventoryReport() {
               return "#2563EB";
             case "SIGNED_OUT":
               return "#14B8A6";
-            case "BUILT":
+            case "BUILDING":
               return "#F59E42";
             case "READY_TO_GO":
               return "#7C3AED";
@@ -261,6 +261,33 @@ function AssetInventoryReport() {
       legend: { display: false },
       title: { display: false },
     },
+  };
+
+  // Prepare data for Assets in Building State
+  const buildingLabels = Object.keys(byTypeInBuilding).sort();
+  const buildingData = {
+    labels: buildingLabels,
+    datasets: [
+      {
+        data: buildingLabels.map((type) => byTypeInBuilding[type]),
+        backgroundColor: buildingLabels.map((type) => {
+          switch (type) {
+            case "LAPTOP":
+              return "#3B82F6";
+            case "MONITOR":
+              return "#22C55E";
+            case "MOBILE_PHONE":
+              return "#A21CAF";
+            case "DESKTOP":
+              return "#F59E42";
+            case "TABLET":
+              return "#EC4899";
+            default:
+              return "#6B7280";
+          }
+        }),
+      },
+    ],
   };
 
   return (
@@ -444,7 +471,7 @@ function AssetInventoryReport() {
             </table>
           </div>
         </div>
-        {/* Assets in Build State */}
+        {/* Assets in Building State */}
         <div
           style={{
             flex: "1 1 0",
@@ -465,42 +492,15 @@ function AssetInventoryReport() {
               textAlign: "center",
             }}
           >
-            Assets in Build State
+            Assets in Building State
           </h2>
           <div
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
             <Bar
-              ref={chartBuiltRef as any}
-              data={{
-                labels: Object.keys(byTypeInBuilt).sort(),
-                datasets: [
-                  {
-                    data: Object.keys(byTypeInBuilt)
-                      .sort()
-                      .map((type) => byTypeInBuilt[type]),
-                    backgroundColor: Object.keys(byTypeInBuilt)
-                      .sort()
-                      .map((type) => {
-                        switch (type) {
-                          case "LAPTOP":
-                            return "#3B82F6";
-                          case "MONITOR":
-                            return "#22C55E";
-                          case "MOBILE_PHONE":
-                            return "#A21CAF";
-                          case "DESKTOP":
-                            return "#F59E42";
-                          case "TABLET":
-                            return "#EC4899";
-                          default:
-                            return "#6B7280";
-                        }
-                      }),
-                  },
-                ],
-              }}
+              ref={chartBuildingRef as any}
+              data={buildingData}
               options={options}
             />
           </div>
@@ -528,28 +528,26 @@ function AssetInventoryReport() {
                 </tr>
               </thead>
               <tbody>
-                {Object.keys(byTypeInBuilt)
-                  .sort()
-                  .map((type) => (
-                    <tr key={type}>
-                      <td
-                        style={{
-                          border: "1px solid #ccc",
-                          padding: "0.5rem",
-                        }}
-                      >
-                        {type}
-                      </td>
-                      <td
-                        style={{
-                          border: "1px solid #ccc",
-                          padding: "0.5rem",
-                        }}
-                      >
-                        {new Intl.NumberFormat().format(byTypeInBuilt[type])}
-                      </td>
-                    </tr>
-                  ))}
+                {buildingLabels.map((type) => (
+                  <tr key={type}>
+                    <td
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                      }}
+                    >
+                      {type}
+                    </td>
+                    <td
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                      }}
+                    >
+                      {new Intl.NumberFormat().format(byTypeInBuilding[type])}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

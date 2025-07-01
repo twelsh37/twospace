@@ -102,7 +102,7 @@ export function UserAssetsModal({
         return "bg-blue-600 text-white";
       case AssetState.SIGNED_OUT:
         return "bg-teal-600 text-white";
-      case AssetState.BUILT:
+      case AssetState.BUILDING:
         return "bg-orange-500 text-white";
       case AssetState.READY_TO_GO:
         return "bg-purple-600 text-white";

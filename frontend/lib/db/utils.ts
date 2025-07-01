@@ -78,7 +78,7 @@ export async function createAssetHistory(
       newState: newState as
         | "AVAILABLE"
         | "SIGNED_OUT"
-        | "BUILT"
+        | "BUILDING"
         | "READY_TO_GO"
         | "ISSUED",
       changedBy,
@@ -86,7 +86,7 @@ export async function createAssetHistory(
       previousState: previousState as
         | "AVAILABLE"
         | "SIGNED_OUT"
-        | "BUILT"
+        | "BUILDING"
         | "READY_TO_GO"
         | "ISSUED"
         | undefined,
@@ -139,7 +139,7 @@ export async function getActiveAssets(filters?: {
             filters.state as
               | "AVAILABLE"
               | "SIGNED_OUT"
-              | "BUILT"
+              | "BUILDING"
               | "READY_TO_GO"
               | "ISSUED"
           )

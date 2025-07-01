@@ -170,7 +170,7 @@ export function AssetsByState({
             <div>
               <div className="text-lg font-semibold">
                 {getCountByState(AssetState.SIGNED_OUT) +
-                  getCountByState(AssetState.BUILT)}
+                  getCountByState(AssetState.BUILDING)}
               </div>
               <div className="text-xs text-muted-foreground">In Processing</div>
             </div>

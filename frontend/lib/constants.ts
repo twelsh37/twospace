@@ -17,42 +17,42 @@ export const VALID_STATE_TRANSITIONS: Record<
   AssetType,
   Record<AssetState, AssetState[]>
 > = {
-  // Mobile Phones, Tablets, Desktops, Laptops: Available → Signed Out → Built → RTGS → Issued
+  // Mobile Phones, Tablets, Desktops, Laptops: Available → Signed Out → Building → RTGS → Issued
   [AssetType.MOBILE_PHONE]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
-    [AssetState.SIGNED_OUT]: [AssetState.BUILT, AssetState.AVAILABLE],
-    [AssetState.BUILT]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILT],
+    [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
+    [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
     [AssetState.ISSUED]: [AssetState.READY_TO_GO],
   },
   [AssetType.TABLET]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
-    [AssetState.SIGNED_OUT]: [AssetState.BUILT, AssetState.AVAILABLE],
-    [AssetState.BUILT]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILT],
+    [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
+    [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
     [AssetState.ISSUED]: [AssetState.READY_TO_GO],
   },
   [AssetType.DESKTOP]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
-    [AssetState.SIGNED_OUT]: [AssetState.BUILT, AssetState.AVAILABLE],
-    [AssetState.BUILT]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILT],
+    [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
+    [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
     [AssetState.ISSUED]: [AssetState.READY_TO_GO],
   },
   [AssetType.LAPTOP]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
-    [AssetState.SIGNED_OUT]: [AssetState.BUILT, AssetState.AVAILABLE],
-    [AssetState.BUILT]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILT],
+    [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
+    [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
     [AssetState.ISSUED]: [AssetState.READY_TO_GO],
   },
-  // Monitors: Available → Signed Out → RTGS → Issued (no BUILD state)
+  // Monitors: Available → Signed Out → RTGS → Issued (no BUILDING state)
   [AssetType.MONITOR]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
     [AssetState.SIGNED_OUT]: [AssetState.READY_TO_GO, AssetState.AVAILABLE],
     [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.SIGNED_OUT],
     [AssetState.ISSUED]: [AssetState.READY_TO_GO],
-    [AssetState.BUILT]: [], // Monitors don't use BUILT state
+    [AssetState.BUILDING]: [], // Monitors don't use BUILDING state
   },
 };
 
@@ -73,7 +73,7 @@ export function getValidNextStates(
 export const ASSET_STATE_LABELS: Record<AssetState, string> = {
   [AssetState.AVAILABLE]: "Available Stock",
   [AssetState.SIGNED_OUT]: "Signed Out",
-  [AssetState.BUILT]: "Built",
+  [AssetState.BUILDING]: "Building",
   [AssetState.READY_TO_GO]: "Ready To Go Stock",
   [AssetState.ISSUED]: "Issued",
 };
@@ -122,13 +122,13 @@ export const API_ENDPOINTS = {
 
 // Utility function to map asset state to solid background color classes (centralized for reuse)
 export function getStateColorClass(state: AssetState): string {
-  // AVAILABLE - Blue, SIGNED_OUT - Teal, BUILT - Orange, READY_TO_GO - Purple, ISSUED - Green
+  // AVAILABLE - Blue, SIGNED_OUT - Teal, BUILDING - Orange, READY_TO_GO - Purple, ISSUED - Green
   switch (state) {
     case AssetState.AVAILABLE:
       return "bg-blue-600 text-white";
     case AssetState.SIGNED_OUT:
       return "bg-teal-600 text-white";
-    case AssetState.BUILT:
+    case AssetState.BUILDING:
       return "bg-orange-500 text-white";
     case AssetState.READY_TO_GO:
       return "bg-purple-600 text-white";

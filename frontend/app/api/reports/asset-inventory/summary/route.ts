@@ -27,17 +27,19 @@ export async function GET() {
     for (const row of byStateRows) {
       byState[row.state as string] = Number(row.count);
     }
-    // Group by type for assets in BUILT state
-    const byTypeInBuiltRows = await db
+    // Group by type for assets in BUILDING state
+    const byTypeInBuildingRows = await db
       .select({ type: assetsTable.type, count: sql<number>`count(*)` })
       .from(assetsTable)
       .where(
-        sql`${isNull(assetsTable.deletedAt)} and ${assetsTable.state} = 'BUILT'`
+        sql`${isNull(assetsTable.deletedAt)} and ${
+          assetsTable.state
+        } = 'BUILDING'`
       )
       .groupBy(assetsTable.type);
-    const byTypeInBuilt: Record<string, number> = {};
-    for (const row of byTypeInBuiltRows) {
-      byTypeInBuilt[row.type as string] = Number(row.count);
+    const byTypeInBuilding: Record<string, number> = {};
+    for (const row of byTypeInBuildingRows) {
+      byTypeInBuilding[row.type as string] = Number(row.count);
     }
     // Group by type for assets in READY_TO_GO state
     const byTypeInReadyToGoRows = await db
@@ -70,7 +72,7 @@ export async function GET() {
     return NextResponse.json({
       byType,
       byState,
-      byTypeInBuilt,
+      byTypeInBuilding,
       byTypeInReadyToGo,
       byYear,
     });

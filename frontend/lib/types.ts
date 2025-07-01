@@ -13,7 +13,7 @@ export enum AssetType {
 export enum AssetState {
   AVAILABLE = "AVAILABLE",
   SIGNED_OUT = "SIGNED_OUT",
-  BUILT = "BUILT",
+  BUILDING = "BUILDING",
   READY_TO_GO = "READY_TO_GO",
   ISSUED = "ISSUED",
 }

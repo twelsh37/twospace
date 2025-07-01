@@ -30,7 +30,7 @@ const getStateColorClass = (state: AssetState) => {
       return "bg-blue-600 text-white";
     case AssetState.SIGNED_OUT:
       return "bg-teal-600 text-white";
-    case AssetState.BUILT:
+    case AssetState.BUILDING:
       return "bg-orange-500 text-white";
     case AssetState.READY_TO_GO:
       return "bg-purple-600 text-white";
@@ -70,7 +70,7 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
       id: "3",
       assetId,
       previousState: AssetState.SIGNED_OUT,
-      newState: AssetState.BUILT,
+      newState: AssetState.BUILDING,
       changedBy: "mike.tech",
       timestamp: new Date("2024-01-17T11:15:00"),
       changeReason: "Asset configuration completed",
@@ -88,7 +88,7 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
         return "bg-blue-500";
       case AssetState.SIGNED_OUT:
         return "bg-yellow-500";
-      case AssetState.BUILT:
+      case AssetState.BUILDING:
         return "bg-green-500";
       case AssetState.READY_TO_GO:
         return "bg-purple-500";
