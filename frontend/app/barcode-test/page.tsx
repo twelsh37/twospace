@@ -9,6 +9,22 @@ import { BarcodeSearchWithResults } from "@/components/search/barcode-search";
 import { AssetFormWithBarcode } from "@/components/assets/asset-form-with-barcode";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AssetType, AssetState, AssignmentType } from "@/lib/types";
+
+// Define Asset interface for the test page
+interface Asset {
+  assetNumber?: string;
+  type: AssetType;
+  state: AssetState;
+  serialNumber: string;
+  description: string;
+  purchasePrice: string;
+  location: string;
+  assignmentType: AssignmentType;
+  assignedTo?: string;
+  employeeId?: string;
+  department?: string;
+}
 
 // Client-side only component to avoid hydration errors
 function SystemInfoCard() {
@@ -75,7 +91,7 @@ export default function BarcodeTestPage() {
     setScannedBarcodes((prev) => [...prev, barcode]);
   };
 
-  const handleAssetSubmit = async (asset: any) => {
+  const handleAssetSubmit = async (asset: Partial<Asset>) => {
     console.log("Asset submitted:", asset);
     alert("Asset form submitted! Check console for details.");
   };

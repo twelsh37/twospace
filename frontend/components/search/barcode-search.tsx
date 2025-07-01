@@ -76,50 +76,6 @@ export function BarcodeSearch({
     }
   };
 
-  // Asset type display helper
-  const getAssetTypeLabel = (type: AssetType): string => {
-    const labels: Record<AssetType, string> = {
-      [AssetType.MOBILE_PHONE]: "Mobile Phone",
-      [AssetType.TABLET]: "Tablet",
-      [AssetType.DESKTOP]: "Desktop",
-      [AssetType.LAPTOP]: "Laptop",
-      [AssetType.MONITOR]: "Monitor",
-    };
-    return labels[type] || type;
-  };
-
-  // Asset state display helper
-  const getAssetStateLabel = (state: AssetState): string => {
-    const labels: Record<AssetState, string> = {
-      [AssetState.AVAILABLE]: "Available",
-      [AssetState.SIGNED_OUT]: "Signed Out",
-      [AssetState.BUILT]: "Built",
-      [AssetState.READY_TO_GO]: "Ready To Go",
-      [AssetState.ISSUED]: "Issued",
-    };
-    return labels[state] || state;
-  };
-
-  // State badge color helper
-  const getStateBadgeVariant = (
-    state: AssetState
-  ): "default" | "secondary" | "destructive" | "outline" => {
-    switch (state) {
-      case AssetState.AVAILABLE:
-        return "default";
-      case AssetState.SIGNED_OUT:
-        return "secondary";
-      case AssetState.BUILT:
-        return "outline";
-      case AssetState.READY_TO_GO:
-        return "default";
-      case AssetState.ISSUED:
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
   return (
     <Card className={className}>
       <CardHeader>
@@ -198,6 +154,48 @@ export function BarcodeSearchWithResults() {
     setNotFoundBarcode(barcode);
     setFoundAsset(null);
   };
+
+  // Helper functions (used only in this component)
+  function getAssetTypeLabel(type: AssetType): string {
+    const labels: Record<AssetType, string> = {
+      [AssetType.MOBILE_PHONE]: "Mobile Phone",
+      [AssetType.TABLET]: "Tablet",
+      [AssetType.DESKTOP]: "Desktop",
+      [AssetType.LAPTOP]: "Laptop",
+      [AssetType.MONITOR]: "Monitor",
+    };
+    return labels[type] || type;
+  }
+
+  function getAssetStateLabel(state: AssetState): string {
+    const labels: Record<AssetState, string> = {
+      [AssetState.AVAILABLE]: "Available",
+      [AssetState.SIGNED_OUT]: "Signed Out",
+      [AssetState.BUILT]: "Built",
+      [AssetState.READY_TO_GO]: "Ready To Go",
+      [AssetState.ISSUED]: "Issued",
+    };
+    return labels[state] || state;
+  }
+
+  function getStateBadgeVariant(
+    state: AssetState
+  ): "default" | "secondary" | "destructive" | "outline" {
+    switch (state) {
+      case AssetState.AVAILABLE:
+        return "default";
+      case AssetState.SIGNED_OUT:
+        return "secondary";
+      case AssetState.BUILT:
+        return "outline";
+      case AssetState.READY_TO_GO:
+        return "default";
+      case AssetState.ISSUED:
+        return "secondary";
+      default:
+        return "outline";
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -293,46 +291,4 @@ export function BarcodeSearchWithResults() {
       )}
     </div>
   );
-}
-
-// Helper functions (duplicated for standalone usage)
-function getAssetTypeLabel(type: AssetType): string {
-  const labels: Record<AssetType, string> = {
-    [AssetType.MOBILE_PHONE]: "Mobile Phone",
-    [AssetType.TABLET]: "Tablet",
-    [AssetType.DESKTOP]: "Desktop",
-    [AssetType.LAPTOP]: "Laptop",
-    [AssetType.MONITOR]: "Monitor",
-  };
-  return labels[type] || type;
-}
-
-function getAssetStateLabel(state: AssetState): string {
-  const labels: Record<AssetState, string> = {
-    [AssetState.AVAILABLE]: "Available",
-    [AssetState.SIGNED_OUT]: "Signed Out",
-    [AssetState.BUILT]: "Built",
-    [AssetState.READY_TO_GO]: "Ready To Go",
-    [AssetState.ISSUED]: "Issued",
-  };
-  return labels[state] || state;
-}
-
-function getStateBadgeVariant(
-  state: AssetState
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (state) {
-    case AssetState.AVAILABLE:
-      return "default";
-    case AssetState.SIGNED_OUT:
-      return "secondary";
-    case AssetState.BUILT:
-      return "outline";
-    case AssetState.READY_TO_GO:
-      return "default";
-    case AssetState.ISSUED:
-      return "secondary";
-    default:
-      return "outline";
-  }
 }

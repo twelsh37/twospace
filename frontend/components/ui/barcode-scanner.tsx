@@ -14,10 +14,16 @@ import {
   DialogTrigger,
 } from "./dialog";
 
+// Type for QuaggaJS result
+interface QuaggaResult {
+  codeResult: {
+    code: string;
+  };
+}
+
 interface BarcodeScannerProps {
   onScan: (barcode: string) => void;
   placeholder?: string;
-  label?: string;
   disabled?: boolean;
   className?: string;
   showCameraOption?: boolean;
@@ -26,7 +32,6 @@ interface BarcodeScannerProps {
 export function BarcodeScanner({
   onScan,
   placeholder = "Scan barcode or enter manually...",
-  label = "Barcode",
   disabled = false,
   className = "",
   showCameraOption = true,
@@ -105,7 +110,7 @@ export function BarcodeScanner({
           },
           locate: true,
         },
-        (err: any) => {
+        (err: unknown) => {
           if (err) {
             console.error("Quagga initialization error:", err);
             setCameraError(
@@ -121,17 +126,26 @@ export function BarcodeScanner({
       );
 
       // Handle successful scans
-      Quagga.onDetected((result: any) => {
-        const scannedCode = result.codeResult.code;
-        console.log("Camera detected barcode:", scannedCode);
-
-        // Stop scanning and close camera
-        Quagga.stop();
-        setIsCameraOpen(false);
-        setIsScanning(false);
-
-        // Process the scanned barcode
-        handleBarcodeScanned(scannedCode);
+      Quagga.onDetected((result: unknown) => {
+        // Type guard for QuaggaJS result
+        if (
+          result &&
+          typeof result === "object" &&
+          "codeResult" in result &&
+          result.codeResult &&
+          typeof result.codeResult === "object" &&
+          "code" in result.codeResult &&
+          typeof result.codeResult.code === "string"
+        ) {
+          const code = (result as QuaggaResult).codeResult.code;
+          console.log("Camera detected barcode:", code);
+          // Stop scanning and close camera
+          Quagga.stop();
+          setIsCameraOpen(false);
+          setIsScanning(false);
+          // Process the scanned barcode
+          handleBarcodeScanned(code);
+        }
       });
     } catch (error) {
       console.error("Error loading QuaggaJS:", error);
