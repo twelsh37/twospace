@@ -85,10 +85,16 @@ function SystemInfoCard() {
 
 export default function BarcodeTestPage() {
   const [scannedBarcodes, setScannedBarcodes] = useState<string[]>([]);
+  const [lastScan, setLastScan] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
+  // Show a brief visual confirmation on scan
   const handleBasicScan = (barcode: string) => {
     console.log("Basic scan:", barcode);
     setScannedBarcodes((prev) => [...prev, barcode]);
+    setLastScan(barcode);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 1200); // Show for 1.2s
   };
 
   const handleAssetSubmit = async (asset: Partial<Asset>) => {
@@ -106,46 +112,38 @@ export default function BarcodeTestPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="basic" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="basic">Basic Scanner</TabsTrigger>
+      {/* --- USB/Keyboard HID Scanner Section --- */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>USB/Keyboard Barcode Scanner (HID) Test</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-gray-600">
+            <strong>Instructions:</strong> Connect your USB barcode scanner.
+            Click the input below (or press Tab) to focus, then scan a barcode.
+            The scanner should type the barcode and press Enter automatically.
+            Each scan will be logged and shown below.
+          </p>
+          <BarcodeScanner
+            onScan={handleBasicScan}
+            placeholder="Focus here and scan a barcode with your USB scanner..."
+            showCameraOption={true}
+          />
+          {showSuccess && lastScan && (
+            <div className="flex items-center gap-2 text-green-600 font-semibold animate-pulse">
+              <span>✔ Barcode scanned:</span> <span>{lastScan}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* --- Tabs for other test modes --- */}
+      <Tabs defaultValue="search" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="search">Asset Search</TabsTrigger>
           <TabsTrigger value="form">Asset Form</TabsTrigger>
           <TabsTrigger value="history">Scan History</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="basic" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Barcode Scanner</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Test the basic barcode scanner. Use a USB scanner or camera to
-                scan any barcode.
-              </p>
-
-              <BarcodeScanner
-                onScan={handleBasicScan}
-                placeholder="Scan any barcode to test..."
-                showCameraOption={true}
-              />
-
-              <div className="text-sm text-gray-500">
-                <p>
-                  <strong>Instructions:</strong>
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>
-                    Connect a USB barcode scanner and scan into the input field
-                  </li>
-                  <li>Or click the 📷 button to use camera scanning</li>
-                  <li>Any scanned barcode will be logged to the console</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="search" className="space-y-4">
           <Card>
@@ -157,7 +155,6 @@ export default function BarcodeTestPage() {
                 Test asset lookup by scanning asset barcodes. This will search
                 for assets in your system.
               </p>
-
               <BarcodeSearchWithResults />
             </CardContent>
           </Card>
@@ -173,7 +170,6 @@ export default function BarcodeTestPage() {
                 Test the asset creation form with integrated barcode scanning
                 for asset numbers and serial numbers.
               </p>
-
               <AssetFormWithBarcode
                 mode="create"
                 onSubmit={handleAssetSubmit}
@@ -191,66 +187,24 @@ export default function BarcodeTestPage() {
               <p className="text-sm text-gray-600 mb-4">
                 Recent barcodes scanned in this session:
               </p>
-
               {scannedBarcodes.length === 0 ? (
                 <p className="text-gray-500 italic">No barcodes scanned yet.</p>
               ) : (
                 <div className="space-y-2">
                   {scannedBarcodes.map((barcode, index) => (
-                    <div
-                      key={index}
-                      className="p-2 bg-gray-50 rounded border text-sm font-mono"
-                    >
+                    <div key={index} className="bg-gray-100 rounded px-2 py-1">
                       {barcode}
                     </div>
                   ))}
                 </div>
-              )}
-
-              {scannedBarcodes.length > 0 && (
-                <button
-                  onClick={() => setScannedBarcodes([])}
-                  className="mt-4 px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
-                >
-                  Clear History
-                </button>
               )}
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      {/* System Information */}
+      {/* System info card at the bottom for troubleshooting */}
       <SystemInfoCard />
-
-      {/* Troubleshooting Tips */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Troubleshooting Tips</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium mb-2">USB Scanner Issues:</h4>
-              <ul className="list-disc list-inside space-y-1 text-gray-600">
-                <li>Test scanner in a text editor first</li>
-                <li>Check USB connection</li>
-                <li>Verify keyboard layout settings</li>
-                <li>Ensure scanner is in keyboard mode</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Camera Scanner Issues:</h4>
-              <ul className="list-disc list-inside space-y-1 text-gray-600">
-                <li>Grant camera permissions</li>
-                <li>Use HTTPS connection</li>
-                <li>Ensure good lighting</li>
-                <li>Hold camera steady</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
