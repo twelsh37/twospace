@@ -101,6 +101,10 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **Quick Actions**: Direct access to common operations
 - **Advanced Reporting & Analytics**: Planned for future implementation, including predictive analytics (e.g., hardware burndown rate) to help with stock management.
 
+### PDF Export and Reporting
+
+- **PDF Generation**: All PDF exports (such as Asset Inventory Reports) are generated using [browserless.io](https://www.browserless.io/), a cloud-based headless Chrome service. This ensures compatibility with Vercel and serverless environments. Puppeteer is no longer used directly in the codebase.
+
 ## High-Level Technical Stack
 
 ### Frontend & API
@@ -119,6 +123,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **Package Manager**: Yarn
 - **Version Control**: Git
 - **Environment**: TypeScript throughout
+- **PDF Export**: [browserless.io](https://www.browserless.io/) REST API for cloud-based PDF generation (replaces Puppeteer)
 
 > **Note:** There is no separate backend service. All business logic, API endpoints, and database access are implemented in the Next.js frontend using API routes and server components. The project does not use Prisma, Supabase, or a traditional backend server.
 

@@ -94,6 +94,10 @@ twospace/
 - **Asset Numbering**: Auto-generated asset numbers with type prefixes
 - **Soft Deletes**: Data preservation with deletion tracking
 
+### PDF Export and Reporting
+
+- **PDF Generation**: Asset Inventory and other reports are exported as PDFs using [browserless.io](https://www.browserless.io/) (cloud-based headless Chrome). This approach is compatible with Vercel and other serverless platforms. The system no longer uses Puppeteer directly for PDF generation.
+
 ## Technology Stack
 
 ### Frontend
@@ -103,6 +107,7 @@ twospace/
 - **Styling**: Tailwind CSS
 - **State Management**: React hooks and context
 - **Icons**: Lucide React
+- **PDF Export**: [browserless.io](https://www.browserless.io/) REST API for serverless-compatible PDF generation (replaces Puppeteer)
 
 ### Backend
 
