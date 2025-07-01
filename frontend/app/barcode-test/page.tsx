@@ -86,7 +86,7 @@ export default function BarcodeTestPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container p-6 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Barcode Scanner Test Page</h1>
         <p className="text-gray-600">

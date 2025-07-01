@@ -23,7 +23,6 @@ import {
 } from "@/components/search/search-results-modal";
 
 export function Header() {
-  const [notifications] = useState(3); // TODO: Get from API
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -89,20 +88,10 @@ export function Header() {
 
         {/* Right Side - Actions and User */}
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <div className="relative">
-            <Button variant="ghost" size="sm">
-              <Bell className="h-4 w-4" />
-            </Button>
-            {notifications > 0 && (
-              <Badge
-                variant="destructive"
-                className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-              >
-                {notifications}
-              </Badge>
-            )}
-          </div>
+          {/* Notifications (bell only, no badge) */}
+          <Button variant="ghost" size="sm">
+            <Bell className="h-4 w-4" />
+          </Button>
 
           {/* User Menu */}
           <DropdownMenu>
