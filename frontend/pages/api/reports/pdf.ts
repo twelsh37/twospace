@@ -2,7 +2,7 @@
 // API route to generate Asset Inventory Report PDF using Puppeteer and client-provided chart images
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import puppeteer from "puppeteer";
+// import puppeteer from "puppeteer"; // Remove Puppeteer
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,8 +22,8 @@ export default async function handler(
       assetCounts = {},
       stateTypes = [],
       stateCounts = {},
-      builtTypes = [],
-      byTypeInBuilt = {},
+      buildingTypes = [],
+      byTypeInBuilding = {},
       readyTypes = [],
       byTypeInReadyToGo = {},
     } = req.body;
@@ -91,10 +91,10 @@ export default async function handler(
                 <table class="pdf-table">
                   <thead><tr><th>Asset Type</th><th>Count</th></tr></thead>
                   <tbody>
-                    ${builtTypes
+                    ${buildingTypes
                       .map(
                         (type: string) =>
-                          `<tr><td>${type}</td><td>${byTypeInBuilt[type]}</td></tr>`
+                          `<tr><td>${type}</td><td>${byTypeInBuilding[type]}</td></tr>`
                       )
                       .join("")}
                   </tbody>
@@ -120,18 +120,35 @@ export default async function handler(
         </body>
       </html>
     `;
-    // Use Puppeteer to generate the PDF
-    const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "A4" });
-    await browser.close();
+    // Use browserless.io to generate the PDF
+    const browserlessToken = process.env.token;
+    if (!browserlessToken) {
+      return res
+        .status(500)
+        .json({ error: "Missing browserless.io token in environment" });
+    }
+    const pdfRes = await fetch(
+      `https://chrome.browserless.io/pdf?token=${browserlessToken}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html }),
+      }
+    );
+    if (!pdfRes.ok) {
+      const errText = await pdfRes.text();
+      console.error("Browserless PDF error:", errText);
+      return res
+        .status(500)
+        .json({ error: "Failed to generate PDF via browserless.io" });
+    }
+    const pdfBuffer = await pdfRes.arrayBuffer();
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
       "attachment; filename=asset-inventory-report.pdf"
     );
-    res.status(200).end(pdfBuffer);
+    res.status(200).end(Buffer.from(pdfBuffer));
   } catch (err) {
     console.error("PDF export error:", err);
     if (err instanceof Error && err.stack) {
