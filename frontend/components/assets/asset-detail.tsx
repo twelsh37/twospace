@@ -1,11 +1,13 @@
 // frontend/components/assets/asset-detail.tsx
 // Asset Detail Component
 
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AssetType, AssetState } from "@/lib/types";
+import { AssetState, Asset } from "@/lib/types";
 import { ASSET_TYPE_LABELS, ASSET_STATE_LABELS } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface AssetDetailProps {
   assetId: string;
@@ -29,24 +31,53 @@ const getStateColorClass = (state: AssetState) => {
   }
 };
 
+// Helper to safely format date
+function safeFormatDate(dateValue: unknown): string {
+  if (!dateValue) return "N/A";
+  let dateObj: Date;
+  if (typeof dateValue === "string") {
+    dateObj = new Date(dateValue);
+  } else if (dateValue instanceof Date) {
+    dateObj = dateValue;
+  } else {
+    return "N/A";
+  }
+  return isNaN(dateObj.getTime()) ? "N/A" : formatDate(dateObj);
+}
+
 export function AssetDetail({ assetId }: AssetDetailProps) {
-  // TODO: Fetch asset data from API
-  const asset = {
-    id: assetId,
-    assetNumber: "01-00001",
-    type: AssetType.MOBILE_PHONE,
-    state: AssetState.AVAILABLE,
-    serialNumber: "MP001234567",
-    description: "iPhone 15 Pro 256GB",
-    purchasePrice: 1099.99,
-    location: "IT Department",
-    assignmentType: "INDIVIDUAL" as const,
-    assignedTo: "",
-    employeeId: "",
-    department: "",
-    createdAt: new Date("2024-01-15"),
-    updatedAt: new Date("2024-01-15"),
-  };
+  const [asset, setAsset] = useState<Asset | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchAsset() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/assets/${assetId}`);
+        if (!res.ok) throw new Error("Failed to fetch asset");
+        const json = await res.json();
+        setAsset(json.data as Asset);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAsset();
+  }, [assetId]);
+
+  if (loading) {
+    return <div className="p-4">Loading asset details...</div>;
+  }
+  if (error || !asset) {
+    return (
+      <div className="p-4 text-destructive">
+        Error: {error || "Asset not found."}
+      </div>
+    );
+  }
 
   return (
     <Card>
@@ -82,7 +113,7 @@ export function AssetDetail({ assetId }: AssetDetailProps) {
             <label className="text-sm font-medium text-muted-foreground">
               Purchase Price
             </label>
-            <p>{formatCurrency(asset.purchasePrice)}</p>
+            <p>{formatCurrency(parseFloat(asset.purchasePrice))}</p>
           </div>
           <div className="md:col-span-2">
             <label className="text-sm font-medium text-muted-foreground">
@@ -94,7 +125,8 @@ export function AssetDetail({ assetId }: AssetDetailProps) {
             <label className="text-sm font-medium text-muted-foreground">
               Location
             </label>
-            <p>{asset.location}</p>
+            {/* Only 'location' is provided by the API, not 'locationName' */}
+            <p>{asset.location || "N/A"}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
@@ -128,13 +160,13 @@ export function AssetDetail({ assetId }: AssetDetailProps) {
             <label className="text-sm font-medium text-muted-foreground">
               Created
             </label>
-            <p>{formatDate(asset.createdAt)}</p>
+            <p>{safeFormatDate(asset.createdAt)}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
               Last Updated
             </label>
-            <p>{formatDate(asset.updatedAt)}</p>
+            <p>{safeFormatDate(asset.updatedAt)}</p>
           </div>
         </div>
       </CardContent>

@@ -1,5 +1,11 @@
 // frontend/components/assets/asset-table.tsx
 // Asset Table Component with client-side data fetching for robustness.
+//
+// DEBUGGING NOTE:
+// - We log the fetched assets to the console after every fetch to help debug deleted asset issues.
+// - After deleting an asset, we immediately refetch the asset list to ensure the UI is always up to date.
+//
+// Reasoning: This helps catch stale state or cache issues and ensures deleted assets disappear from the list right away.
 
 "use client";
 
@@ -64,27 +70,34 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
   );
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    const fetchAssets = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`/api/assets?${queryString}`, {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch assets");
-        }
-        const result = await response.json();
-        setData(result.data);
-      } catch (error) {
-        console.error("Error fetching assets:", error);
-        setData(null); // Clear data on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Placeholder for userId until real auth is implemented
+  const currentUserId = "admin-user-id"; // TODO: Replace with real user ID from auth context
 
+  // Fetch assets function is now reusable for refetching after delete
+  const fetchAssets = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/assets?${queryString}`, {
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch assets");
+      }
+      const result = await response.json();
+      // DEBUG: Log the assets array to help debug deleted asset issues
+      console.log("[AssetTable] Assets fetched:", result.data?.assets);
+      setData(result.data);
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+      setData(null); // Clear data on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAssets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryString]);
 
   const handleEditClick = (assetNumber: string) => {
@@ -112,24 +125,32 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
     setDeleteModalOpen(true);
   };
 
-  const handleDeleteConfirmed = async () => {
+  // After a successful delete, refetch the asset list instead of setTimeout/setData(null)
+  const handleDeleteConfirmed = async (reason: string, comment: string) => {
     if (!deleteAssetNumber) return;
     setDeleting(true);
     try {
-      await fetch(`/api/assets/${deleteAssetNumber}`, { method: "DELETE" });
+      await fetch(`/api/assets/${deleteAssetNumber}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          archiveReason: reason,
+          comment: comment,
+          userId: currentUserId,
+        }),
+      });
       setDeleteModalOpen(false);
       setDeleteAssetNumber(null);
-      setData(null);
-      setTimeout(() => {
-        onPageChange(data?.pagination.page || 1);
-        if (
-          typeof window !== "undefined" &&
-          (window as Window & { mutateDashboard?: () => void }).mutateDashboard
-        ) {
-          (window as Window & { mutateDashboard?: () => void })
-            .mutateDashboard!();
-        }
-      }, 100);
+      // Immediately refetch assets to ensure UI is up to date
+      // DEBUG: This ensures deleted assets disappear right away
+      await fetchAssets();
+      if (
+        typeof window !== "undefined" &&
+        (window as Window & { mutateDashboard?: () => void }).mutateDashboard
+      ) {
+        (window as Window & { mutateDashboard?: () => void })
+          .mutateDashboard!();
+      }
     } catch {
       setDeleting(false);
     }
@@ -166,7 +187,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
         loading={deleting}
         title="Delete Asset"
         description={
-          "This action cannot be undone. To confirm, type 'confirm deletion' below to delete this asset."
+          "This action cannot be undone. Please select a reason for deletion."
         }
       />
       <div>

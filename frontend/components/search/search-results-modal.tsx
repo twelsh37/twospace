@@ -14,9 +14,14 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { UserDetailModal } from "@/components/users/user-detail-modal";
 
+// Extend Asset type to include search API fields
 export type Asset = BaseAsset & {
   locationName: string | null;
   updatedByName: string;
+  isArchived: boolean;
+  archiveReason: string | null;
+  archivedAt: string | null;
+  archivedBy: string | null;
 };
 
 export type SearchResults = {
@@ -107,16 +112,27 @@ export function SearchResultsModal({
                       <span className="font-bold text-base">
                         {asset.assetNumber}
                       </span>
-                      <Badge variant="outline">
-                        {asset.type.replace(/_/g, " ")}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {asset.isArchived && (
+                          <Badge className="bg-gray-700 text-white">
+                            ARCHIVED ASSET
+                          </Badge>
+                        )}
+                        <Badge variant="outline">
+                          {asset.type.replace(/_/g, " ")}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                       <div className="text-muted-foreground">Location:</div>
                       <div>{asset.locationName || "N/A"}</div>
 
                       <div className="text-muted-foreground">Assigned To:</div>
-                      <div>{asset.assignedTo || "Unassigned"}</div>
+                      <div>
+                        {asset.isArchived
+                          ? "Unassigned"
+                          : asset.assignedTo || "Unassigned"}
+                      </div>
 
                       <div className="text-muted-foreground">Cost:</div>
                       <div>
@@ -128,12 +144,40 @@ export function SearchResultsModal({
 
                       <div className="text-muted-foreground">Last Update:</div>
                       <div>
-                        {new Date(asset.updatedAt!).toLocaleString("en-GB")}
+                        {asset.updatedAt
+                          ? new Date(asset.updatedAt).toLocaleString("en-GB")
+                          : "N/A"}
                       </div>
 
                       <div className="text-muted-foreground">Updated By:</div>
                       <div>{asset.updatedByName}</div>
                     </div>
+                    {/* Archive Metadata Section */}
+                    {asset.isArchived && (
+                      <div className="mt-3 p-2 border rounded bg-gray-50">
+                        <div className="font-semibold text-gray-700 mb-1">
+                          Archive Information
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                          <div className="text-muted-foreground">Reason:</div>
+                          <div>{asset.archiveReason || "N/A"}</div>
+                          <div className="text-muted-foreground">
+                            Archived By (User ID):
+                          </div>
+                          <div>{asset.archivedBy || "N/A"}</div>
+                          <div className="text-muted-foreground">
+                            Archived At:
+                          </div>
+                          <div>
+                            {asset.archivedAt
+                              ? new Date(asset.archivedAt).toLocaleString(
+                                  "en-GB"
+                                )
+                              : "N/A"}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

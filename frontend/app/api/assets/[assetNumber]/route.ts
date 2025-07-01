@@ -9,9 +9,11 @@ import {
   locationsTable,
   assetHistoryTable,
 } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, isNull, and } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 import { NextRequest } from "next/server";
+import { archivedAssetsTable } from "@/lib/db/schema";
+import { assetCache } from "../route";
 
 /**
  * GET /api/assets/{assetNumber}
@@ -31,7 +33,7 @@ export async function GET(
       );
     }
 
-    // Fetch the main asset details and join with location
+    // 1. Try to fetch the asset from the active assets table (not soft deleted)
     const assetResult = await db
       .select({
         ...getTableColumns(assetsTable),
@@ -39,28 +41,52 @@ export async function GET(
       })
       .from(assetsTable)
       .leftJoin(locationsTable, eq(assetsTable.locationId, locationsTable.id))
-      .where(eq(assetsTable.assetNumber, assetNumber));
+      .where(
+        and(
+          eq(assetsTable.assetNumber, assetNumber),
+          isNull(assetsTable.deletedAt)
+        )
+      );
 
-    if (assetResult.length === 0) {
-      return NextResponse.json({ error: "Asset not found" }, { status: 404 });
+    if (assetResult.length > 0) {
+      // Found in active assets
+      const asset = assetResult[0];
+      // Fetch the last update history for the asset using its UUID id
+      const lastHistory = await db
+        .select({ updatedBy: usersTable.name })
+        .from(assetHistoryTable)
+        .leftJoin(usersTable, eq(assetHistoryTable.changedBy, usersTable.id))
+        .where(eq(assetHistoryTable.assetId, asset.id))
+        .orderBy(desc(assetHistoryTable.timestamp))
+        .limit(1);
+      const assetWithHistory = {
+        ...asset,
+        updatedByName: lastHistory[0]?.updatedBy || "System",
+        isArchived: false,
+      };
+      return NextResponse.json({ success: true, data: assetWithHistory });
     }
-    const asset = assetResult[0];
 
-    // Fetch the last update history for the asset using its UUID id
-    const lastHistory = await db
-      .select({ updatedBy: usersTable.name })
-      .from(assetHistoryTable)
-      .leftJoin(usersTable, eq(assetHistoryTable.changedBy, usersTable.id))
-      .where(eq(assetHistoryTable.assetId, asset.id))
-      .orderBy(desc(assetHistoryTable.timestamp))
-      .limit(1);
+    // 2. If not found, try to fetch from archived_assets
+    const archivedResult = await db
+      .select()
+      .from(archivedAssetsTable)
+      .where(eq(archivedAssetsTable.assetNumber, assetNumber));
+    if (archivedResult.length > 0) {
+      const archivedAsset = archivedResult[0];
+      // Add archive metadata and flag
+      const assetWithArchiveInfo = {
+        ...archivedAsset,
+        isArchived: true,
+        archiveReason: archivedAsset.archiveReason,
+        archivedAt: archivedAsset.archivedAt,
+        archivedBy: archivedAsset.archivedBy,
+      };
+      return NextResponse.json({ success: true, data: assetWithArchiveInfo });
+    }
 
-    const assetWithHistory = {
-      ...asset,
-      updatedByName: lastHistory[0]?.updatedBy || "System",
-    };
-
-    return NextResponse.json({ success: true, data: assetWithHistory });
+    // Not found in either table
+    return NextResponse.json({ error: "Asset not found" }, { status: 404 });
   } catch (error) {
     console.error("Error fetching asset details:", error);
     return NextResponse.json(
@@ -135,6 +161,7 @@ export async function DELETE(
   context: { params: Promise<{ assetNumber: string }> }
 ) {
   try {
+    // Parse assetNumber from route params
     const { assetNumber } = await context.params;
     if (!assetNumber) {
       return NextResponse.json(
@@ -142,18 +169,93 @@ export async function DELETE(
         { status: 400 }
       );
     }
-    const deleted = await db
-      .delete(assetsTable)
-      .where(eq(assetsTable.assetNumber, assetNumber))
-      .returning();
-    if (!deleted.length) {
+
+    // Parse archiveReason, comment, and userId from request body
+    let archiveReason = "Deleted via API";
+    let userId = null;
+    let comment = "";
+    try {
+      const body = await request.json();
+      archiveReason = body.archiveReason || archiveReason;
+      userId = body.userId;
+      comment = body.comment || "";
+    } catch {
+      // If no body or invalid JSON, use defaults
+      return NextResponse.json(
+        {
+          error:
+            "Request body with 'archiveReason', 'comment', and 'userId' is required",
+        },
+        { status: 400 }
+      );
+    }
+    if (!userId) {
+      return NextResponse.json(
+        { error: "'userId' is required in request body" },
+        { status: 400 }
+      );
+    }
+
+    // Fetch the asset to delete
+    const assetResult = await db
+      .select()
+      .from(assetsTable)
+      .where(eq(assetsTable.assetNumber, assetNumber));
+    if (assetResult.length === 0) {
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
     }
+    const asset = assetResult[0];
+
+    // Soft delete: set deletedAt
+    const now = new Date();
+    await db
+      .update(assetsTable)
+      .set({ deletedAt: now })
+      .where(eq(assetsTable.assetNumber, assetNumber));
+
+    // Archive: copy to archived_assets with valid state (use previous state or 'holding')
+    await db.insert(archivedAssetsTable).values({
+      id: asset.id,
+      assetNumber: asset.assetNumber,
+      type: asset.type,
+      state: asset.state, // Keep the last known state for audit
+      serialNumber: asset.serialNumber,
+      description: asset.description,
+      purchasePrice: asset.purchasePrice,
+      locationId: asset.locationId,
+      assignmentType: asset.assignmentType,
+      assignedTo: asset.assignedTo,
+      employeeId: asset.employeeId,
+      department: asset.department,
+      createdAt: asset.createdAt,
+      updatedAt: asset.updatedAt,
+      deletedAt: now,
+      status: asset.status,
+      archivedAt: now,
+      archivedBy: userId,
+      archiveReason: comment ? `${archiveReason}: ${comment}` : archiveReason,
+    });
+
+    // Add to asset_history for audit trail (use previous state and keep newState as previous state for traceability)
+    await db.insert(assetHistoryTable).values({
+      assetId: asset.id,
+      previousState: asset.state,
+      newState: asset.state, // Not a real state change, just for audit
+      changedBy: userId,
+      changeReason: archiveReason,
+      timestamp: now,
+      details: comment ? { comment } : undefined,
+    });
+
+    // Invalidate asset list cache so deleted asset disappears from /assets page
+    assetCache.clear();
+
+    // Success: asset soft-deleted and archived
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error("Error deleting asset:", error);
+    console.error("Error deleting (archiving) asset:", error);
     return NextResponse.json(
-      { error: "Failed to delete asset" },
+      { error: "Failed to delete (archive) asset" },
       { status: 500 }
     );
   }
