@@ -128,7 +128,7 @@ export default async function handler(
         .json({ error: "Missing browserless.io token in environment" });
     }
     const pdfRes = await fetch(
-      `https://chrome.browserless.io/pdf?token=${browserlessToken}`,
+      `https://production-sfo.browserless.io/pdf?token=${browserlessToken}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
