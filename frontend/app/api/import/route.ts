@@ -87,10 +87,10 @@ function canonicalizeState(state: unknown): string {
     stock: "AVAILABLE",
     STOCK: "AVAILABLE",
     // Built/Building
-    built: "BUILT",
-    BUILT: "BUILT",
-    building: "BUILT",
-    BUILDING: "BUILT",
+    built: "BUILDING",
+    BUILT: "BUILDING",
+    building: "BUILDING",
+    BUILDING: "BUILDING",
     // Ready To Go
     ready_to_go: "READY_TO_GO",
     READY_TO_GO: "READY_TO_GO",

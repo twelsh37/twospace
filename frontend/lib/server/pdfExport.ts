@@ -84,7 +84,7 @@ export async function generateAssetInventoryPDF(
           return "#2563EB";
         case "SIGNED_OUT":
           return "#14B8A6";
-        case "BUILT":
+        case "BUILDING":
           return "#F59E42";
         case "READY_TO_GO":
           return "#7C3AED";
@@ -105,14 +105,14 @@ export async function generateAssetInventoryPDF(
       data: stateTypes.map((state) => summary.byState[state]),
       colors: stateColors,
     });
-    const builtTypes = Object.keys(summary.byTypeInBuilt || {}).sort();
-    const builtColors = builtTypes.map(
+    const buildingTypes = Object.keys(summary.byTypeInBuilding || {}).sort();
+    const buildingColors = buildingTypes.map(
       (type) => assetTypeColors[assetTypes.indexOf(type)] || "#6B7280"
     );
     const chart3 = await generateBarChart({
-      labels: builtTypes,
-      data: builtTypes.map((type) => summary.byTypeInBuilt[type]),
-      colors: builtColors,
+      labels: buildingTypes,
+      data: buildingTypes.map((type) => summary.byTypeInBuilding[type]),
+      colors: buildingColors,
     });
     const readyTypes = Object.keys(summary.byTypeInReadyToGo || {}).sort();
     const readyColors = readyTypes.map(
@@ -186,10 +186,10 @@ export async function generateAssetInventoryPDF(
                 <table class="pdf-table">
                   <thead><tr><th>Asset Type</th><th>Count</th></tr></thead>
                   <tbody>
-                    ${builtTypes
+                    ${buildingTypes
                       .map(
                         (type) =>
-                          `<tr><td>${type}</td><td>${summary.byTypeInBuilt[type]}</td></tr>`
+                          `<tr><td>${type}</td><td>${summary.byTypeInBuilding[type]}</td></tr>`
                       )
                       .join("")}
                   </tbody>

@@ -26,7 +26,7 @@ export const assetTypeEnum = pgEnum("asset_type", [
 export const assetStateEnum = pgEnum("asset_state", [
   "AVAILABLE", // Available Stock
   "SIGNED_OUT", // Signed Out for building/configuration
-  "BUILT", // Built and configured (phones, tablets, desktops, laptops only)
+  "BUILDING", // Building and configured (phones, tablets, desktops, laptops only)
   "READY_TO_GO", // Ready To Go Stock (RTGS)
   "ISSUED", // Issued to individuals or locations
   "holding", // Added for imported/holding assets (dashboard and seed logic)

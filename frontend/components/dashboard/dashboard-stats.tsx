@@ -56,12 +56,12 @@ export function DashboardStats({ assetsByState }: DashboardStatsProps) {
     "imported",
     "IMPORTED",
   ]);
-  // Get count for assets in 'BUILT' state (handle possible variants)
-  const builtCount = getCountByStateVariants([
-    "BUILT",
-    "built",
-    "building",
+  // Get count for assets in 'BUILDING' state (handle possible variants)
+  const buildingCount = getCountByStateVariants([
     "BUILDING",
+    "building",
+    "built",
+    "BUILT",
   ]);
 
   const stats: StatCard[] = [
@@ -80,7 +80,7 @@ export function DashboardStats({ assetsByState }: DashboardStatsProps) {
     },
     {
       title: "Currently Building",
-      value: builtCount.toLocaleString(),
+      value: buildingCount.toLocaleString(),
       description: "Assets that are building",
       icon: Rocket,
     },
@@ -106,7 +106,7 @@ export function DashboardStats({ assetsByState }: DashboardStatsProps) {
       case "Available Stock":
         return "/assets?state=AVAILABLE";
       case "Currently Building":
-        return "/assets?state=BUILT";
+        return "/assets?state=BUILDING";
       case "Ready To Go":
         return "/assets?state=READY_TO_GO";
       case "Issued":

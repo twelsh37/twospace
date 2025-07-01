@@ -80,8 +80,8 @@ export async function getDashboardData() {
       // Built/Building
       built: "BUILT",
       BUILT: "BUILT",
-      building: "BUILT",
-      BUILDING: "BUILT",
+      building: "BUILDING",
+      BUILDING: "BUILDING",
       // Ready To Go
       ready_to_go: "READY_TO_GO",
       READY_TO_GO: "READY_TO_GO",
@@ -98,7 +98,7 @@ export async function getDashboardData() {
     const allStates = [
       "holding", // imported/holding
       "AVAILABLE",
-      "BUILT",
+      "BUILDING",
       "READY_TO_GO",
       "ISSUED",
     ];

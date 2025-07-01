@@ -221,11 +221,11 @@ const canonicalizeState = (state: string | undefined): string => {
     AVAILABLE: "AVAILABLE",
     stock: "AVAILABLE",
     STOCK: "AVAILABLE",
-    // Built/Building
-    built: "BUILT",
-    BUILT: "BUILT",
-    building: "BUILT",
-    BUILDING: "BUILT",
+    // Building
+    built: "BUILDING",
+    BUILT: "BUILDING",
+    building: "BUILDING",
+    BUILDING: "BUILDING",
     // Ready To Go
     ready_to_go: "READY_TO_GO",
     READY_TO_GO: "READY_TO_GO",
@@ -490,11 +490,11 @@ async function seedDatabase() {
     // --- Generate blueprints for STOCK assets (unassigned, in IT Department - store room) ---
     // Do NOT create any 'holding' state assets here. 'holding' assets are only created via the /imports functionality.
     // If there are no assets in 'holding', the dashboard card will display 'No Assets to Import'.
-    // Only create AVAILABLE, BUILT, and READY_TO_GO stock assets.
+    // Only create AVAILABLE, BUILDING, and READY_TO_GO stock assets.
     // Calculate stock percentages based on total user-assigned assets
     const issuedCount = assetBlueprints.length;
     const availableCount = Math.ceil(issuedCount * 0.01);
-    const builtCount = Math.ceil(issuedCount * 0.001);
+    const buildingCount = Math.ceil(issuedCount * 0.001);
     const readyToGoCount = Math.ceil(issuedCount * 0.002);
     function createStockBlueprints(
       state: string,
@@ -534,7 +534,7 @@ async function seedDatabase() {
       return stock;
     }
     assetBlueprints.push(...createStockBlueprints("AVAILABLE", availableCount));
-    assetBlueprints.push(...createStockBlueprints("BUILT", builtCount));
+    assetBlueprints.push(...createStockBlueprints("BUILDING", buildingCount));
     assetBlueprints.push(
       ...createStockBlueprints("READY_TO_GO", readyToGoCount)
     );

@@ -1,5 +1,5 @@
 // frontend/components/dashboard/building-assets-card.tsx
-// Card to display the number and types of assets currently in the 'BUILT' state
+// Card to display the number and types of assets currently in the 'BUILDING' state
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Rocket } from "lucide-react";

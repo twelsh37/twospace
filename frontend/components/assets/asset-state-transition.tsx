@@ -22,7 +22,7 @@ const getStateColorClass = (state: AssetState) => {
       return "bg-blue-600 text-white";
     case AssetState.SIGNED_OUT:
       return "bg-teal-600 text-white";
-    case AssetState.BUILT:
+    case AssetState.BUILDING:
       return "bg-orange-500 text-white";
     case AssetState.READY_TO_GO:
       return "bg-purple-600 text-white";
@@ -128,7 +128,7 @@ export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
           <ul className="text-xs text-muted-foreground space-y-1">
             <li>• State changes are tracked in the audit trail</li>
             <li>• Some transitions may require additional approvals</li>
-            <li>• Monitors skip the BUILT state in the lifecycle</li>
+            <li>• Monitors skip the BUILDING state in the lifecycle</li>
           </ul>
         </div>
       </CardContent>

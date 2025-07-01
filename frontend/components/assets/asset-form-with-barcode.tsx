@@ -170,7 +170,7 @@ export function AssetFormWithBarcode({
             <SelectContent>
               <SelectItem value={AssetState.AVAILABLE}>Available</SelectItem>
               <SelectItem value={AssetState.SIGNED_OUT}>Signed Out</SelectItem>
-              <SelectItem value={AssetState.BUILT}>Built</SelectItem>
+              <SelectItem value={AssetState.BUILDING}>Building</SelectItem>
               <SelectItem value={AssetState.READY_TO_GO}>
                 Ready To Go
               </SelectItem>

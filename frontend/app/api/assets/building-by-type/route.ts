@@ -1,5 +1,5 @@
 // frontend/app/api/assets/building-by-type/route.ts
-// API route to get the count of assets in the 'BUILT' state, grouped by type
+// API route to get the count of assets in the 'BUILDING' state, grouped by type
 
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
@@ -7,12 +7,12 @@ import { assetsTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET() {
-  // Query assets in the 'BUILT' state
+  // Query assets in the 'BUILDING' state
   // Group by type and count the number of assets for each type
   const results = await db
     .select({ type: assetsTable.type })
     .from(assetsTable)
-    .where(eq(assetsTable.state, "BUILT"));
+    .where(eq(assetsTable.state, "BUILDING"));
 
   // Aggregate counts by type
   const typeCounts: Record<string, number> = {};
