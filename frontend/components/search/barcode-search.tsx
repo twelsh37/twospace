@@ -5,9 +5,7 @@
 "use client";
 import React, { useState } from "react";
 import { BarcodeScanner } from "@/components/ui/barcode-scanner";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { AssetType, AssetState } from "@/lib/types";
 
 interface Asset {
@@ -19,6 +17,7 @@ interface Asset {
   description: string;
   purchasePrice: string;
   location: string;
+  locationName?: string;
   assignedTo?: string;
   employeeId?: string;
   department?: string;
@@ -28,26 +27,30 @@ interface BarcodeSearchProps {
   onAssetFound: (asset: Asset) => void;
   onAssetNotFound: (barcode: string) => void;
   className?: string;
+  onBarcodeScanned?: (barcode: string) => void;
 }
 
 export function BarcodeSearch({
   onAssetFound,
   onAssetNotFound,
   className = "",
+  onBarcodeScanned,
 }: BarcodeSearchProps) {
   const [searching, setSearching] = useState(false);
   const [lastScanned, setLastScanned] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [foundAsset, setFoundAsset] = useState<Asset | null>(null);
 
   // Handle barcode scan
   const handleBarcodeScan = async (barcode: string) => {
+    if (onBarcodeScanned) onBarcodeScanned(barcode);
     console.log("Searching for asset with barcode:", barcode);
     setSearching(true);
     setError(null);
     setLastScanned(barcode);
 
     try {
-      // Search for asset by asset number or serial number
+      // Search for asset by asset number or serial number using unified API
       const response = await fetch(
         `/api/search?q=${encodeURIComponent(barcode)}`
       );
@@ -57,19 +60,24 @@ export function BarcodeSearch({
       }
 
       const data = await response.json();
-
-      if (data.assets && data.assets.length > 0) {
+      // Unify with main search modal: expect { success, data: { assets } }
+      const assets = data?.data?.assets || [];
+      if (assets.length > 0) {
         // Found asset(s) - use the first one
-        const asset = data.assets[0];
-        console.log("Asset found:", asset);
+        const asset = assets[0];
+        console.log("[DEBUG] Asset found (unified logic):", asset);
         onAssetFound(asset);
+        setFoundAsset(asset);
       } else {
         // No asset found
-        console.log("No asset found for barcode:", barcode);
+        console.log(
+          "[DEBUG] No asset found for barcode (unified logic):",
+          barcode
+        );
         onAssetNotFound(barcode);
       }
     } catch (error) {
-      console.error("Error searching for asset:", error);
+      console.error("Error searching for asset (unified logic):", error);
       setError("Failed to search for asset. Please try again.");
     } finally {
       setSearching(false);
@@ -93,6 +101,30 @@ export function BarcodeSearch({
             disabled={searching}
           />
         </div>
+
+        {/* Minimal Asset Details Card (shows immediately when asset is found) */}
+        {foundAsset && (
+          <Card className="border-green-500 border mt-2">
+            <CardHeader>
+              <CardTitle className="text-green-700 text-base flex items-center gap-2">
+                ✅ Asset Found
+                <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+                  {foundAsset.assetNumber}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm grid grid-cols-2 gap-x-4 gap-y-1">
+              <div className="font-medium">Type:</div>
+              <div>{foundAsset.type}</div>
+              <div className="font-medium">Serial Number:</div>
+              <div>{foundAsset.serialNumber}</div>
+              <div className="font-medium">Location:</div>
+              <div>
+                {foundAsset.locationName || foundAsset.location || "N/A"}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Loading State */}
         {searching && (
@@ -141,138 +173,38 @@ export function BarcodeSearch({
 }
 
 // Example usage component showing how to handle found assets
-export function BarcodeSearchWithResults() {
-  const [foundAsset, setFoundAsset] = useState<Asset | null>(null);
+export function BarcodeSearchWithResults({
+  onBarcodeScanned,
+}: {
+  onBarcodeScanned?: (barcode: string) => void;
+}) {
+  const [, setFoundAsset] = useState<Asset | null>(null); // Only setter needed
   const [notFoundBarcode, setNotFoundBarcode] = useState<string | null>(null);
 
-  const handleAssetFound = (asset: Asset) => {
+  // When an asset is found, set state and show minimal details (no navigation)
+  const handleAssetFound = (asset: Asset, barcode?: string) => {
+    console.log("[DEBUG] handleAssetFound called with asset:", asset);
     setFoundAsset(asset);
     setNotFoundBarcode(null);
+    if (onBarcodeScanned && barcode) onBarcodeScanned(barcode);
   };
 
   const handleAssetNotFound = (barcode: string) => {
     setNotFoundBarcode(barcode);
     setFoundAsset(null);
+    if (onBarcodeScanned) onBarcodeScanned(barcode);
   };
-
-  // Helper functions (used only in this component)
-  function getAssetTypeLabel(type: AssetType): string {
-    const labels: Record<AssetType, string> = {
-      [AssetType.MOBILE_PHONE]: "Mobile Phone",
-      [AssetType.TABLET]: "Tablet",
-      [AssetType.DESKTOP]: "Desktop",
-      [AssetType.LAPTOP]: "Laptop",
-      [AssetType.MONITOR]: "Monitor",
-    };
-    return labels[type] || type;
-  }
-
-  function getAssetStateLabel(state: AssetState): string {
-    const labels: Record<AssetState, string> = {
-      [AssetState.AVAILABLE]: "Available",
-      [AssetState.SIGNED_OUT]: "Signed Out",
-      [AssetState.BUILT]: "Built",
-      [AssetState.READY_TO_GO]: "Ready To Go",
-      [AssetState.ISSUED]: "Issued",
-    };
-    return labels[state] || state;
-  }
-
-  function getStateBadgeVariant(
-    state: AssetState
-  ): "default" | "secondary" | "destructive" | "outline" {
-    switch (state) {
-      case AssetState.AVAILABLE:
-        return "default";
-      case AssetState.SIGNED_OUT:
-        return "secondary";
-      case AssetState.BUILT:
-        return "outline";
-      case AssetState.READY_TO_GO:
-        return "default";
-      case AssetState.ISSUED:
-        return "secondary";
-      default:
-        return "outline";
-    }
-  }
 
   return (
     <div className="space-y-6">
       <BarcodeSearch
-        onAssetFound={handleAssetFound}
+        onAssetFound={(asset) =>
+          handleAssetFound(asset, asset.assetNumber || asset.serialNumber)
+        }
         onAssetNotFound={handleAssetNotFound}
+        onBarcodeScanned={onBarcodeScanned}
       />
-
-      {/* Found Asset Display */}
-      {foundAsset && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              Asset Found
-              <Badge variant={getStateBadgeVariant(foundAsset.state)}>
-                {getAssetStateLabel(foundAsset.state)}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Asset Number:</span>
-                <br />
-                <code className="bg-gray-100 px-2 py-1 rounded">
-                  {foundAsset.assetNumber}
-                </code>
-              </div>
-              <div>
-                <span className="font-medium">Type:</span>
-                <br />
-                {getAssetTypeLabel(foundAsset.type)}
-              </div>
-              <div>
-                <span className="font-medium">Serial Number:</span>
-                <br />
-                <code className="bg-gray-100 px-2 py-1 rounded">
-                  {foundAsset.serialNumber}
-                </code>
-              </div>
-              <div>
-                <span className="font-medium">Location:</span>
-                <br />
-                {foundAsset.location}
-              </div>
-              <div className="col-span-2">
-                <span className="font-medium">Description:</span>
-                <br />
-                {foundAsset.description}
-              </div>
-              {foundAsset.assignedTo && (
-                <div>
-                  <span className="font-medium">Assigned To:</span>
-                  <br />
-                  {foundAsset.assignedTo}
-                  {foundAsset.employeeId && ` (${foundAsset.employeeId})`}
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 pt-2">
-              <Button size="sm" variant="outline">
-                View Details
-              </Button>
-              <Button size="sm" variant="outline">
-                Change State
-              </Button>
-              <Button size="sm" variant="outline">
-                Edit Asset
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Not Found Message */}
+      {/* Remove the detailed foundAsset card here. Only show not found message if needed. */}
       {notFoundBarcode && (
         <Card>
           <CardContent className="pt-6">
