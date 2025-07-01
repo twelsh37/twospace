@@ -33,6 +33,7 @@ import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { AssetEditModal } from "./asset-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
+import { UserAssetsModal } from "@/components/users/user-assets-modal";
 
 // Utility function to map asset state to solid background color classes
 const getStateColorClass = (state: AssetState) => {
@@ -69,6 +70,12 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
     null
   );
   const [deleting, setDeleting] = useState(false);
+
+  // User assets modal state
+  const [userAssetsModalOpen, setUserAssetsModalOpen] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
+    null
+  );
 
   // Placeholder for userId until real auth is implemented
   const currentUserId = "admin-user-id"; // TODO: Replace with real user ID from auth context
@@ -157,6 +164,12 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
     setDeleting(false);
   };
 
+  // Handle clicking on assigned to field to show user assets modal
+  const handleAssignedToClick = (employeeId: string) => {
+    setSelectedEmployeeId(employeeId);
+    setUserAssetsModalOpen(true);
+  };
+
   if (isLoading) {
     return <div className="p-8 text-center">Loading assets...</div>;
   }
@@ -189,6 +202,11 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
         description={
           "This action cannot be undone. Please select a reason for deletion."
         }
+      />
+      <UserAssetsModal
+        employeeId={selectedEmployeeId}
+        open={userAssetsModalOpen}
+        onOpenChange={setUserAssetsModalOpen}
       />
       <div>
         <Table>
@@ -237,7 +255,20 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                     <div>
                       <div className="font-medium">{asset.assignedTo}</div>
                       <div className="text-sm text-muted-foreground">
-                        {asset.employeeId} • {asset.department}
+                        {asset.employeeId ? (
+                          <button
+                            onClick={() =>
+                              handleAssignedToClick(asset.employeeId!)
+                            }
+                            className="hover:underline hover:text-blue-600 cursor-pointer transition-colors"
+                            title="Click to view user details and assigned assets"
+                          >
+                            {asset.employeeId}
+                          </button>
+                        ) : (
+                          asset.employeeId
+                        )}{" "}
+                        • {asset.department}
                       </div>
                     </div>
                   ) : (
