@@ -8,6 +8,7 @@
 
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { Bar } from "react-chartjs-2";
+import { useSearchParams } from "next/navigation";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,7 +18,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { useSearchParams } from "next/navigation";
 
 // Register Chart.js components
 ChartJS.register(
@@ -93,11 +93,11 @@ function AssetInventoryReport() {
   // State for export loading
   const [exportLoading, setExportLoading] = useState(false);
 
-  // Use the correct ref type for react-chartjs-2 Bar components (ChartJS | null)
-  const chartTypeRef = useRef<ChartJS | null>(null);
-  const chartStateRef = useRef<ChartJS | null>(null);
-  const chartBuiltRef = useRef<ChartJS | null>(null);
-  const chartReadyRef = useRef<ChartJS | null>(null);
+  // Use generic refs for Bar charts to avoid type errors
+  const chartTypeRef = useRef(null);
+  const chartStateRef = useRef(null);
+  const chartBuiltRef = useRef(null);
+  const chartReadyRef = useRef(null);
 
   // Fetch summary data for the charts and tables
   useEffect(() => {
@@ -145,10 +145,10 @@ function AssetInventoryReport() {
     setExportLoading(true);
     try {
       // Get chart images as data URLs
-      const chart1 = chartTypeRef.current?.toBase64Image() || "";
-      const chart2 = chartStateRef.current?.toBase64Image() || "";
-      const chart3 = chartBuiltRef.current?.toBase64Image() || "";
-      const chart4 = chartReadyRef.current?.toBase64Image() || "";
+      const chart1 = (chartTypeRef as any).current?.toBase64Image() || "";
+      const chart2 = (chartStateRef as any).current?.toBase64Image() || "";
+      const chart3 = (chartBuiltRef as any).current?.toBase64Image() || "";
+      const chart4 = (chartReadyRef as any).current?.toBase64Image() || "";
       // Send to API with real table data
       const res = await fetch("/api/reports/pdf", {
         method: "POST",
@@ -313,12 +313,7 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <Bar
-              ref={chartTypeRef as unknown as React.RefObject<any>}
-              data={data}
-              options={options}
-            />
+            <Bar ref={chartTypeRef as any} data={data} options={options} />
           </div>
           <div
             className="print-table"
@@ -395,9 +390,8 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Bar
-              ref={chartStateRef as unknown as React.RefObject<any>}
+              ref={chartStateRef as any}
               data={stateData}
               options={stateOptions}
             />
@@ -477,9 +471,8 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Bar
-              ref={chartBuiltRef as unknown as React.RefObject<any>}
+              ref={chartBuiltRef as any}
               data={{
                 labels: Object.keys(byTypeInBuilt).sort(),
                 datasets: [
@@ -588,9 +581,8 @@ function AssetInventoryReport() {
             className="print-chart"
             style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
           >
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Bar
-              ref={chartReadyRef as unknown as React.RefObject<any>}
+              ref={chartReadyRef as any}
               data={{
                 labels: Object.keys(byTypeInReadyToGo).sort(),
                 datasets: [

@@ -8,8 +8,9 @@ import {
   usersTable,
   locationsTable,
   assetHistoryTable,
+  archivedAssetsTable,
 } from "@/lib/db/schema";
-import { ilike, or, eq, desc } from "drizzle-orm";
+import { ilike, or, eq, desc, sql } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 
 /**
@@ -31,29 +32,43 @@ export async function GET(request: Request) {
     const normalizedQuery = `%${query}%`;
 
     // Perform searches in parallel
-    const [assetResults, userResults, locationResults] = await Promise.all([
-      db
-        .select({
-          ...getTableColumns(assetsTable),
-          locationName: locationsTable.name,
-        })
-        .from(assetsTable)
-        .leftJoin(locationsTable, eq(assetsTable.locationId, locationsTable.id))
-        .where(ilike(assetsTable.assetNumber, normalizedQuery)),
-      db
-        .select()
-        .from(usersTable)
-        .where(
-          or(
-            ilike(usersTable.name, normalizedQuery),
-            ilike(usersTable.email, normalizedQuery)
+    const [assetResults, archivedAssetResults, userResults, locationResults] =
+      await Promise.all([
+        db
+          .select({
+            ...getTableColumns(assetsTable),
+            locationName: locationsTable.name,
+          })
+          .from(assetsTable)
+          .leftJoin(
+            locationsTable,
+            eq(assetsTable.locationId, locationsTable.id)
           )
-        ),
-      db
-        .select()
-        .from(locationsTable)
-        .where(ilike(locationsTable.name, normalizedQuery)),
-    ]);
+          .where(ilike(assetsTable.assetNumber, normalizedQuery)),
+        db
+          .select({
+            ...getTableColumns(archivedAssetsTable),
+            locationName: sql`NULL`, // Archived assets may not have a location name
+            archiveReason: archivedAssetsTable.archiveReason,
+            archivedAt: archivedAssetsTable.archivedAt,
+            archivedBy: archivedAssetsTable.archivedBy,
+          })
+          .from(archivedAssetsTable)
+          .where(ilike(archivedAssetsTable.assetNumber, normalizedQuery)),
+        db
+          .select()
+          .from(usersTable)
+          .where(
+            or(
+              ilike(usersTable.name, normalizedQuery),
+              ilike(usersTable.email, normalizedQuery)
+            )
+          ),
+        db
+          .select()
+          .from(locationsTable)
+          .where(ilike(locationsTable.name, normalizedQuery)),
+      ]);
 
     // For each asset, find who updated it last
     const assetsWithHistory = await Promise.all(
@@ -69,12 +84,21 @@ export async function GET(request: Request) {
         return {
           ...asset,
           updatedByName: lastHistory[0]?.updatedBy || "System",
+          isArchived: false,
         };
       })
     );
 
+    // Add isArchived and archive metadata to archived assets
+    const archivedAssetsWithMeta = archivedAssetResults.map((asset) => ({
+      ...asset,
+      isArchived: true,
+      assignedTo: null, // Always unassigned for archived assets
+      updatedByName: "Archived", // Or fetch who archived if needed
+    }));
+
     const results = {
-      assets: assetsWithHistory,
+      assets: [...assetsWithHistory, ...archivedAssetsWithMeta],
       users: userResults,
       locations: locationResults,
     };

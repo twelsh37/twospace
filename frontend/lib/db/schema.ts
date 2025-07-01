@@ -159,6 +159,37 @@ export const settingsTable = pgTable("settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+// Archived Assets table for storing deleted asset records
+// REASONING: When an asset is deleted, it is moved here instead of being permanently removed. This allows for future audits, compliance, and traceability. All fields from 'assets' are preserved, plus archive metadata.
+export const archivedAssetsTable = pgTable("archived_assets", {
+  // All asset fields
+  id: uuid("id").primaryKey(), // Keep original asset id for traceability
+  assetNumber: varchar("asset_number", { length: 10 }),
+  type: assetTypeEnum("type").notNull(),
+  state: assetStateEnum("state").notNull(),
+  serialNumber: varchar("serial_number", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  purchasePrice: decimal("purchase_price", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  locationId: uuid("location_id").notNull(),
+  assignmentType: assignmentTypeEnum("assignment_type").notNull(),
+  assignedTo: varchar("assigned_to", { length: 255 }),
+  employeeId: varchar("employee_id", { length: 50 }),
+  department: varchar("department", { length: 255 }),
+  createdAt: timestamp("created_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  status: assetStatusEnum("status").notNull(),
+  // Archive metadata
+  archivedAt: timestamp("archived_at", { withTimezone: true }).defaultNow(), // When archived
+  archivedBy: uuid("archived_by")
+    .notNull()
+    .references(() => usersTable.id), // Who archived
+  archiveReason: text("archive_reason"), // Why archived
+});
+
 // Type exports for use in application
 export type User = typeof usersTable.$inferSelect;
 export type NewUser = typeof usersTable.$inferInsert;
@@ -172,3 +203,5 @@ export type AssetAssignment = typeof assetAssignmentsTable.$inferSelect;
 export type NewAssetAssignment = typeof assetAssignmentsTable.$inferInsert;
 export type Department = typeof departmentsTable.$inferSelect;
 export type NewDepartment = typeof departmentsTable.$inferInsert;
+export type ArchivedAsset = typeof archivedAssetsTable.$inferSelect;
+export type NewArchivedAsset = typeof archivedAssetsTable.$inferInsert;

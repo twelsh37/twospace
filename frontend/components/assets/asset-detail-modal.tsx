@@ -9,14 +9,22 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Asset as DetailedAsset } from "@/components/search/search-results-modal"; // Re-using the detailed type
+import { Asset as BaseAsset } from "@/components/search/search-results-modal";
 import { AssetState } from "@/lib/types";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
+
+// Extend Asset type to allow isArchived and archive metadata
+type AssetWithArchive = BaseAsset & {
+  isArchived: boolean;
+  archiveReason: string | null;
+  archivedAt: string | null;
+  archivedBy: string | null;
+};
 
 type AssetDetailModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  asset: DetailedAsset | null;
+  asset: AssetWithArchive | null;
   isLoading: boolean;
 };
 
@@ -70,6 +78,12 @@ export function AssetDetailModal({
 
         {!isLoading && asset && (
           <div className="border p-3 rounded-lg text-sm space-y-4">
+            {/* Archived Asset Badge */}
+            {asset.isArchived && (
+              <div className="flex items-center justify-between mb-2">
+                <Badge className="bg-gray-700 text-white">ARCHIVED ASSET</Badge>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <span className="font-bold text-base">{asset.assetNumber}</span>
               <Badge className={getStateColorClass(asset.state)}>
@@ -97,6 +111,28 @@ export function AssetDetailModal({
               <div className="text-muted-foreground">Updated By:</div>
               <div>{asset.updatedByName}</div>
             </div>
+            {/* Archive Metadata Section */}
+            {asset.isArchived && (
+              <div className="mt-4 p-3 border rounded bg-gray-50">
+                <div className="font-semibold text-gray-700 mb-1">
+                  Archive Information
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                  <div className="text-muted-foreground">Reason:</div>
+                  <div>{asset.archiveReason || "N/A"}</div>
+                  <div className="text-muted-foreground">
+                    Archived By (User ID):
+                  </div>
+                  <div>{asset.archivedBy || "N/A"}</div>
+                  <div className="text-muted-foreground">Archived At:</div>
+                  <div>
+                    {asset.archivedAt
+                      ? new Date(asset.archivedAt).toLocaleString("en-GB")
+                      : "N/A"}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </DialogContent>
