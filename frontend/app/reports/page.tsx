@@ -7,13 +7,15 @@
 // Includes Print, Email, Share, and Export buttons.
 
 import React, { useState, useRef, useEffect, Suspense } from "react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import { useSearchParams } from "next/navigation";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
@@ -24,6 +26,8 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend
@@ -877,6 +881,291 @@ function LifecycleManagementReport() {
   );
 }
 
+// --- Financial Report: Asset Value by Type and Over Years ---
+function FinancialReport() {
+  // State for API data
+  const [byType, setByType] = useState<{ [type: string]: number }>({});
+  const [byYear, setByYear] = useState<{ [year: string]: number }>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  // Print time for header
+  const [printTime, setPrintTime] = useState<string>("");
+  useEffect(() => {
+    setPrintTime(
+      new Date().toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    );
+  }, []);
+  // Fetch summary data
+  useEffect(() => {
+    async function fetchSummary() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/reports/financial/summary");
+        const json = await res.json();
+        if (!json.byType || !json.byYear)
+          throw new Error(json.error || "No data");
+        setByType(json.byType);
+        setByYear(json.byYear);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSummary();
+  }, []);
+  // Prepare data for bar chart (value by type)
+  const typeLabels = Object.keys(byType).sort();
+  const barData = {
+    labels: typeLabels,
+    datasets: [
+      {
+        label: "Current Value (£)",
+        data: typeLabels.map((type) => byType[type]),
+        backgroundColor: typeLabels.map((type) => {
+          switch (type) {
+            case "LAPTOP":
+              return "#3B82F6";
+            case "MONITOR":
+              return "#22C55E";
+            case "MOBILE_PHONE":
+              return "#A21CAF";
+            case "DESKTOP":
+              return "#F59E42";
+            case "TABLET":
+              return "#EC4899";
+            default:
+              return "#6B7280";
+          }
+        }),
+      },
+    ],
+  };
+  const barOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: "Asset Value by Type" },
+      tooltip: {
+        callbacks: {
+          label: (ctx: any) =>
+            `£${ctx.parsed.y.toLocaleString(undefined, {
+              maximumFractionDigits: 2,
+            })}`,
+        },
+      },
+    },
+    animation: { duration: 1200, easing: "easeOutQuart" as const },
+    scales: { y: { beginAtZero: true } },
+  };
+  // Prepare data for line chart (value over years)
+  const yearLabels = Object.keys(byYear).sort();
+  const lineData = {
+    labels: yearLabels,
+    datasets: [
+      {
+        label: "Total Value (£)",
+        data: yearLabels.map((year) => byYear[year]),
+        borderColor: "#2563EB",
+        backgroundColor: "rgba(37,99,235,0.2)",
+        fill: true,
+        tension: 0.2,
+      },
+    ],
+  };
+  const lineOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: "Asset Value Over Years" },
+      tooltip: {
+        callbacks: {
+          label: (ctx: any) =>
+            `£${ctx.parsed.y.toLocaleString(undefined, {
+              maximumFractionDigits: 2,
+            })}`,
+        },
+      },
+    },
+    animation: { duration: 1200, easing: "easeOutQuart" as const },
+    scales: { y: { beginAtZero: true } },
+  };
+  // Render loading, error, or charts
+  return (
+    <div style={{ padding: "1rem" }}>
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Financial Report</h2>
+        <p className="text-muted-foreground">Prepared on: {printTime || "—"}</p>
+      </div>
+      {loading ? (
+        <div>Loading financial data...</div>
+      ) : error ? (
+        <div style={{ color: "red" }}>Error: {error}</div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: "2rem",
+            marginTop: "2.5rem",
+            marginBottom: "2.5rem",
+            width: "100%",
+            overflowX: "auto",
+            justifyContent: "flex-start",
+            boxSizing: "border-box",
+          }}
+        >
+          {/* Bar Chart: Value by Type */}
+          <div
+            style={{
+              flex: "1 1 0",
+              padding: "1rem",
+              border: "1px solid #eee",
+              borderRadius: 8,
+              background: "#fafbfc",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h2
+              style={{
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                marginBottom: "0.5rem",
+                textAlign: "center",
+              }}
+            >
+              Asset Value by Type
+            </h2>
+            <div
+              style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+            >
+              <Bar data={barData} options={barOptions} />
+            </div>
+            {/* Table of values */}
+            <div style={{ width: "100%", marginTop: "2rem" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Asset Type
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Current Value (£)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {typeLabels.map((type) => (
+                    <tr key={type}>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {type}
+                      </td>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {byType[type].toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {/* Line Chart: Value over Years */}
+          <div
+            style={{
+              flex: "1 1 0",
+              padding: "1rem",
+              border: "1px solid #eee",
+              borderRadius: 8,
+              background: "#fafbfc",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h2
+              style={{
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                marginBottom: "0.5rem",
+                textAlign: "center",
+              }}
+            >
+              Asset Value Over Years
+            </h2>
+            <div
+              style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+            >
+              <Line data={lineData} options={lineOptions} />
+            </div>
+            {/* Table of values */}
+            <div style={{ width: "100%", marginTop: "2rem" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Year
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Total Value (£)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {yearLabels.map((year) => (
+                    <tr key={year}>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {year}
+                      </td>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {byYear[year].toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Main Reports Page
 function ReportsPageContent() {
   // Read the selected report from the query string (?report=CategoryName)
@@ -891,6 +1180,7 @@ function ReportsPageContent() {
     if (selected === "Asset Inventory") return <AssetInventoryReport />;
     if (selected === "Lifecycle Management")
       return <LifecycleManagementReport />;
+    if (selected === "Financial") return <FinancialReport />;
     return <ReportPlaceholder title={selected} />;
   }
 
