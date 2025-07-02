@@ -342,7 +342,12 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+            style={{
+              marginBottom: "1rem",
+              width: "400px",
+              height: "200px",
+              margin: "0 auto",
+            }}
           >
             <Bar ref={chartTypeRef as any} data={data} options={options} />
           </div>
@@ -419,7 +424,12 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+            style={{
+              marginBottom: "1rem",
+              width: "400px",
+              height: "200px",
+              margin: "0 auto",
+            }}
           >
             <Bar
               ref={chartStateRef as any}
@@ -500,7 +510,12 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+            style={{
+              marginBottom: "1rem",
+              width: "400px",
+              height: "200px",
+              margin: "0 auto",
+            }}
           >
             <Bar
               ref={chartBuildingRef as any}
@@ -581,7 +596,12 @@ function AssetInventoryReport() {
           </h2>
           <div
             className="print-chart"
-            style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+            style={{
+              marginBottom: "1rem",
+              width: "400px",
+              height: "200px",
+              margin: "0 auto",
+            }}
           >
             <Bar
               ref={chartReadyRef as any}
@@ -958,7 +978,7 @@ function FinancialReport() {
     responsive: true,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: "Asset Value by Type" },
+      title: { display: false },
       tooltip: {
         callbacks: {
           label: (ctx: any) =>
@@ -990,7 +1010,7 @@ function FinancialReport() {
     responsive: true,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: "Asset Value Over Years" },
+      title: { display: false },
       tooltip: {
         callbacks: {
           label: (ctx: any) =>
@@ -1022,9 +1042,9 @@ function FinancialReport() {
             gap: "2rem",
             marginTop: "2.5rem",
             marginBottom: "2.5rem",
-            width: "100%",
+            width: "auto",
             overflowX: "auto",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             boxSizing: "border-box",
           }}
         >
@@ -1052,7 +1072,12 @@ function FinancialReport() {
               Asset Value by Type
             </h2>
             <div
-              style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+              style={{
+                marginBottom: "1rem",
+                width: "400px",
+                height: "200px",
+                margin: "0 auto",
+              }}
             >
               <Bar data={barData} options={barOptions} />
             </div>
@@ -1120,7 +1145,12 @@ function FinancialReport() {
               Asset Value Over Years
             </h2>
             <div
-              style={{ marginBottom: "1rem", width: "100%", height: "200px" }}
+              style={{
+                marginBottom: "1rem",
+                width: "400px",
+                height: "200px",
+                margin: "0 auto",
+              }}
             >
               <Line data={lineData} options={lineOptions} />
             </div>
