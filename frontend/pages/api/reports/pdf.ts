@@ -1,7 +1,7 @@
 // frontend/pages/api/reports/pdf.ts
-// API route to generate Asset Inventory Report PDF using browserless.io REST API (no Puppeteer)
+// API route to generate Asset Inventory Report PDF using browserless.io REST API
 // This endpoint receives chart images and table data from the client, builds an HTML report, and sends it to browserless.io for PDF generation.
-// NOTE: We no longer use Puppeteer directly. All PDF rendering is handled by browserless.io cloud service.
+// NOTE: All PDF rendering is handled by browserless.io cloud service. Puppeteer is not used or supported.
 
 import type { NextApiRequest, NextApiResponse } from "next";
 // import puppeteer from "puppeteer"; // No longer used

@@ -79,30 +79,43 @@ function AssetsPageContent() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  // Export handler
-  const handleExport = async (type: "csv" | "xlsx") => {
+  // Export handler for PDF or CSV
+  const handleExport = async (format: "pdf" | "csv") => {
     setExportLoading(true);
-    let dataToExport: Record<string, unknown>[] = [];
-    // Always fetch all filtered data from backend
     try {
-      // Use a proper API path and handle possible null for searchParams
-      const response = await fetch(
-        `/api/assets?${searchParams?.toString() ?? ""}&all=1`
-      );
-      const result = await response.json();
-      dataToExport = result.data.assets;
+      // Send selected format and filters to API
+      const res = await fetch("/api/assets/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: filters.type,
+          state: filters.state,
+          status: filters.status,
+          format,
+        }),
+      });
+      if (!res.ok) throw new Error(`Failed to export ${format.toUpperCase()}`);
+      const blob = await res.blob();
+      // Set filename and extension based on format
+      const filename =
+        format === "csv" ? "assets-report.csv" : "assets-report.pdf";
+      // Download the file
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
     } catch {
+      alert(
+        `Failed to export assets ${format.toUpperCase()}. Please try again.`
+      );
+    } finally {
       setExportLoading(false);
-      alert("Failed to fetch all data for export.");
-      return;
+      setExportModalOpen(false);
     }
-    if (type === "csv") {
-      exportToCSV(dataToExport, "assets.csv");
-    } else {
-      await exportToXLSX(dataToExport, "assets.xlsx");
-    }
-    setExportLoading(false);
-    setExportModalOpen(false);
   };
 
   return (
@@ -111,7 +124,7 @@ function AssetsPageContent() {
       <Card className="shadow-lg border rounded-xl">
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-2xl">Assets</CardTitle>
+            <CardTitle className="text-2xl text-left">Assets</CardTitle>
             <p className="text-muted-foreground text-sm">
               Manage your organization&apos;s assets and track their lifecycle
             </p>
