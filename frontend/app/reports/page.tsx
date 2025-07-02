@@ -20,6 +20,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 // Register Chart.js components
 ChartJS.register(
@@ -62,8 +63,6 @@ function ReportPlaceholder({ title }: { title: string }) {
 
 // Asset Inventory Report with summary API and smooth chart animation
 function AssetInventoryReport() {
-  // Ref for print functionality
-  const printRef = useRef<HTMLDivElement>(null);
   // State for summary data
   const [assetCounts, setAssetCounts] = useState<{ [type: string]: number }>(
     {}
@@ -122,27 +121,6 @@ function AssetInventoryReport() {
     }
     fetchSummary();
   }, []);
-
-  // Print handler (prints the chart and table)
-  const handlePrint = () => {
-    // Capture print time in British format
-    setPrintTime(
-      new Date().toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      })
-    );
-    setTimeout(() => {
-      if (printRef.current) {
-        window.print();
-      }
-    }, 100); // Give time for printTime to update
-  };
 
   // Export handler: get chart images and send to API
   const handleExport = async () => {
@@ -308,386 +286,421 @@ function AssetInventoryReport() {
         style={{
           display: "flex",
           flexDirection: "row",
-          gap: "2rem",
+          flexWrap: "wrap",
+          gap: "1rem",
           marginTop: "2.5rem",
           marginBottom: "2.5rem",
           width: "100%",
-          overflowX: "auto",
-          justifyContent: "flex-start",
+          overflowX: "visible",
+          justifyContent: "center",
           boxSizing: "border-box",
         }}
       >
         {/* Assets by Type */}
-        <div
+        <Card
           style={{
-            flex: "1 1 0",
-            padding: "1rem",
-            border: "1px solid #eee",
-            borderRadius: 8,
-            background: "#fafbfc",
+            flex: "1 1 350px",
+            maxWidth: 400,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          <h2
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              marginBottom: "0.5rem",
-              textAlign: "center",
-            }}
-          >
-            Assets by Type
-          </h2>
-          <div
-            className="print-chart"
-            style={{
-              marginBottom: "1rem",
-              width: "400px",
-              height: "200px",
-              margin: "0 auto",
-            }}
-          >
-            <Bar ref={chartTypeRef as any} data={data} options={options} />
-          </div>
-          <div
-            className="print-table"
-            style={{ width: "100%", marginTop: "2rem" }}
-          >
-            {/* Font size reduced to match chart labels for compact layout */}
-            <table
+          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+            <CardTitle
               style={{
+                fontSize: "1rem",
+                textAlign: "center",
+                whiteSpace: "normal",
+                overflow: "visible",
+                textOverflow: "unset",
                 width: "100%",
-                borderCollapse: "collapse",
-                marginTop: 0,
-                fontSize: "12px",
               }}
             >
-              <thead>
-                <tr>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Asset Type
-                  </th>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Count
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {labels.map((type) => (
-                  <tr key={type}>
-                    <td
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0.5rem",
-                      }}
-                    >
-                      {type}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0.5rem",
-                      }}
-                    >
-                      {new Intl.NumberFormat().format(assetCounts[type])}
-                    </td>
+              Assets by Type
+            </CardTitle>
+          </CardHeader>
+          <CardContent
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0 0.5rem 0.5rem 0.5rem",
+            }}
+          >
+            <div
+              className="print-chart"
+              style={{
+                marginBottom: "1rem",
+                width: "350px",
+                height: "200px",
+                margin: "0 auto",
+              }}
+            >
+              <Bar ref={chartTypeRef as any} data={data} options={options} />
+            </div>
+            <div
+              className="print-table"
+              style={{
+                width: "100%",
+                marginTop: "0.5rem",
+              }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: 0,
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Asset Type
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Count
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {/* Assets by State */}
-        <div
-          style={{
-            flex: "1 1 0",
-            padding: "1rem",
-            border: "1px solid #eee",
-            borderRadius: 8,
-            background: "#fafbfc",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              marginBottom: "0.5rem",
-              textAlign: "center",
-            }}
-          >
-            Assets by State
-          </h2>
-          <div
-            className="print-chart"
-            style={{
-              marginBottom: "1rem",
-              width: "400px",
-              height: "200px",
-              margin: "0 auto",
-            }}
-          >
-            <Bar
-              ref={chartStateRef as any}
-              data={stateData}
-              options={stateOptions}
-            />
-          </div>
-          <div
-            className="print-table"
-            style={{ width: "100%", marginTop: "2rem" }}
-          >
-            {/* Font size reduced to match chart labels for compact layout */}
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: 0,
-                fontSize: "12px",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Asset State
-                  </th>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Count
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {stateLabels.map((state) => (
-                  <tr key={state}>
-                    <td
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0.5rem",
-                      }}
-                    >
-                      {state}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0.5rem",
-                      }}
-                    >
-                      {new Intl.NumberFormat().format(stateCounts[state])}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {/* Assets in Building State */}
-        <div
-          style={{
-            flex: "1 1 0",
-            padding: "1rem",
-            border: "1px solid #eee",
-            borderRadius: 8,
-            background: "#fafbfc",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              marginBottom: "0.5rem",
-              textAlign: "center",
-            }}
-          >
-            Assets in Building State
-          </h2>
-          <div
-            className="print-chart"
-            style={{
-              marginBottom: "1rem",
-              width: "400px",
-              height: "200px",
-              margin: "0 auto",
-            }}
-          >
-            <Bar
-              ref={chartBuildingRef as any}
-              data={buildingData}
-              options={options}
-            />
-          </div>
-          <div
-            className="print-table"
-            style={{ width: "100%", marginTop: "2rem" }}
-          >
-            {/* Font size reduced to match chart labels for compact layout */}
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: 0,
-                fontSize: "12px",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Asset Type
-                  </th>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Count
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {buildingLabels.map((type) => (
-                  <tr key={type}>
-                    <td
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0.5rem",
-                      }}
-                    >
-                      {type}
-                    </td>
-                    <td
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: "0.5rem",
-                      }}
-                    >
-                      {new Intl.NumberFormat().format(byTypeInBuilding[type])}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {/* Assets Ready to Go */}
-        <div
-          style={{
-            flex: "1 1 0",
-            padding: "1rem",
-            border: "1px solid #eee",
-            borderRadius: 8,
-            background: "#fafbfc",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              marginBottom: "0.5rem",
-              textAlign: "center",
-            }}
-          >
-            Assets Ready to Go
-          </h2>
-          <div
-            className="print-chart"
-            style={{
-              marginBottom: "1rem",
-              width: "400px",
-              height: "200px",
-              margin: "0 auto",
-            }}
-          >
-            <Bar
-              ref={chartReadyRef as any}
-              data={{
-                labels: Object.keys(byTypeInReadyToGo).sort(),
-                datasets: [
-                  {
-                    data: Object.keys(byTypeInReadyToGo)
-                      .sort()
-                      .map((type) => byTypeInReadyToGo[type]),
-                    backgroundColor: Object.keys(byTypeInReadyToGo)
-                      .sort()
-                      .map((type) => {
-                        switch (type) {
-                          case "LAPTOP":
-                            return "#3B82F6";
-                          case "MONITOR":
-                            return "#22C55E";
-                          case "MOBILE_PHONE":
-                            return "#A21CAF";
-                          case "DESKTOP":
-                            return "#F59E42";
-                          case "TABLET":
-                            return "#EC4899";
-                          default:
-                            return "#6B7280";
-                        }
-                      }),
-                  },
-                ],
-              }}
-              options={options}
-            />
-          </div>
-          <div
-            className="print-table"
-            style={{ width: "100%", marginTop: "2rem" }}
-          >
-            {/* Font size reduced to match chart labels for compact layout */}
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: 0,
-                fontSize: "12px",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Asset Type
-                  </th>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Count
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.keys(byTypeInReadyToGo)
-                  .sort()
-                  .map((type) => (
+                </thead>
+                <tbody>
+                  {labels.map((type) => (
                     <tr key={type}>
                       <td
-                        style={{
-                          border: "1px solid #ccc",
-                          padding: "0.5rem",
-                        }}
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
                       >
                         {type}
                       </td>
                       <td
-                        style={{
-                          border: "1px solid #ccc",
-                          padding: "0.5rem",
-                        }}
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
                       >
-                        {new Intl.NumberFormat().format(
-                          byTypeInReadyToGo[type]
-                        )}
+                        {new Intl.NumberFormat().format(assetCounts[type])}
                       </td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Assets by State */}
+        <Card
+          style={{
+            flex: "1 1 350px",
+            maxWidth: 400,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+            <CardTitle
+              style={{
+                fontSize: "1rem",
+                textAlign: "center",
+                whiteSpace: "normal",
+                overflow: "visible",
+                textOverflow: "unset",
+                width: "100%",
+              }}
+            >
+              Assets by State
+            </CardTitle>
+          </CardHeader>
+          <CardContent
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0 0.5rem 0.5rem 0.5rem",
+            }}
+          >
+            <div
+              className="print-chart"
+              style={{
+                marginBottom: "1rem",
+                width: "350px",
+                height: "200px",
+                margin: "0 auto",
+              }}
+            >
+              <Bar
+                ref={chartStateRef as any}
+                data={stateData}
+                options={stateOptions}
+              />
+            </div>
+            <div
+              className="print-table"
+              style={{
+                width: "100%",
+                marginTop: "0.5rem",
+              }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: 0,
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Asset State
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Count
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stateLabels.map((state) => (
+                    <tr key={state}>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {state}
+                      </td>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {new Intl.NumberFormat().format(stateCounts[state])}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Assets in Building State */}
+        <Card
+          style={{
+            flex: "1 1 260px",
+            maxWidth: 400,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+            <CardTitle
+              style={{
+                fontSize: "1rem",
+                textAlign: "center",
+                whiteSpace: "normal",
+                overflow: "visible",
+                textOverflow: "unset",
+                width: "100%",
+              }}
+            >
+              Assets in Building State
+            </CardTitle>
+          </CardHeader>
+          <CardContent
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0 0.5rem 0.5rem 0.5rem",
+            }}
+          >
+            <div
+              className="print-chart"
+              style={{
+                marginBottom: "1rem",
+                width: "350px",
+                height: "200px",
+                margin: "0 auto",
+              }}
+            >
+              <Bar
+                ref={chartBuildingRef as any}
+                data={buildingData}
+                options={options}
+              />
+            </div>
+            <div
+              className="print-table"
+              style={{
+                width: "100%",
+                marginTop: "0.5rem",
+              }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: 0,
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Asset Type
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Count
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {buildingLabels.map((type) => (
+                    <tr key={type}>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {type}
+                      </td>
+                      <td
+                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                      >
+                        {new Intl.NumberFormat().format(byTypeInBuilding[type])}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Assets Ready to Go */}
+        <Card
+          style={{
+            flex: "1 1 260px",
+            maxWidth: 400,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+            <CardTitle
+              style={{
+                fontSize: "1rem",
+                textAlign: "center",
+                whiteSpace: "normal",
+                overflow: "visible",
+                textOverflow: "unset",
+                width: "100%",
+              }}
+            >
+              Assets Ready to Go
+            </CardTitle>
+          </CardHeader>
+          <CardContent
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0 0.5rem 0.5rem 0.5rem",
+            }}
+          >
+            <div
+              className="print-chart"
+              style={{
+                marginBottom: "1rem",
+                width: "350px",
+                height: "200px",
+                margin: "0 auto",
+              }}
+            >
+              <Bar
+                ref={chartReadyRef as any}
+                data={{
+                  labels: Object.keys(byTypeInReadyToGo).sort(),
+                  datasets: [
+                    {
+                      data: Object.keys(byTypeInReadyToGo)
+                        .sort()
+                        .map((type) => byTypeInReadyToGo[type]),
+                      backgroundColor: Object.keys(byTypeInReadyToGo)
+                        .sort()
+                        .map((type) => {
+                          switch (type) {
+                            case "LAPTOP":
+                              return "#3B82F6";
+                            case "MONITOR":
+                              return "#22C55E";
+                            case "MOBILE_PHONE":
+                              return "#A21CAF";
+                            case "DESKTOP":
+                              return "#F59E42";
+                            case "TABLET":
+                              return "#EC4899";
+                            default:
+                              return "#6B7280";
+                          }
+                        }),
+                    },
+                  ],
+                }}
+                options={options}
+              />
+            </div>
+            <div
+              className="print-table"
+              style={{
+                width: "100%",
+                marginTop: "0.5rem",
+              }}
+            >
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: 0,
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Asset Type
+                    </th>
+                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                      Count
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(byTypeInReadyToGo)
+                    .sort()
+                    .map((type) => (
+                      <tr key={type}>
+                        <td
+                          style={{
+                            border: "1px solid #ccc",
+                            padding: "0.5rem",
+                          }}
+                        >
+                          {type}
+                        </td>
+                        <td
+                          style={{
+                            border: "1px solid #ccc",
+                            padding: "0.5rem",
+                          }}
+                        >
+                          {new Intl.NumberFormat().format(
+                            byTypeInReadyToGo[type]
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       {/* Action buttons moved to bottom, left-aligned with title */}
       <div
@@ -699,23 +712,6 @@ function AssetInventoryReport() {
           justifyContent: "flex-end",
         }}
       >
-        <button
-          onClick={handlePrint}
-          style={{
-            padding: "0.5rem 1.5rem",
-            borderRadius: 6,
-            border: "1px solid #1d4ed8",
-            background: "#1d4ed8",
-            color: "white",
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: "pointer",
-          }}
-          aria-label="Print report"
-          title="Print report"
-        >
-          Print
-        </button>
         {/* Export PDF functionality */}
         <button
           onClick={handleExport}
@@ -1069,13 +1065,13 @@ function FinancialReport() {
                 textAlign: "center",
               }}
             >
-              Asset Value by Type
+              Current Value of Assets
             </h2>
             <div
               style={{
                 marginBottom: "1rem",
-                width: "400px",
-                height: "200px",
+                width: "500px",
+                height: "300px",
                 margin: "0 auto",
               }}
             >
@@ -1147,8 +1143,8 @@ function FinancialReport() {
             <div
               style={{
                 marginBottom: "1rem",
-                width: "400px",
-                height: "200px",
+                width: "500px",
+                height: "300px",
                 margin: "0 auto",
               }}
             >
