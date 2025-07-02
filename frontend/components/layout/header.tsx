@@ -70,8 +70,11 @@ export function Header() {
   };
 
   return (
-    <>
-      <header className="flex items-center justify-between px-6 py-4 bg-background border-b">
+    <header role="banner" style={{ background: "#1d4ed8", color: "white" }}>
+      <div
+        className="flex items-center justify-between px-6 py-4 border-b"
+        style={{ borderColor: "#1d4ed8" }}
+      >
         {/* Left Side - Search */}
         <div className="flex items-center space-x-4">
           <div className="relative w-64 md:w-96">
@@ -89,14 +92,24 @@ export function Header() {
         {/* Right Side - Actions and User */}
         <div className="flex items-center space-x-4">
           {/* Notifications (bell only, no badge) */}
-          <Button variant="ghost" size="sm">
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label="Notifications"
+            title="Notifications"
+          >
             <Bell className="h-4 w-4" />
           </Button>
 
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+              <Button
+                variant="ghost"
+                className="relative h-8 w-8 rounded-full"
+                aria-label="User menu"
+                title="User menu"
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback>
@@ -145,7 +158,7 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </header>
+      </div>
       <SearchResultsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -153,6 +166,6 @@ export function Header() {
         isLoading={isSearching}
         query={searchQuery}
       />
-    </>
+    </header>
   );
 }

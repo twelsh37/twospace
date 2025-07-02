@@ -505,7 +505,7 @@ export default function SettingsPage() {
         <Link href="/barcode-test">
           <button
             style={{
-              background: "#2563eb",
+              background: "#1d4ed8",
               color: "#fff",
               border: "none",
               borderRadius: 6,
@@ -517,6 +517,8 @@ export default function SettingsPage() {
               alignItems: "center",
               gap: 8,
             }}
+            aria-label="Go to Barcode Test"
+            title="Go to Barcode Test"
           >
             <FaBarcode /> Go to Barcode Test
           </button>
@@ -534,7 +536,7 @@ export default function SettingsPage() {
             padding: "0.5rem 1.2rem",
             fontSize: 15,
             fontWeight: "bold",
-            background: isChanged && !saving ? "#2563EB" : "#ccc",
+            background: isChanged && !saving ? "#1d4ed8" : "#aaa",
             color: "white",
             border: "none",
             borderRadius: 6,
@@ -543,6 +545,8 @@ export default function SettingsPage() {
             textAlign: "center",
             boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
           }}
+          aria-label="Save settings"
+          title="Save settings"
         >
           {saving ? "Saving..." : "Save"}
         </button>
