@@ -7,10 +7,10 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserTable } from "@/components/users/user-table";
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
-import Link from "next/link";
 import { UserFilters, UserFilterState } from "@/components/users/user-filters";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserAddModal } from "@/components/users/user-add-modal";
+import { ExportModal } from "@/components/ui/export-modal";
 
 export default function UsersPage() {
   return (
@@ -25,6 +25,8 @@ function UsersPageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
   // Filters and pagination state
   const filters: UserFilterState = {
@@ -52,6 +54,44 @@ function UsersPageContent() {
     const params = new URLSearchParams(searchParams?.toString() ?? "");
     params.set("page", pageNumber.toString());
     router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  // Export handler for PDF or CSV
+  const handleExport = async (format: "pdf" | "csv") => {
+    setExportLoading(true);
+    try {
+      // Send selected format to API
+      const res = await fetch("/api/users/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          department: filters.department,
+          role: filters.role,
+          format, // pass format to backend
+        }),
+      });
+      if (!res.ok) throw new Error(`Failed to export ${format.toUpperCase()}`);
+      const blob = await res.blob();
+      // Set filename and extension based on format
+      const filename =
+        format === "csv" ? "users-report.csv" : "users-report.pdf";
+      // Download the file
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert(
+        `Failed to export users ${format.toUpperCase()}. Please try again.`
+      );
+    } finally {
+      setExportLoading(false);
+      setExportModalOpen(false);
+    }
   };
 
   return (
@@ -92,7 +132,11 @@ function UsersPageContent() {
               </p>
             </div>
             <div className="flex items-center space-x-5">
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setExportModalOpen(true)}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
@@ -128,6 +172,12 @@ function UsersPageContent() {
           const params = new URLSearchParams(searchParams?.toString() ?? "");
           router.replace(`${pathname}?${params.toString()}`);
         }}
+      />
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        onExport={handleExport}
+        loading={exportLoading}
       />
     </div>
   );
