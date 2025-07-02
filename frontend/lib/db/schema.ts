@@ -156,6 +156,8 @@ export const assetSequencesTable = pgTable("asset_sequences", {
 export const settingsTable = pgTable("settings", {
   id: uuid("id").primaryKey().defaultRandom(),
   reportCacheDuration: integer("report_cache_duration").notNull().default(30), // in minutes
+  // New: JSON column for global depreciation settings (method, years, percentages)
+  depreciationSettings: jsonb("depreciation_settings"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 

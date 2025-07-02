@@ -52,7 +52,7 @@ export default function SettingsPage() {
   const decliningTotal = decliningPercents.reduce((a, b) => a + b, 0);
   const decliningWarning = Math.abs(decliningTotal - 100) > 0.01;
 
-  // Fetch current setting on mount
+  // Fetch current setting on mount (including depreciationSettings)
   useEffect(() => {
     async function fetchSettings() {
       setLoading(true);
@@ -66,6 +66,16 @@ export default function SettingsPage() {
         } else {
           setError("Failed to load settings");
         }
+        // Load depreciation settings if present
+        if (json.depreciationSettings) {
+          setDepreciationMethod(json.depreciationSettings.method || "straight");
+          setDepreciationYears(json.depreciationSettings.years || 4);
+          setDecliningPercents(
+            Array.isArray(json.depreciationSettings.decliningPercents)
+              ? json.depreciationSettings.decliningPercents
+              : [50, 25, 12.5, 12.5]
+          );
+        }
       } catch {
         setError("Failed to load settings");
       } finally {
@@ -75,7 +85,7 @@ export default function SettingsPage() {
     fetchSettings();
   }, []);
 
-  // Save handler
+  // Save handler (save both cacheDuration and depreciationSettings)
   async function handleSave() {
     setSaving(true);
     setError(null);
@@ -84,7 +94,14 @@ export default function SettingsPage() {
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reportCacheDuration: cacheDuration }),
+        body: JSON.stringify({
+          reportCacheDuration: cacheDuration,
+          depreciationSettings: {
+            method: depreciationMethod,
+            years: depreciationYears,
+            decliningPercents,
+          },
+        }),
       });
       const json = await res.json();
       if (res.ok) {
