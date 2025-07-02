@@ -334,6 +334,13 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
             size="sm"
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
+            style={{
+              background: page <= 1 ? "#aaa" : "#1d4ed8",
+              color: "white",
+              border: "1px solid #1d4ed8",
+            }}
+            aria-label="Previous page"
+            title="Previous page"
           >
             Previous
           </Button>
@@ -345,6 +352,13 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
             size="sm"
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
+            style={{
+              background: page >= totalPages ? "#aaa" : "#1d4ed8",
+              color: "white",
+              border: "1px solid #1d4ed8",
+            }}
+            aria-label="Next page"
+            title="Next page"
           >
             Next
           </Button>
