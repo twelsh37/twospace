@@ -372,6 +372,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopLeftRadius: "12px",
+                        textAlign: "left",
                       }}
                     >
                       Asset Type
@@ -381,6 +382,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopRightRadius: "12px",
+                        textAlign: "right",
                       }}
                     >
                       Count
@@ -392,6 +394,7 @@ function AssetInventoryReport() {
                     <tr
                       key={type}
                       style={{
+                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                         transition: "background 0.2s",
                         borderBottom:
                           idx === labels.length - 1
@@ -400,10 +403,11 @@ function AssetInventoryReport() {
                         cursor: "pointer",
                       }}
                       onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#f3f4f6")
+                        (e.currentTarget.style.background = "#e0e7ff")
                       }
                       onMouseOut={(e) =>
-                        (e.currentTarget.style.background = "")
+                        (e.currentTarget.style.background =
+                          idx % 2 === 0 ? "#f8fafc" : "#fff")
                       }
                     >
                       <td
@@ -420,6 +424,8 @@ function AssetInventoryReport() {
                           padding: "0.5rem",
                           border: "none",
                           textAlign: "right",
+                          fontFamily:
+                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                         }}
                       >
                         {new Intl.NumberFormat().format(assetCounts[type])}
@@ -511,6 +517,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopLeftRadius: "12px",
+                        textAlign: "left",
                       }}
                     >
                       Asset State
@@ -520,6 +527,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopRightRadius: "12px",
+                        textAlign: "right",
                       }}
                     >
                       Count
@@ -531,6 +539,7 @@ function AssetInventoryReport() {
                     <tr
                       key={state}
                       style={{
+                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                         transition: "background 0.2s",
                         borderBottom:
                           idx === stateLabels.length - 1
@@ -539,10 +548,11 @@ function AssetInventoryReport() {
                         cursor: "pointer",
                       }}
                       onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#f3f4f6")
+                        (e.currentTarget.style.background = "#e0e7ff")
                       }
                       onMouseOut={(e) =>
-                        (e.currentTarget.style.background = "")
+                        (e.currentTarget.style.background =
+                          idx % 2 === 0 ? "#f8fafc" : "#fff")
                       }
                     >
                       <td
@@ -559,6 +569,8 @@ function AssetInventoryReport() {
                           padding: "0.5rem",
                           border: "none",
                           textAlign: "right",
+                          fontFamily:
+                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                         }}
                       >
                         {new Intl.NumberFormat().format(stateCounts[state])}
@@ -650,6 +662,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopLeftRadius: "12px",
+                        textAlign: "left",
                       }}
                     >
                       Asset Type
@@ -659,6 +672,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopRightRadius: "12px",
+                        textAlign: "right",
                       }}
                     >
                       Count
@@ -670,6 +684,7 @@ function AssetInventoryReport() {
                     <tr
                       key={type}
                       style={{
+                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                         transition: "background 0.2s",
                         borderBottom:
                           idx === buildingLabels.length - 1
@@ -678,10 +693,11 @@ function AssetInventoryReport() {
                         cursor: "pointer",
                       }}
                       onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#f3f4f6")
+                        (e.currentTarget.style.background = "#e0e7ff")
                       }
                       onMouseOut={(e) =>
-                        (e.currentTarget.style.background = "")
+                        (e.currentTarget.style.background =
+                          idx % 2 === 0 ? "#f8fafc" : "#fff")
                       }
                     >
                       <td
@@ -698,6 +714,8 @@ function AssetInventoryReport() {
                           padding: "0.5rem",
                           border: "none",
                           textAlign: "right",
+                          fontFamily:
+                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                         }}
                       >
                         {new Intl.NumberFormat().format(byTypeInBuilding[type])}
@@ -816,6 +834,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopLeftRadius: "12px",
+                        textAlign: "left",
                       }}
                     >
                       Asset Type
@@ -825,6 +844,7 @@ function AssetInventoryReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopRightRadius: "12px",
+                        textAlign: "right",
                       }}
                     >
                       Count
@@ -838,6 +858,7 @@ function AssetInventoryReport() {
                       <tr
                         key={type}
                         style={{
+                          background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                           transition: "background 0.2s",
                           borderBottom:
                             idx === arr.length - 1
@@ -846,10 +867,11 @@ function AssetInventoryReport() {
                           cursor: "pointer",
                         }}
                         onMouseOver={(e) =>
-                          (e.currentTarget.style.background = "#f3f4f6")
+                          (e.currentTarget.style.background = "#e0e7ff")
                         }
                         onMouseOut={(e) =>
-                          (e.currentTarget.style.background = "")
+                          (e.currentTarget.style.background =
+                            idx % 2 === 0 ? "#f8fafc" : "#fff")
                         }
                       >
                         <td
@@ -866,6 +888,8 @@ function AssetInventoryReport() {
                             padding: "0.5rem",
                             border: "none",
                             textAlign: "right",
+                            fontFamily:
+                              'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                           }}
                         >
                           {new Intl.NumberFormat().format(
@@ -1084,6 +1108,7 @@ function LifecycleManagementReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopLeftRadius: "12px",
+                        textAlign: "left",
                       }}
                     >
                       Year
@@ -1093,6 +1118,7 @@ function LifecycleManagementReport() {
                         padding: "0.5rem",
                         border: "none",
                         borderTopRightRadius: "12px",
+                        textAlign: "right",
                       }}
                     >
                       Count
@@ -1104,6 +1130,7 @@ function LifecycleManagementReport() {
                     <tr
                       key={year}
                       style={{
+                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                         transition: "background 0.2s",
                         borderBottom:
                           idx === years.length - 1
@@ -1112,10 +1139,11 @@ function LifecycleManagementReport() {
                         cursor: "pointer",
                       }}
                       onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#f3f4f6")
+                        (e.currentTarget.style.background = "#e0e7ff")
                       }
                       onMouseOut={(e) =>
-                        (e.currentTarget.style.background = "")
+                        (e.currentTarget.style.background =
+                          idx % 2 === 0 ? "#f8fafc" : "#fff")
                       }
                     >
                       <td
@@ -1132,6 +1160,8 @@ function LifecycleManagementReport() {
                           padding: "0.5rem",
                           border: "none",
                           textAlign: "right",
+                          fontFamily:
+                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                         }}
                       >
                         {new Intl.NumberFormat().format(yearCounts[year])}
@@ -1361,6 +1391,7 @@ function FinancialReport() {
                           padding: "0.5rem",
                           border: "none",
                           borderTopLeftRadius: "12px",
+                          textAlign: "left",
                         }}
                       >
                         Asset Type
@@ -1370,6 +1401,7 @@ function FinancialReport() {
                           padding: "0.5rem",
                           border: "none",
                           borderTopRightRadius: "12px",
+                          textAlign: "right",
                         }}
                       >
                         Current Value (£)
@@ -1381,6 +1413,7 @@ function FinancialReport() {
                       <tr
                         key={type}
                         style={{
+                          background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                           transition: "background 0.2s",
                           borderBottom:
                             idx === typeLabels.length - 1
@@ -1389,10 +1422,11 @@ function FinancialReport() {
                           cursor: "pointer",
                         }}
                         onMouseOver={(e) =>
-                          (e.currentTarget.style.background = "#f3f4f6")
+                          (e.currentTarget.style.background = "#e0e7ff")
                         }
                         onMouseOut={(e) =>
-                          (e.currentTarget.style.background = "")
+                          (e.currentTarget.style.background =
+                            idx % 2 === 0 ? "#f8fafc" : "#fff")
                         }
                       >
                         <td
@@ -1409,6 +1443,8 @@ function FinancialReport() {
                             padding: "0.5rem",
                             border: "none",
                             textAlign: "right",
+                            fontFamily:
+                              'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                           }}
                         >
                           {byType[type].toLocaleString(undefined, {
@@ -1492,6 +1528,7 @@ function FinancialReport() {
                           padding: "0.5rem",
                           border: "none",
                           borderTopLeftRadius: "12px",
+                          textAlign: "left",
                         }}
                       >
                         Year
@@ -1501,6 +1538,7 @@ function FinancialReport() {
                           padding: "0.5rem",
                           border: "none",
                           borderTopRightRadius: "12px",
+                          textAlign: "right",
                         }}
                       >
                         Total Value (£)
@@ -1512,6 +1550,7 @@ function FinancialReport() {
                       <tr
                         key={year}
                         style={{
+                          background: idx % 2 === 0 ? "#f8fafc" : "#fff",
                           transition: "background 0.2s",
                           borderBottom:
                             idx === yearLabels.length - 1
@@ -1520,10 +1559,11 @@ function FinancialReport() {
                           cursor: "pointer",
                         }}
                         onMouseOver={(e) =>
-                          (e.currentTarget.style.background = "#f3f4f6")
+                          (e.currentTarget.style.background = "#e0e7ff")
                         }
                         onMouseOut={(e) =>
-                          (e.currentTarget.style.background = "")
+                          (e.currentTarget.style.background =
+                            idx % 2 === 0 ? "#f8fafc" : "#fff")
                         }
                       >
                         <td
@@ -1540,6 +1580,8 @@ function FinancialReport() {
                             padding: "0.5rem",
                             border: "none",
                             textAlign: "right",
+                            fontFamily:
+                              'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                           }}
                         >
                           {byYear[year].toLocaleString(undefined, {
