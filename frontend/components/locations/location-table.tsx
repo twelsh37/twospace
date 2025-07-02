@@ -2,14 +2,6 @@
 // Table for displaying locations in the same style as the users table
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";

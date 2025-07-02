@@ -216,29 +216,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// GET /api/users/next-employee-id - returns the next available employeeId
-export async function GET_NEXT_EMPLOYEE_ID() {
-  try {
-    // Find the highest employeeId that matches EMP\d{6}
-    const result = await db
-      .select({ employeeId: usersTable.employeeId })
-      .from(usersTable)
-      .where(sql`employee_id ~ '^EMP\\d{6}$'`)
-      .orderBy(sql`employee_id DESC`)
-      .limit(1);
-    let nextId = "EMP000001";
-    if (result.length > 0 && result[0].employeeId) {
-      const lastId = result[0].employeeId;
-      const num = parseInt(lastId.replace("EMP", ""), 10);
-      nextId = `EMP${String(num + 1).padStart(6, "0")}`;
-    }
-    return NextResponse.json({ nextEmployeeId: nextId });
-  } catch (error) {
-    console.error("Error getting next employeeId:", error);
-    return NextResponse.json(
-      { error: "Failed to get next employeeId." },
-      { status: 500 }
-    );
-  }
-}

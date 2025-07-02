@@ -2,7 +2,17 @@
 
 // Utility for modular CSV and PDF export using browserless.io for PDF
 
-import { NextResponse } from "next/server";
+interface ExportColumn {
+  header: string;
+  key: string;
+}
+
+interface GenerateTableReportHTMLParams {
+  title: string;
+  columns: ExportColumn[];
+  rows: Record<string, unknown>[];
+  filters?: Record<string, unknown>;
+}
 
 /**
  * Generate HTML for a tabular report (for PDF export)
@@ -13,7 +23,12 @@ import { NextResponse } from "next/server";
  * @param {Object} [params.filters] - Optional filters applied
  * @returns {string} HTML string
  */
-export function generateTableReportHTML({ title, columns, rows, filters }) {
+export function generateTableReportHTML({
+  title,
+  columns,
+  rows,
+  filters,
+}: GenerateTableReportHTMLParams) {
   // Build filter summary if filters are provided
   let filterSummary = "";
   if (filters && Object.keys(filters).length > 0) {
@@ -25,13 +40,17 @@ export function generateTableReportHTML({ title, columns, rows, filters }) {
       `</div>`;
   }
   // Build table header
-  const headerHtml = columns.map((col) => `<th>${col.header}</th>`).join("");
+  const headerHtml = columns
+    .map((col: ExportColumn) => `<th>${col.header}</th>`)
+    .join("");
   // Build table rows
   const rowsHtml = rows
     .map(
-      (row, idx) =>
+      (row: Record<string, unknown>, idx: number) =>
         `<tr class="${idx % 2 === 0 ? "even" : "odd"}">` +
-        columns.map((col) => `<td>${row[col.key] ?? ""}</td>`).join("") +
+        columns
+          .map((col: ExportColumn) => `<td>${row[col.key] ?? ""}</td>`)
+          .join("") +
         `</tr>`
     )
     .join("");
@@ -76,6 +95,11 @@ export function generateTableReportHTML({ title, columns, rows, filters }) {
   `;
 }
 
+interface GenerateTableCSVParams {
+  columns: ExportColumn[];
+  rows: Record<string, unknown>[];
+}
+
 /**
  * Generate CSV for a tabular report
  * @param {Object} params
@@ -83,14 +107,14 @@ export function generateTableReportHTML({ title, columns, rows, filters }) {
  * @param {Array<Object>} params.rows - Table data
  * @returns {string} CSV string
  */
-export function generateTableCSV({ columns, rows }) {
+export function generateTableCSV({ columns, rows }: GenerateTableCSVParams) {
   // Helper to escape CSV values
-  function escapeCSV(val) {
+  function escapeCSV(val: unknown): string {
     if (val == null) return "";
-    if (typeof val !== "string") val = String(val);
-    if (val.includes('"')) val = val.replace(/"/g, '""');
-    if (val.search(/[",\n]/) >= 0) return `"${val}"`;
-    return val;
+    const strVal = String(val);
+    if (strVal.includes('"')) return `"${strVal.replace(/"/g, '""')}"`;
+    if (strVal.search(/[",\n]/) >= 0) return `"${strVal}"`;
+    return strVal;
   }
   // Header row
   const header = columns.map((col) => escapeCSV(col.header)).join(",");
@@ -102,7 +126,7 @@ export function generateTableCSV({ columns, rows }) {
 }
 
 // Helper: Generate PDF via browserless.io
-export async function generatePDFViaBrowserless(html) {
+export async function generatePDFViaBrowserless(html: string) {
   const browserlessToken = process.env.token;
   if (!browserlessToken) {
     throw new Error("Missing browserless.io token in environment");

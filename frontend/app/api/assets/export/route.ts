@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db, assetsTable, locationsTable } from "@/lib/db";
-import { eq, and, or, ilike, isNull, isNotNull } from "drizzle-orm";
+import { eq, and, or, ilike, isNull, SQL, Column } from "drizzle-orm";
 import {
   generateTableReportHTML,
   generateTableCSV,
@@ -22,6 +22,11 @@ const assetColumns = [
   { header: "Purchase Price", key: "purchasePrice" },
   { header: "Updated", key: "updatedAt" },
 ];
+
+// Helper to safely call ilike and avoid undefined
+function safeIlike(column: Column, value: string): SQL<unknown> | undefined {
+  return value ? ilike(column, value) : undefined;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,19 +63,22 @@ export async function POST(request: NextRequest) {
       }
     }
     if (search) {
-      const searchConditions = [
-        ilike(assetsTable.assetNumber, `%${search}%`),
-        ilike(assetsTable.serialNumber, `%${search}%`),
-        ilike(assetsTable.description, `%${search}%`),
-      ];
-      const assignedToSearch = and(
-        isNotNull(assetsTable.assignedTo),
-        ilike(assetsTable.assignedTo, `%${search}%`)
+      const validConditions: SQL<unknown>[] = [];
+      const assetNumberCond = safeIlike(assetsTable.assetNumber, `%${search}%`);
+      if (assetNumberCond) validConditions.push(assetNumberCond);
+      const serialNumberCond = safeIlike(
+        assetsTable.serialNumber,
+        `%${search}%`
       );
-      if (assignedToSearch) {
-        searchConditions.push(assignedToSearch);
+      if (serialNumberCond) validConditions.push(serialNumberCond);
+      const descriptionCond = safeIlike(assetsTable.description, `%${search}%`);
+      if (descriptionCond) validConditions.push(descriptionCond);
+      if (validConditions.length === 1) {
+        whereConditions.push(validConditions[0]);
+      } else if (validConditions.length > 1) {
+        // @ts-expect-error: Drizzle type definitions are too strict, but all values are guaranteed to be SQL expressions.
+        whereConditions.push(or(...(validConditions as SQL<unknown>[])));
       }
-      whereConditions.push(or(...searchConditions));
     }
 
     // Get assets with location details
@@ -89,7 +97,9 @@ export async function POST(request: NextRequest) {
       location: location?.name || "Unknown Location",
       assignedTo: asset.assignedTo || "Unassigned",
       purchasePrice: asset.purchasePrice,
-      updatedAt: new Date(asset.updatedAt).toLocaleString("en-GB"),
+      updatedAt: asset.updatedAt
+        ? new Date(asset.updatedAt).toLocaleString("en-GB")
+        : "",
     }));
     const filters = { type, state, status, locationId, assignedTo, search };
     if (format === "csv") {

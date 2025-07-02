@@ -16,7 +16,6 @@ import { Plus, Download } from "lucide-react";
 import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
-import { exportToCSV, exportToXLSX } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function AssetsPage() {
