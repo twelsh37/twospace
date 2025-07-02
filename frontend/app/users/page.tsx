@@ -2,7 +2,7 @@
 // Users Management Page
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserTable } from "@/components/users/user-table";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Plus, Download } from "lucide-react";
 import Link from "next/link";
 import { UserFilters, UserFilterState } from "@/components/users/user-filters";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { UserAddModal } from "@/components/users/user-add-modal";
 
 export default function UsersPage() {
   return (
@@ -23,6 +24,7 @@ function UsersPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   // Filters and pagination state
   const filters: UserFilterState = {
@@ -94,12 +96,10 @@ function UsersPageContent() {
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
-              <Link href="/users/new">
-                <Button size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add User
-                </Button>
-              </Link>
+              <Button size="sm" onClick={() => setAddModalOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add User
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -120,6 +120,15 @@ function UsersPageContent() {
           </div>
         </CardContent>
       </Card>
+      <UserAddModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        onAdded={() => {
+          // Refresh the user list by navigating to the current page
+          const params = new URLSearchParams(searchParams?.toString() ?? "");
+          router.replace(`${pathname}?${params.toString()}`);
+        }}
+      />
     </div>
   );
 }

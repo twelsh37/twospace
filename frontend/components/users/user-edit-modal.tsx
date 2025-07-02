@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface UserEditModalProps {
   userId: string | null;
@@ -51,6 +60,8 @@ export function UserEditModal({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [departmentsLoading, setDepartmentsLoading] = useState(false);
 
   // Fetch user data when modal opens
   useEffect(() => {
@@ -73,6 +84,28 @@ export function UserEditModal({
     }
     fetchUser();
   }, [userId, open]);
+
+  // Fetch departments when modal opens
+  useEffect(() => {
+    if (!open) return;
+    setDepartmentsLoading(true);
+    async function fetchDepartments() {
+      try {
+        const res = await fetch("/api/departments");
+        const json = await res.json();
+        if (json.departments && Array.isArray(json.departments)) {
+          setDepartments(json.departments);
+        } else {
+          setDepartments([]);
+        }
+      } catch {
+        setDepartments([]);
+      } finally {
+        setDepartmentsLoading(false);
+      }
+    }
+    fetchDepartments();
+  }, [open]);
 
   // Track if form is dirty
   const isDirty =
@@ -110,107 +143,140 @@ export function UserEditModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
-          <DialogDescription>
-            Update user details. Only fields from the UserTable are editable.
-          </DialogDescription>
-        </DialogHeader>
-        {loading ? (
-          <div className="p-8 text-center">Loading...</div>
-        ) : user ? (
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium mb-1">Name</label>
-              <Input
-                value={form.name || ""}
-                onChange={(e) => handleChange("name", e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <Input
-                type="email"
-                value={form.email || ""}
-                onChange={(e) => handleChange("email", e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Department
-              </label>
-              <Input
-                value={form.department || ""}
-                onChange={(e) => handleChange("department", e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Role</label>
-              <Select
-                value={form.role || "USER"}
-                onValueChange={(value) => handleChange("role", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ROLE_OPTIONS.map((role) => (
-                    <SelectItem key={role.value} value={role.value}>
-                      {role.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Active</label>
-              <Select
-                value={form.isActive ? "true" : "false"}
-                onValueChange={(value) =>
-                  handleChange("isActive", value === "true")
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="true">Active</SelectItem>
-                  <SelectItem value="false">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Employee ID
-              </label>
-              <Input
-                value={form.employeeId || ""}
-                onChange={(e) => handleChange("employeeId", e.target.value)}
-                required
-              />
-            </div>
-            {error && <div className="text-red-500 text-sm">{error}</div>}
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => onOpenChange(false)}
-                disabled={saving}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={!isDirty || saving}>
-                {saving ? "Updating..." : "Update"}
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <div className="p-8 text-center text-red-500">User not found.</div>
-        )}
+      <DialogContent className="max-w-lg" hideClose={true}>
+        {/* Visually hidden DialogTitle for accessibility */}
+        <DialogTitle asChild>
+          <VisuallyHidden>Edit User</VisuallyHidden>
+        </DialogTitle>
+        <Card className="shadow-lg border rounded-xl">
+          <CardHeader className="pb-2">
+            <CardTitle>Edit User</CardTitle>
+            <CardDescription>
+              Update user details. Only fields from the UserTable are editable.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {loading ? (
+              <div className="p-8 text-center">Loading...</div>
+            ) : user ? (
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <Input
+                    value={form.name || ""}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    value={form.email || ""}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Department
+                  </label>
+                  {departmentsLoading ? (
+                    <div className="text-sm text-muted-foreground">
+                      Loading departments...
+                    </div>
+                  ) : (
+                    <Select
+                      value={form.department || ""}
+                      onValueChange={(value) =>
+                        handleChange("department", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept} value={dept}>
+                            {dept}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Role</label>
+                  <Select
+                    value={form.role || "USER"}
+                    onValueChange={(value) => handleChange("role", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLE_OPTIONS.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Active
+                  </label>
+                  <Select
+                    value={form.isActive ? "true" : "false"}
+                    onValueChange={(value) =>
+                      handleChange("isActive", value === "true")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Active</SelectItem>
+                      <SelectItem value="false">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Employee ID
+                  </label>
+                  <Input
+                    value={form.employeeId || ""}
+                    onChange={(e) => handleChange("employeeId", e.target.value)}
+                    required
+                  />
+                </div>
+                {error && <div className="text-red-500 text-sm">{error}</div>}
+                {/* Action buttons in CardFooter */}
+                <CardFooter className="flex justify-end gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => onOpenChange(false)}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={!isDirty || saving}>
+                    {saving ? "Updating..." : "Update"}
+                  </Button>
+                </CardFooter>
+              </form>
+            ) : (
+              <div className="p-8 text-center text-red-500">
+                User not found.
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </DialogContent>
     </Dialog>
   );

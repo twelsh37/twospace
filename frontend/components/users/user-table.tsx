@@ -26,6 +26,14 @@ interface User {
 
 export function UserTable({ filters, page, onPageChange }: UserTableProps) {
   const [users, setUsers] = useState<User[]>([]);
+  const [pagination, setPagination] = useState<{
+    page: number;
+    totalPages: number;
+    totalUsers: number;
+    limit: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -54,6 +62,7 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
         if (!response.ok) throw new Error("Failed to fetch users");
         const result = await response.json();
         setUsers(result.data || []);
+        setPagination(result.pagination || null);
       } catch {
         setUsers([]);
       } finally {
@@ -226,8 +235,11 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                   border: "none",
                   borderTopRightRadius: "12px",
                   textAlign: "left",
+                  width: "60px",
                 }}
-              ></th>
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -323,7 +335,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                   style={{
                     padding: "0.25rem",
                     border: "none",
-                    textAlign: "right",
+                    textAlign: "left",
+                    width: "60px",
                   }}
                 >
                   <div
@@ -362,6 +375,50 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
           </tbody>
         </table>
       </div>
+      {/* Pagination controls and user count */}
+      {pagination && (
+        <div className="flex items-center justify-between pt-4 pb-2 mt-3">
+          <div className="text-sm text-muted-foreground">
+            Showing {users.length} of {pagination.totalUsers} users
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(pagination.page - 1)}
+              disabled={pagination.page <= 1}
+              style={{
+                background: pagination.page <= 1 ? "#aaa" : "#1d4ed8",
+                color: "white",
+                border: "1px solid #1d4ed8",
+              }}
+              aria-label="Previous page"
+              title="Previous page"
+            >
+              Previous
+            </Button>
+            <span>
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(pagination.page + 1)}
+              disabled={pagination.page >= pagination.totalPages}
+              style={{
+                background:
+                  pagination.page >= pagination.totalPages ? "#aaa" : "#1d4ed8",
+                color: "white",
+                border: "1px solid #1d4ed8",
+              }}
+              aria-label="Next page"
+              title="Next page"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
