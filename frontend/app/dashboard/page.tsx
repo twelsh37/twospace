@@ -60,7 +60,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Main Content Grid - Two columns: left (stacked), right (full height) */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 items-stretch">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 lg:items-end items-stretch">
         {/* Left Column: Stack Assets by Type and Building Assets */}
         <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">
           <div className="flex-1">

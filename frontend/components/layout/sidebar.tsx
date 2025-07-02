@@ -118,7 +118,7 @@ export function Sidebar() {
       {/* Desktop Sidebar */}
       <div
         className={cn(
-          "hidden md:flex flex-col bg-card border-r transition-all duration-300",
+          "hidden md:flex flex-col bg-card border-r transition-all duration-300 h-full",
           isCollapsed ? "w-16" : "w-64"
         )}
       >
@@ -241,10 +241,10 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Footer */}
+        {/* Sticky Footer */}
         {!isCollapsed && (
-          <div className="p-4 border-t">
-            <div className="text-xs text-muted-foreground">
+          <div className="p-4 border-t mt-auto">
+            <div className="text-xs text-muted-foreground text-center">
               Asset Management System v1.0
             </div>
           </div>

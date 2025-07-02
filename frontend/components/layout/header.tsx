@@ -70,10 +70,10 @@ export function Header() {
   };
 
   return (
-    <header role="banner" style={{ background: "#1d4ed8", color: "white" }}>
+    <header role="banner" style={{ background: "#fff", color: "#1e293b" }}>
       <div
         className="flex items-center justify-between px-6 py-4 border-b"
-        style={{ borderColor: "#1d4ed8" }}
+        style={{ borderColor: "#e5e7eb" }}
       >
         {/* Left Side - Search */}
         <div className="flex items-center space-x-4">
