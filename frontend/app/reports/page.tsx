@@ -350,31 +350,77 @@ function AssetInventoryReport() {
               <table
                 style={{
                   width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                  borderRadius: "0 0 12px 12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
                   fontSize: "12px",
                 }}
               >
                 <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                  <tr
+                    style={{
+                      background: "#1d4ed8",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                    }}
+                  >
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopLeftRadius: "12px",
+                      }}
+                    >
                       Asset Type
                     </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopRightRadius: "12px",
+                      }}
+                    >
                       Count
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {labels.map((type) => (
-                    <tr key={type}>
+                  {labels.map((type, idx) => (
+                    <tr
+                      key={type}
+                      style={{
+                        transition: "background 0.2s",
+                        borderBottom:
+                          idx === labels.length - 1
+                            ? "none"
+                            : "1px solid #cbd5e1",
+                        cursor: "pointer",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.background = "#f3f4f6")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.background = "")
+                      }
+                    >
                       <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "left",
+                        }}
                       >
                         {type}
                       </td>
                       <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "right",
+                        }}
                       >
                         {new Intl.NumberFormat().format(assetCounts[type])}
                       </td>
@@ -443,31 +489,77 @@ function AssetInventoryReport() {
               <table
                 style={{
                   width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                  borderRadius: "0 0 12px 12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
                   fontSize: "12px",
                 }}
               >
                 <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                  <tr
+                    style={{
+                      background: "#1d4ed8",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                    }}
+                  >
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopLeftRadius: "12px",
+                      }}
+                    >
                       Asset State
                     </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopRightRadius: "12px",
+                      }}
+                    >
                       Count
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {stateLabels.map((state) => (
-                    <tr key={state}>
+                  {stateLabels.map((state, idx) => (
+                    <tr
+                      key={state}
+                      style={{
+                        transition: "background 0.2s",
+                        borderBottom:
+                          idx === stateLabels.length - 1
+                            ? "none"
+                            : "1px solid #cbd5e1",
+                        cursor: "pointer",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.background = "#f3f4f6")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.background = "")
+                      }
+                    >
                       <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "left",
+                        }}
                       >
                         {state}
                       </td>
                       <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "right",
+                        }}
                       >
                         {new Intl.NumberFormat().format(stateCounts[state])}
                       </td>
@@ -536,31 +628,77 @@ function AssetInventoryReport() {
               <table
                 style={{
                   width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                  borderRadius: "0 0 12px 12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
                   fontSize: "12px",
                 }}
               >
                 <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                  <tr
+                    style={{
+                      background: "#1d4ed8",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                    }}
+                  >
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopLeftRadius: "12px",
+                      }}
+                    >
                       Asset Type
                     </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopRightRadius: "12px",
+                      }}
+                    >
                       Count
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {buildingLabels.map((type) => (
-                    <tr key={type}>
+                  {buildingLabels.map((type, idx) => (
+                    <tr
+                      key={type}
+                      style={{
+                        transition: "background 0.2s",
+                        borderBottom:
+                          idx === buildingLabels.length - 1
+                            ? "none"
+                            : "1px solid #cbd5e1",
+                        cursor: "pointer",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.background = "#f3f4f6")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.background = "")
+                      }
+                    >
                       <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "left",
+                        }}
                       >
                         {type}
                       </td>
                       <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "right",
+                        }}
                       >
                         {new Intl.NumberFormat().format(byTypeInBuilding[type])}
                       </td>
@@ -656,17 +794,39 @@ function AssetInventoryReport() {
               <table
                 style={{
                   width: "100%",
-                  borderCollapse: "collapse",
-                  marginTop: 0,
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                  borderRadius: "0 0 12px 12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
                   fontSize: "12px",
                 }}
               >
                 <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                  <tr
+                    style={{
+                      background: "#1d4ed8",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                    }}
+                  >
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopLeftRadius: "12px",
+                      }}
+                    >
                       Asset Type
                     </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopRightRadius: "12px",
+                      }}
+                    >
                       Count
                     </th>
                   </tr>
@@ -674,20 +834,38 @@ function AssetInventoryReport() {
                 <tbody>
                   {Object.keys(byTypeInReadyToGo)
                     .sort()
-                    .map((type) => (
-                      <tr key={type}>
+                    .map((type, idx, arr) => (
+                      <tr
+                        key={type}
+                        style={{
+                          transition: "background 0.2s",
+                          borderBottom:
+                            idx === arr.length - 1
+                              ? "none"
+                              : "1px solid #cbd5e1",
+                          cursor: "pointer",
+                        }}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.background = "#f3f4f6")
+                        }
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.background = "")
+                        }
+                      >
                         <td
                           style={{
-                            border: "1px solid #ccc",
                             padding: "0.5rem",
+                            border: "none",
+                            textAlign: "left",
                           }}
                         >
                           {type}
                         </td>
                         <td
                           style={{
-                            border: "1px solid #ccc",
                             padding: "0.5rem",
+                            border: "none",
+                            textAlign: "right",
                           }}
                         >
                           {new Intl.NumberFormat().format(
@@ -825,77 +1003,146 @@ function LifecycleManagementReport() {
       ) : error ? (
         <div style={{ color: "red" }}>Error: {error}</div>
       ) : (
-        <div
+        <Card
           style={{
-            padding: "1rem",
-            border: "1px solid #eee",
-            borderRadius: 8,
-            background: "#fafbfc",
+            flex: "1 1 350px",
+            maxWidth: 400,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             marginTop: "2.5rem",
             marginBottom: "2.5rem",
-            width: 400,
-            boxSizing: "border-box",
           }}
         >
-          {/* Bar chart for assets by year (no card title) */}
-          <div
-            style={{
-              width: "100%",
-              margin: 0,
-              marginBottom: "1rem",
-              height: 200,
-            }}
-          >
-            <Bar
-              data={data}
-              options={{
-                ...options,
-                plugins: { ...options.plugins, title: { display: false } },
-                scales: {
-                  ...options.scales,
-                  x: { ...options.scales.x, title: { display: false } },
-                  y: { ...options.scales.y, title: { display: false } },
-                },
-              }}
-            />
-          </div>
-          {/* Table of values beneath the chart */}
-          <div style={{ width: "100%", marginTop: "2rem" }}>
-            <table
+          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+            <CardTitle
               style={{
+                fontSize: "1rem",
+                textAlign: "center",
+                whiteSpace: "normal",
+                overflow: "visible",
+                textOverflow: "unset",
                 width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "12px",
               }}
             >
-              <thead>
-                <tr>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Year
-                  </th>
-                  <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                    Count
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {years.map((year) => (
-                  <tr key={year}>
-                    <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      {year}
-                    </td>
-                    <td style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      {new Intl.NumberFormat().format(yearCounts[year])}
-                    </td>
+              Assets by Year
+            </CardTitle>
+          </CardHeader>
+          <CardContent
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0 0.5rem 0.5rem 0.5rem",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                margin: 0,
+                marginBottom: "1rem",
+                height: 200,
+              }}
+            >
+              <Bar
+                data={data}
+                options={{
+                  ...options,
+                  plugins: { ...options.plugins, title: { display: false } },
+                  scales: {
+                    ...options.scales,
+                    x: { ...options.scales.x, title: { display: false } },
+                    y: { ...options.scales.y, title: { display: false } },
+                  },
+                }}
+              />
+            </div>
+            <div style={{ width: "100%", marginTop: "2rem" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                  borderRadius: "0 0 12px 12px",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                  fontSize: "12px",
+                }}
+              >
+                <thead>
+                  <tr
+                    style={{
+                      background: "#1d4ed8",
+                      color: "#fff",
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                    }}
+                  >
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopLeftRadius: "12px",
+                      }}
+                    >
+                      Year
+                    </th>
+                    <th
+                      style={{
+                        padding: "0.5rem",
+                        border: "none",
+                        borderTopRightRadius: "12px",
+                      }}
+                    >
+                      Count
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </thead>
+                <tbody>
+                  {years.map((year, idx) => (
+                    <tr
+                      key={year}
+                      style={{
+                        transition: "background 0.2s",
+                        borderBottom:
+                          idx === years.length - 1
+                            ? "none"
+                            : "1px solid #cbd5e1",
+                        cursor: "pointer",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.background = "#f3f4f6")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.background = "")
+                      }
+                    >
+                      <td
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "left",
+                        }}
+                      >
+                        {year}
+                      </td>
+                      <td
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          textAlign: "right",
+                        }}
+                      >
+                        {new Intl.NumberFormat().format(yearCounts[year])}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
@@ -1045,151 +1292,267 @@ function FinancialReport() {
           }}
         >
           {/* Bar Chart: Value by Type */}
-          <div
+          <Card
             style={{
-              flex: "1 1 0",
-              padding: "1rem",
-              border: "1px solid #eee",
-              borderRadius: 8,
-              background: "#fafbfc",
+              flex: "1 1 350px",
+              maxWidth: 400,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <h2
-              style={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
-                textAlign: "center",
-              }}
-            >
-              Current Value of Assets
-            </h2>
-            <div
-              style={{
-                marginBottom: "1rem",
-                width: "500px",
-                height: "300px",
-                margin: "0 auto",
-              }}
-            >
-              <Bar data={barData} options={barOptions} />
-            </div>
-            {/* Table of values */}
-            <div style={{ width: "100%", marginTop: "2rem" }}>
-              <table
+            <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+              <CardTitle
                 style={{
+                  fontSize: "1rem",
+                  textAlign: "center",
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                  textOverflow: "unset",
                   width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "12px",
                 }}
               >
-                <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Asset Type
-                    </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Current Value (£)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {typeLabels.map((type) => (
-                    <tr key={type}>
-                      <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                Current Value of Assets
+              </CardTitle>
+            </CardHeader>
+            <CardContent
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "0 0.5rem 0.5rem 0.5rem",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "1rem",
+                  width: "350px",
+                  height: "200px",
+                  margin: "0 auto",
+                }}
+              >
+                <Bar data={barData} options={barOptions} />
+              </div>
+              {/* Table of values */}
+              <div style={{ width: "100%", marginTop: "2rem" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "separate",
+                    borderSpacing: 0,
+                    borderRadius: "0 0 12px 12px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                    fontSize: "12px",
+                  }}
+                >
+                  <thead>
+                    <tr
+                      style={{
+                        background: "#1d4ed8",
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      <th
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          borderTopLeftRadius: "12px",
+                        }}
                       >
-                        {type}
-                      </td>
-                      <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        Asset Type
+                      </th>
+                      <th
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          borderTopRightRadius: "12px",
+                        }}
                       >
-                        {byType[type].toLocaleString(undefined, {
-                          maximumFractionDigits: 2,
-                        })}
-                      </td>
+                        Current Value (£)
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                  </thead>
+                  <tbody>
+                    {typeLabels.map((type, idx) => (
+                      <tr
+                        key={type}
+                        style={{
+                          transition: "background 0.2s",
+                          borderBottom:
+                            idx === typeLabels.length - 1
+                              ? "none"
+                              : "1px solid #cbd5e1",
+                          cursor: "pointer",
+                        }}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.background = "#f3f4f6")
+                        }
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.background = "")
+                        }
+                      >
+                        <td
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            textAlign: "left",
+                          }}
+                        >
+                          {type}
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            textAlign: "right",
+                          }}
+                        >
+                          {byType[type].toLocaleString(undefined, {
+                            maximumFractionDigits: 2,
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
           {/* Line Chart: Value over Years */}
-          <div
+          <Card
             style={{
-              flex: "1 1 0",
-              padding: "1rem",
-              border: "1px solid #eee",
-              borderRadius: 8,
-              background: "#fafbfc",
+              flex: "1 1 350px",
+              maxWidth: 400,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <h2
-              style={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                marginBottom: "0.5rem",
-                textAlign: "center",
-              }}
-            >
-              Asset Value Over Years
-            </h2>
-            <div
-              style={{
-                marginBottom: "1rem",
-                width: "500px",
-                height: "300px",
-                margin: "0 auto",
-              }}
-            >
-              <Line data={lineData} options={lineOptions} />
-            </div>
-            {/* Table of values */}
-            <div style={{ width: "100%", marginTop: "2rem" }}>
-              <table
+            <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
+              <CardTitle
                 style={{
+                  fontSize: "1rem",
+                  textAlign: "center",
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                  textOverflow: "unset",
                   width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "12px",
                 }}
               >
-                <thead>
-                  <tr>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Year
-                    </th>
-                    <th style={{ border: "1px solid #ccc", padding: "0.5rem" }}>
-                      Total Value (£)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {yearLabels.map((year) => (
-                    <tr key={year}>
-                      <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                Asset Value Over Years
+              </CardTitle>
+            </CardHeader>
+            <CardContent
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "0 0.5rem 0.5rem 0.5rem",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "1rem",
+                  width: "350px",
+                  height: "200px",
+                  margin: "0 auto",
+                }}
+              >
+                <Line data={lineData} options={lineOptions} />
+              </div>
+              {/* Table of values */}
+              <div style={{ width: "100%", marginTop: "2rem" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "separate",
+                    borderSpacing: 0,
+                    borderRadius: "0 0 12px 12px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                    fontSize: "12px",
+                  }}
+                >
+                  <thead>
+                    <tr
+                      style={{
+                        background: "#1d4ed8",
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      <th
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          borderTopLeftRadius: "12px",
+                        }}
                       >
-                        {year}
-                      </td>
-                      <td
-                        style={{ border: "1px solid #ccc", padding: "0.5rem" }}
+                        Year
+                      </th>
+                      <th
+                        style={{
+                          padding: "0.5rem",
+                          border: "none",
+                          borderTopRightRadius: "12px",
+                        }}
                       >
-                        {byYear[year].toLocaleString(undefined, {
-                          maximumFractionDigits: 2,
-                        })}
-                      </td>
+                        Total Value (£)
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                  </thead>
+                  <tbody>
+                    {yearLabels.map((year, idx) => (
+                      <tr
+                        key={year}
+                        style={{
+                          transition: "background 0.2s",
+                          borderBottom:
+                            idx === yearLabels.length - 1
+                              ? "none"
+                              : "1px solid #cbd5e1",
+                          cursor: "pointer",
+                        }}
+                        onMouseOver={(e) =>
+                          (e.currentTarget.style.background = "#f3f4f6")
+                        }
+                        onMouseOut={(e) =>
+                          (e.currentTarget.style.background = "")
+                        }
+                      >
+                        <td
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            textAlign: "left",
+                          }}
+                        >
+                          {year}
+                        </td>
+                        <td
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            textAlign: "right",
+                          }}
+                        >
+                          {byYear[year].toLocaleString(undefined, {
+                            maximumFractionDigits: 2,
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

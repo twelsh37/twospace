@@ -1,14 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { UserFilterState } from "./user-filters";
@@ -161,36 +153,186 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
         }
       />
       <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Department</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+            fontSize: "12px",
+          }}
+        >
+          <thead>
+            <tr
+              style={{
+                background: "#1d4ed8",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "1rem",
+              }}
+            >
+              <th
+                style={{
+                  padding: "0.25rem",
+                  border: "none",
+                  borderTopLeftRadius: "12px",
+                  textAlign: "left",
+                  paddingLeft: "8px",
+                }}
+              >
+                Name
+              </th>
+              <th
+                style={{
+                  padding: "0.25rem",
+                  border: "none",
+                  textAlign: "left",
+                }}
+              >
+                Email
+              </th>
+              <th
+                style={{
+                  padding: "0.25rem",
+                  border: "none",
+                  textAlign: "left",
+                }}
+              >
+                Role
+              </th>
+              <th
+                style={{
+                  padding: "0.25rem",
+                  border: "none",
+                  textAlign: "left",
+                }}
+              >
+                Department
+              </th>
+              <th
+                style={{
+                  padding: "0.25rem",
+                  border: "none",
+                  textAlign: "left",
+                }}
+              >
+                Status
+              </th>
+              <th
+                style={{
+                  padding: "0.25rem",
+                  border: "none",
+                  borderTopRightRadius: "12px",
+                  textAlign: "left",
+                }}
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user, idx) => (
+              <tr
+                key={user.id}
+                style={{
+                  background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                  transition: "background 0.2s",
+                  borderBottom:
+                    idx === users.length - 1 ? "none" : "1px solid #cbd5e1",
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = "#e0e7ff")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.background =
+                    idx % 2 === 0 ? "#f8fafc" : "#fff")
+                }
+              >
+                <td
+                  style={{
+                    padding: "0.25rem",
+                    border: "none",
+                    textAlign: "left",
+                    fontWeight: 500,
+                    paddingLeft: "8px",
+                  }}
+                >
                   <button
                     onClick={() => handleUserClick(user.id)}
-                    className="font-medium hover:underline focus:outline-none cursor-pointer bg-transparent border-none p-0 m-0"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      cursor: "pointer",
+                      color: "#1d4ed8",
+                      fontWeight: 600,
+                    }}
                     aria-label={`View details for ${user.name}`}
                     title={`View details for ${user.name}`}
                   >
                     {user.name}
                   </button>
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>{user.department}</TableCell>
-                <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end space-x-2">
+                </td>
+                <td
+                  style={{
+                    padding: "0.25rem",
+                    border: "none",
+                    textAlign: "left",
+                  }}
+                >
+                  {user.email}
+                </td>
+                <td
+                  style={{
+                    padding: "0.25rem",
+                    border: "none",
+                    textAlign: "left",
+                  }}
+                >
+                  {user.role}
+                </td>
+                <td
+                  style={{
+                    padding: "0.25rem",
+                    border: "none",
+                    textAlign: "left",
+                  }}
+                >
+                  {user.department}
+                </td>
+                <td
+                  style={{
+                    padding: "0.25rem",
+                    border: "none",
+                    textAlign: "left",
+                  }}
+                >
+                  {user.isActive ? (
+                    <span style={{ color: "#16a34a", fontWeight: 600 }}>
+                      Active
+                    </span>
+                  ) : (
+                    <span style={{ color: "#ef4444", fontWeight: 600 }}>
+                      Inactive
+                    </span>
+                  )}
+                </td>
+                <td
+                  style={{
+                    padding: "0.25rem",
+                    border: "none",
+                    textAlign: "right",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      justifyContent: "flex-end",
+                    }}
+                  >
                     <Button
                       variant="ghost"
                       size="icon"
@@ -198,6 +340,7 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                         e.stopPropagation();
                         handleEditClick(user.id);
                       }}
+                      title="Edit user"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -208,15 +351,16 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                         e.stopPropagation();
                         handleDeleteClick(user.id);
                       }}
+                      title="Delete user"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
     </div>
   );

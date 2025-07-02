@@ -17,6 +17,7 @@ import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
 import { exportToCSV, exportToXLSX } from "@/lib/utils";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function AssetsPage() {
   return (
@@ -106,32 +107,74 @@ function AssetsPageContent() {
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Assets</h2>
-          <p className="text-muted-foreground">
-            Manage your organization&apos;s assets and track their lifecycle
-          </p>
-        </div>
-        {/* Button group: Increased gap to 20px (space-x-5) for better separation between Export and Add Asset buttons */}
-        <div className="flex items-center space-x-5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setExportModalOpen(true)}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Link href="/assets/new">
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Asset
+      {/* Assets Table */}
+      <Card className="shadow-lg border rounded-xl">
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-2xl">Assets</CardTitle>
+            <p className="text-muted-foreground text-sm">
+              Manage your organization&apos;s assets and track their lifecycle
+            </p>
+          </div>
+          <div className="flex items-center space-x-5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setExportModalOpen(true)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export
             </Button>
-          </Link>
-        </div>
-      </div>
+            <Link href="/assets/new">
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Asset
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {/* Filters */}
+          <AssetFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+          />
+          <div className="mt-4">
+            <Suspense fallback={<AssetsLoadingSkeleton />}>
+              <AssetTable
+                queryString={(() => {
+                  // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
+                  const params = new URLSearchParams(
+                    searchParams?.toString() ?? ""
+                  );
+                  // Remove status from query string if 'all' is selected
+                  if (filters.status === "all") {
+                    params.delete("status");
+                  } else if (filters.status) {
+                    params.set("status", filters.status);
+                  }
+                  if (filters.type === "all") {
+                    params.delete("type");
+                  } else if (filters.type) {
+                    params.set("type", filters.type);
+                  }
+                  if (filters.state === "all") {
+                    params.delete("state");
+                  } else if (filters.state) {
+                    params.set("state", filters.state);
+                  }
+                  return params.toString();
+                })()}
+                onPageChange={handlePageChange}
+              />
+            </Suspense>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bulk Actions */}
+      <AssetActions />
 
       {/* Export Modal */}
       <ExportModal
@@ -140,48 +183,6 @@ function AssetsPageContent() {
         onExport={handleExport}
         loading={exportLoading}
       />
-
-      {/* Filters */}
-      <AssetFilters
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={handleClearFilters}
-      />
-
-      {/* Assets Table */}
-      <div className="rounded-md border">
-        <Suspense fallback={<AssetsLoadingSkeleton />}>
-          <AssetTable
-            queryString={(() => {
-              // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
-              const params = new URLSearchParams(
-                searchParams?.toString() ?? ""
-              );
-              // Remove status from query string if 'all' is selected
-              if (filters.status === "all") {
-                params.delete("status");
-              } else if (filters.status) {
-                params.set("status", filters.status);
-              }
-              if (filters.type === "all") {
-                params.delete("type");
-              } else if (filters.type) {
-                params.set("type", filters.type);
-              }
-              if (filters.state === "all") {
-                params.delete("state");
-              } else if (filters.state) {
-                params.set("state", filters.state);
-              }
-              return params.toString();
-            })()}
-            onPageChange={handlePageChange}
-          />
-        </Suspense>
-      </div>
-
-      {/* Bulk Actions */}
-      <AssetActions />
     </div>
   );
 }

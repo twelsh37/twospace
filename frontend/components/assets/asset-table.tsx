@@ -13,14 +13,6 @@ import { useState, useEffect } from "react";
 import { Asset, AssetState, AssetType, AssetWithPagination } from "@/lib/types";
 import { ASSET_STATE_LABELS, ASSET_TYPE_LABELS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -209,48 +201,102 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
         onOpenChange={setUserAssetsModalOpen}
       />
       <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Asset Number</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>State</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Assigned To</TableHead>
-              <TableHead>Purchase Price</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {assets.map((asset: Asset, idx: number) => (
-              <TableRow
-                key={asset.assetNumber || asset.serialNumber || `row-${idx}`}
+        {/* Modern table style: rounded corners, colored header, bold/white header text, row hover, compact padding, pronounced border, and box shadow. */}
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+            fontSize: "12px",
+          }}
+        >
+          <thead>
+            <tr
+              style={{
+                background: "#1d4ed8",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "1rem",
+              }}
+            >
+              <th
+                style={{
+                  padding: "0.5rem",
+                  border: "none",
+                  borderTopLeftRadius: "12px",
+                }}
               >
-                <TableCell className="font-medium">
+                Asset Number
+              </th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Type</th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Description</th>
+              <th style={{ padding: "0.5rem", border: "none" }}>State</th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Location</th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Assigned To</th>
+              <th style={{ padding: "0.5rem", border: "none" }}>
+                Purchase Price
+              </th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Updated</th>
+              <th
+                style={{
+                  padding: "0.5rem",
+                  border: "none",
+                  borderTopRightRadius: "12px",
+                }}
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            {assets.map((asset: Asset, idx: number) => (
+              <tr
+                key={asset.assetNumber || asset.serialNumber || `row-${idx}`}
+                style={{
+                  background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                  transition: "background 0.2s",
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = "#e0e7ff")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.background =
+                    idx % 2 === 0 ? "#f8fafc" : "#fff")
+                }
+              >
+                <td style={{ padding: "0.5rem", fontWeight: 500 }}>
                   <Link
                     href={`/assets/${asset.assetNumber}`}
                     className="hover:underline"
                   >
                     {asset.assetNumber}
                   </Link>
-                </TableCell>
-                <TableCell>
+                </td>
+                <td style={{ padding: "0.5rem" }}>
                   {ASSET_TYPE_LABELS[asset.type as AssetType]}
-                </TableCell>
-                <TableCell className="max-w-[200px] truncate">
+                </td>
+                <td
+                  style={{
+                    padding: "0.5rem",
+                    maxWidth: "200px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
                   {asset.description}
-                </TableCell>
-                <TableCell>
+                </td>
+                <td style={{ padding: "0.5rem" }}>
                   <Badge
                     className={getStateColorClass(asset.state as AssetState)}
                   >
                     {ASSET_STATE_LABELS[asset.state as AssetState]}
                   </Badge>
-                </TableCell>
-                <TableCell>{asset.location}</TableCell>
-                <TableCell>
+                </td>
+                <td style={{ padding: "0.5rem" }}>{asset.location}</td>
+                <td style={{ padding: "0.5rem" }}>
                   {asset.assignedTo ? (
                     <div>
                       <div className="font-medium">{asset.assignedTo}</div>
@@ -274,11 +320,11 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                   ) : (
                     <span className="text-muted-foreground">Unassigned</span>
                   )}
-                </TableCell>
-                <TableCell>
+                </td>
+                <td style={{ padding: "0.5rem" }}>
                   {formatCurrency(parseFloat(asset.purchasePrice))}
-                </TableCell>
-                <TableCell>
+                </td>
+                <td style={{ padding: "0.5rem" }}>
                   {new Date(asset.updatedAt).toLocaleString(undefined, {
                     year: "numeric",
                     month: "short",
@@ -287,8 +333,8 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                     minute: "2-digit",
                     hour12: false,
                   })}
-                </TableCell>
-                <TableCell>
+                </td>
+                <td style={{ padding: "0.5rem" }}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0">
@@ -318,11 +364,11 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
       <div className="flex items-center justify-between p-4 mt-3">
         <div className="text-sm text-muted-foreground">

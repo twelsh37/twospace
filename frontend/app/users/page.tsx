@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
 import Link from "next/link";
 import { UserFilters, UserFilterState } from "@/components/users/user-filters";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export default function UsersPage() {
   return (
@@ -52,44 +53,73 @@ function UsersPageContent() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Users</h2>
-          <p className="text-muted-foreground">
-            Manage your organization&apos;s users and their roles
-          </p>
-        </div>
-        <div className="flex items-center space-x-5">
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Link href="/users/new">
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add User
-            </Button>
-          </Link>
-        </div>
-      </div>
-      {/* Filters */}
-      <UserFilters
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={handleClearFilters}
-      />
-      {/* Users Table */}
-      <div className="rounded-md border">
-        <Suspense fallback={<UsersLoadingSkeleton />}>
-          <UserTable
+    <div className="flex-1 flex justify-center items-start p-2 md:p-4">
+      <Card
+        style={{
+          maxWidth: 1200,
+          width: "100%",
+          margin: 0,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+          borderRadius: 16,
+        }}
+      >
+        <CardHeader
+          style={{
+            padding: "1rem 1.5rem 0.5rem 1.5rem",
+            width: "100%",
+            marginBottom: 0,
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle
+                style={{
+                  fontSize: "2rem",
+                  textAlign: "left",
+                  marginBottom: 0,
+                  lineHeight: 1.1,
+                }}
+              >
+                Users
+              </CardTitle>
+              <p
+                className="text-muted-foreground"
+                style={{ marginTop: 2, marginBottom: 0 }}
+              >
+                Manage your organization&apos;s users and their roles
+              </p>
+            </div>
+            <div className="flex items-center space-x-5">
+              <Button variant="outline" size="sm">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <Link href="/users/new">
+                <Button size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add User
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent style={{ padding: "1rem 1.5rem 1.5rem 1.5rem" }}>
+          <UserFilters
             filters={filters}
-            page={page}
-            onPageChange={handlePageChange}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
           />
-        </Suspense>
-      </div>
+          <div style={{ marginTop: 12 }}>
+            <Suspense fallback={<UsersLoadingSkeleton />}>
+              <UserTable
+                filters={filters}
+                page={page}
+                onPageChange={handlePageChange}
+              />
+            </Suspense>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

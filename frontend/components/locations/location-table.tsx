@@ -175,62 +175,154 @@ export function LocationTable({
         }
       />
       <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {locations.map((loc) => (
-              <TableRow key={loc.id}>
-                <TableCell className="font-medium">
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            borderRadius: "12px",
+            overflow: "hidden",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+            fontSize: "12px",
+          }}
+        >
+          <thead>
+            <tr
+              style={{
+                background: "#1d4ed8",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "1rem",
+              }}
+            >
+              <th
+                style={{
+                  padding: "0.5rem",
+                  border: "none",
+                  borderTopLeftRadius: "12px",
+                }}
+              >
+                Name
+              </th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Description</th>
+              <th style={{ padding: "0.5rem", border: "none" }}>Status</th>
+              <th
+                style={{
+                  padding: "0.5rem",
+                  border: "none",
+                  borderTopRightRadius: "12px",
+                }}
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            {locations.map((loc, idx) => (
+              <tr
+                key={loc.id}
+                style={{
+                  transition: "background 0.2s",
+                  borderBottom:
+                    idx === locations.length - 1 ? "none" : "1px solid #cbd5e1",
+                  cursor: "pointer",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = "#f3f4f6")
+                }
+                onMouseOut={(e) => (e.currentTarget.style.background = "")}
+              >
+                <td
+                  style={{
+                    padding: "0.5rem",
+                    border: "none",
+                    textAlign: "left",
+                    fontWeight: 500,
+                  }}
+                >
                   <button
                     onClick={() => handleLocationClick(loc.id)}
-                    className="font-medium"
                     style={{
                       background: "none",
                       border: "none",
                       padding: 0,
                       margin: 0,
                       cursor: "pointer",
+                      color: "#1d4ed8",
+                      fontWeight: 600,
                     }}
                   >
                     {loc.name}
                   </button>
-                </TableCell>
-                <TableCell>{loc.description || "-"}</TableCell>
-                <TableCell>{loc.isActive ? "Active" : "Inactive"}</TableCell>
-                <TableCell className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleLocationClick(loc.id)}
+                </td>
+                <td
+                  style={{
+                    padding: "0.5rem",
+                    border: "none",
+                    textAlign: "left",
+                  }}
+                >
+                  {loc.description || "—"}
+                </td>
+                <td
+                  style={{
+                    padding: "0.5rem",
+                    border: "none",
+                    textAlign: "left",
+                  }}
+                >
+                  {loc.isActive ? (
+                    <span style={{ color: "#16a34a", fontWeight: 600 }}>
+                      Active
+                    </span>
+                  ) : (
+                    <span style={{ color: "#ef4444", fontWeight: 600 }}>
+                      Inactive
+                    </span>
+                  )}
+                </td>
+                <td
+                  style={{
+                    padding: "0.5rem",
+                    border: "none",
+                    textAlign: "right",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      justifyContent: "flex-end",
+                    }}
                   >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEditClick(loc.id)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteClick(loc.id)}
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </Button>
-                </TableCell>
-              </TableRow>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleLocationClick(loc.id)}
+                      title="View details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEditClick(loc.id)}
+                      title="Edit location"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteClick(loc.id)}
+                      title="Delete location"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
       {/* Pagination and count */}
       {pagination && (
