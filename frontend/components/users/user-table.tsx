@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { UserFilterState } from "./user-filters";
 import { UserDetailModal } from "./user-detail-modal";
 import { UserEditModal } from "./user-edit-modal";
@@ -32,18 +32,8 @@ interface User {
   employeeId: string;
 }
 
-interface Pagination {
-  page: number;
-  limit: number;
-  totalUsers: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
-
 export function UserTable({ filters, page, onPageChange }: UserTableProps) {
   const [users, setUsers] = useState<User[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -72,10 +62,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
         if (!response.ok) throw new Error("Failed to fetch users");
         const result = await response.json();
         setUsers(result.data || []);
-        setPagination(result.pagination || null);
       } catch {
         setUsers([]);
-        setPagination(null);
       } finally {
         setIsLoading(false);
       }
@@ -190,16 +178,7 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                 <TableCell className="font-medium">
                   <button
                     onClick={() => handleUserClick(user.id)}
-                    className="font-medium"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      padding: 0,
-                      margin: 0,
-                      cursor: "pointer",
-                      color: "#1d4ed8",
-                      textDecoration: "underline",
-                    }}
+                    className="font-medium hover:underline focus:outline-none cursor-pointer bg-transparent border-none p-0 m-0"
                     aria-label={`View details for ${user.name}`}
                     title={`View details for ${user.name}`}
                   >
@@ -210,33 +189,25 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.department}</TableCell>
                 <TableCell>{user.isActive ? "Active" : "Inactive"}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end space-x-2">
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleUserClick(user.id)}
-                      aria-label="View user details"
-                      title="View user details"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEditClick(user.id)}
-                      aria-label="Edit user"
-                      title="Edit user"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditClick(user.id);
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-destructive"
-                      onClick={() => handleDeleteClick(user.id)}
-                      aria-label="Delete user"
-                      title="Delete user"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(user.id);
+                      }}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -247,35 +218,6 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
           </TableBody>
         </Table>
       </div>
-      {/* Pagination and count */}
-      {pagination && (
-        <div className="flex items-center justify-between p-4 mt-3">
-          <div className="text-sm text-muted-foreground">
-            Showing {users.length} of {pagination.totalUsers} users
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(pagination.page - 1)}
-              disabled={!pagination.hasPrevPage}
-            >
-              Previous
-            </Button>
-            <span>
-              Page {pagination.page} of {pagination.totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(pagination.page + 1)}
-              disabled={!pagination.hasNextPage}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
