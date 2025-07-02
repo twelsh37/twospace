@@ -1,8 +1,13 @@
+// File: frontend/app/layout.tsx
+// Root layout for Next.js app. Vercel Analytics is integrated at the bottom of <body> for global page tracking.
+// Reasoning: This ensures analytics are loaded on every page, as recommended by Vercel docs.
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+// Import the Analytics component from @vercel/analytics
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +37,8 @@ export default async function RootLayout({
             </main>
           </div>
         </div>
+        {/* Vercel Analytics: Tracks page views and events globally. */}
+        <Analytics />
       </body>
     </html>
   );
