@@ -197,22 +197,46 @@ export function LocationTable({
             >
               <th
                 style={{
-                  padding: "0.5rem",
+                  padding: "0.5rem 8px 0.5rem 0.5rem",
                   border: "none",
                   borderTopLeftRadius: "12px",
+                  textAlign: "left",
+                  width: "25%",
                 }}
               >
                 Name
               </th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Description</th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Status</th>
+              <th
+                style={{
+                  padding: "0.5rem",
+                  border: "none",
+                  textAlign: "left",
+                  width: "25%",
+                }}
+              >
+                Description
+              </th>
+              <th
+                style={{
+                  padding: "0.5rem",
+                  border: "none",
+                  textAlign: "left",
+                  width: "25%",
+                }}
+              >
+                Status
+              </th>
               <th
                 style={{
                   padding: "0.5rem",
                   border: "none",
                   borderTopRightRadius: "12px",
+                  textAlign: "left",
+                  width: "25%",
                 }}
-              ></th>
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -232,10 +256,11 @@ export function LocationTable({
               >
                 <td
                   style={{
-                    padding: "0.5rem",
+                    padding: "0.5rem 8px 0.5rem 0.5rem",
                     border: "none",
                     textAlign: "left",
                     fontWeight: 500,
+                    width: "25%",
                   }}
                 >
                   <button
@@ -258,6 +283,7 @@ export function LocationTable({
                     padding: "0.5rem",
                     border: "none",
                     textAlign: "left",
+                    width: "25%",
                   }}
                 >
                   {loc.description || "—"}
@@ -267,6 +293,7 @@ export function LocationTable({
                     padding: "0.5rem",
                     border: "none",
                     textAlign: "left",
+                    width: "25%",
                   }}
                 >
                   {loc.isActive ? (
@@ -283,14 +310,15 @@ export function LocationTable({
                   style={{
                     padding: "0.5rem",
                     border: "none",
-                    textAlign: "right",
+                    textAlign: "left",
+                    width: "25%",
                   }}
                 >
                   <div
                     style={{
                       display: "flex",
                       gap: 8,
-                      justifyContent: "flex-end",
+                      justifyContent: "flex-start",
                     }}
                   >
                     <Button

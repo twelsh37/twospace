@@ -12,6 +12,7 @@ import {
 import { LocationTable } from "@/components/locations/location-table";
 import { LocationAddModal } from "@/components/locations/location-add-modal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ExportModal } from "@/components/ui/export-modal";
 
 export default function LocationsPage() {
   // Filter and pagination state
@@ -23,6 +24,8 @@ export default function LocationsPage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   // Add a refresh trigger to force re-render of the table
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
   const handleFilterChange = (
     key: keyof LocationFilterState,
@@ -45,6 +48,44 @@ export default function LocationsPage() {
   const handleRefresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
+
+  // Export handler for PDF or CSV
+  const handleExport = async (format: "pdf" | "csv") => {
+    setExportLoading(true);
+    try {
+      // Send selected format and filters to API
+      const res = await fetch("/api/locations/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          location: filters.location,
+          isActive: filters.isActive,
+          format,
+        }),
+      });
+      if (!res.ok) throw new Error(`Failed to export ${format.toUpperCase()}`);
+      const blob = await res.blob();
+      // Set filename and extension based on format
+      const filename =
+        format === "csv" ? "locations-report.csv" : "locations-report.pdf";
+      // Download the file
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert(
+        `Failed to export locations ${format.toUpperCase()}. Please try again.`
+      );
+    } finally {
+      setExportLoading(false);
+      setExportModalOpen(false);
+    }
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -71,7 +112,11 @@ export default function LocationsPage() {
               </p>
             </div>
             <div className="flex items-center space-x-5">
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setExportModalOpen(true)}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
@@ -115,6 +160,12 @@ export default function LocationsPage() {
               />
             </Suspense>
           </div>
+          <ExportModal
+            open={exportModalOpen}
+            onOpenChange={setExportModalOpen}
+            onExport={handleExport}
+            loading={exportLoading}
+          />
         </CardContent>
       </Card>
     </div>

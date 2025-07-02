@@ -224,29 +224,59 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
             >
               <th
                 style={{
-                  padding: "0.5rem",
+                  padding: "0.5rem 8px 0.5rem 0.5rem",
                   border: "none",
                   borderTopLeftRadius: "12px",
+                  textAlign: "left",
                 }}
               >
                 Asset Number
               </th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Type</th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Description</th>
-              <th style={{ padding: "0.5rem", border: "none" }}>State</th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Location</th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Assigned To</th>
-              <th style={{ padding: "0.5rem", border: "none" }}>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
+                Type
+              </th>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
+                Description
+              </th>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
+                State
+              </th>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
+                Location
+              </th>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
+                Assigned To
+              </th>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
                 Purchase Price
               </th>
-              <th style={{ padding: "0.5rem", border: "none" }}>Updated</th>
+              <th
+                style={{ padding: "0.5rem", border: "none", textAlign: "left" }}
+              >
+                Updated
+              </th>
               <th
                 style={{
                   padding: "0.5rem",
                   border: "none",
                   borderTopRightRadius: "12px",
+                  textAlign: "left",
                 }}
-              ></th>
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -266,7 +296,13 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                     idx % 2 === 0 ? "#f8fafc" : "#fff")
                 }
               >
-                <td style={{ padding: "0.5rem", fontWeight: 500 }}>
+                <td
+                  style={{
+                    padding: "0.5rem 8px 0.5rem 0.5rem",
+                    fontWeight: 500,
+                    textAlign: "left",
+                  }}
+                >
                   <Link
                     href={`/assets/${asset.assetNumber}`}
                     className="hover:underline"

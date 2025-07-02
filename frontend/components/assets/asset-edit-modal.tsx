@@ -112,7 +112,10 @@ export function AssetEditModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="max-w-lg bg-white rounded-lg shadow-xl p-8"
+        hideClose
+      >
         <DialogHeader>
           <DialogTitle>Edit Asset</DialogTitle>
           <DialogDescription>
@@ -213,7 +216,9 @@ export function AssetEditModal({
             </div>
           </form>
         ) : (
-          <div className="p-8 text-center text-red-500">Asset not found.</div>
+          <div className="p-8 text-center text-red-500">
+            {error || "Asset not found."}
+          </div>
         )}
       </DialogContent>
     </Dialog>
