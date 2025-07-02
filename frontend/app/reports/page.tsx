@@ -684,13 +684,15 @@ function AssetInventoryReport() {
           style={{
             padding: "0.5rem 1.5rem",
             borderRadius: 6,
-            border: "1px solid #2563EB",
-            background: "#2563EB",
+            border: "1px solid #1d4ed8",
+            background: "#1d4ed8",
             color: "white",
             fontWeight: 600,
             fontSize: 16,
             cursor: "pointer",
           }}
+          aria-label="Print report"
+          title="Print report"
         >
           Print
         </button>
@@ -701,13 +703,15 @@ function AssetInventoryReport() {
           style={{
             padding: "0.5rem 1.5rem",
             borderRadius: 6,
-            border: "1px solid #2563EB",
-            background: exportLoading ? "#ccc" : "#2563EB",
+            border: "1px solid #1d4ed8",
+            background: exportLoading ? "#aaa" : "#1d4ed8",
             color: "white",
             fontWeight: 600,
             fontSize: 16,
             cursor: exportLoading ? "not-allowed" : "pointer",
           }}
+          aria-label="Export report as PDF"
+          title="Export report as PDF"
         >
           {exportLoading ? "Exporting..." : "Export"}
         </button>

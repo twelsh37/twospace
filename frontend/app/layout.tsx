@@ -20,16 +20,15 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="flex h-screen bg-background">
-          {/* Sidebar Navigation */}
-          <Sidebar />
+          {/* Top Header */}
+          <Header />
 
           {/* Main Content Area */}
-          <div className="flex flex-col flex-1 overflow-hidden">
-            {/* Top Header */}
-            <Header />
-
-            {/* Page Content */}
-            <main className="flex-1 overflow-y-auto bg-background">
+          <div className="flex">
+            <nav>
+              <Sidebar />
+            </nav>
+            <main role="main" className="flex-1 overflow-y-auto bg-background">
               {children}
             </main>
           </div>

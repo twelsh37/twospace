@@ -197,7 +197,11 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                       padding: 0,
                       margin: 0,
                       cursor: "pointer",
+                      color: "#1d4ed8",
+                      textDecoration: "underline",
                     }}
+                    aria-label={`View details for ${user.name}`}
+                    title={`View details for ${user.name}`}
                   >
                     {user.name}
                   </button>
@@ -212,6 +216,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleUserClick(user.id)}
+                      aria-label="View user details"
+                      title="View user details"
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -219,6 +225,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEditClick(user.id)}
+                      aria-label="Edit user"
+                      title="Edit user"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -227,6 +235,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
                       size="icon"
                       className="text-destructive"
                       onClick={() => handleDeleteClick(user.id)}
+                      aria-label="Delete user"
+                      title="Delete user"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
