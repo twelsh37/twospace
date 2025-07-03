@@ -40,26 +40,25 @@ export default async function DashboardPage() {
   }
 
   return (
-    // Add horizontal padding for a professional look, while keeping top and bottom padding as set above.
-    // Add a subtle light gray background to help cards stand out.
+    // Mobile-first responsive dashboard layout
     <div
-      className="flex-1 space-y-4 pt-4 md:pt-8 pb-0 px-4 md:px-8 bg-gray-50"
+      className="flex-1 space-y-4 pt-4 md:pt-8 pb-0 px-3 md:px-6 lg:px-8 bg-gray-50"
       style={{ marginTop: "-30px" }}
     >
       {/* Page Header */}
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-center md:justify-end">
         <QuickActions />
       </div>
 
-      {/* Dashboard Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      {/* Dashboard Stats Grid - Mobile stacked, desktop grid */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <DashboardStats
           totalAssets={data.totalAssets}
           assetsByState={data.assetsByState}
         />
       </div>
 
-      {/* Main Content Grid - Two columns: left (stacked), right (full height) */}
+      {/* Main Content Grid - Mobile stacked, desktop two columns */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 lg:items-end items-stretch">
         {/* Left Column: Stack Assets by Type and Building Assets */}
         <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">

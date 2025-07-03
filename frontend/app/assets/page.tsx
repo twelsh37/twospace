@@ -118,29 +118,31 @@ function AssetsPageContent() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+    <div className="flex-1 space-y-4 p-3 md:p-6 pt-4 md:pt-8">
       {/* Assets Table */}
       <Card className="shadow-lg border rounded-xl">
-        <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl text-left">Assets</CardTitle>
-            <p className="text-muted-foreground text-sm">
+        <CardHeader className="pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="text-center md:text-left">
+            <CardTitle className="text-xl md:text-2xl">Assets</CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">
               Manage your organization&apos;s assets and track their lifecycle
             </p>
           </div>
-          <div className="flex items-center space-x-5">
+          <div className="flex items-center justify-center md:justify-end gap-2 md:gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setExportModalOpen(true)}
+              className="flex-1 md:flex-none"
             >
               <Download className="mr-2 h-4 w-4" />
-              Export
+              <span className="hidden sm:inline">Export</span>
             </Button>
-            <Link href="/assets/new">
-              <Button size="sm">
+            <Link href="/assets/new" className="flex-1 md:flex-none">
+              <Button size="sm" className="w-full md:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Asset
+                <span className="hidden sm:inline">Add Asset</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </Link>
           </div>

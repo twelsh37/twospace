@@ -1,117 +1,72 @@
 // frontend/components/layout/sidebar.tsx
-// Sidebar Navigation Component
+// Sidebar Component with mobile-first responsive design
 
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  Package,
-  Users,
-  MapPin,
-  Upload,
-  BarChart3,
-  Settings,
-  Menu,
-  X,
-} from "lucide-react";
-import useSWR from "swr";
+import { Package, X, Menu } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface NavItem {
-  title: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
+// Navigation items with icons and labels
+const navItems = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: Package,
+    badge: null,
+  },
+  {
+    title: "Assets",
+    href: "/assets",
+    icon: Package,
+    badge: null,
+  },
+  {
+    title: "Locations",
+    href: "/locations",
+    icon: Package,
+    badge: null,
+  },
+  {
+    title: "Users",
+    href: "/users",
+    icon: Package,
+    badge: null,
+  },
+  {
+    title: "Reports",
+    href: "/reports",
+    icon: Package,
+    badge: null,
+  },
+  {
+    title: "Imports",
+    href: "/imports",
+    icon: Package,
+    badge: null,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Package,
+    badge: null,
+  },
+];
+
+interface SidebarProps {
+  isMobileMenuOpen?: boolean;
+  onMobileMenuClose?: () => void;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-export function useDashboardStats() {
-  const { data, error, isLoading, mutate } = useSWR("/api/dashboard", fetcher);
-  return {
-    stats: data?.data || {},
-    error,
-    isLoading,
-    mutate,
-  };
-}
-
-export function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [showReportsFlyout, setShowReportsFlyout] = useState(false);
+export function Sidebar({
+  isMobileMenuOpen = false,
+  onMobileMenuClose,
+}: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { stats, isLoading, mutate } = useDashboardStats();
-
-  const navItems: NavItem[] = [
-    {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Assets",
-      href: "/assets",
-      icon: Package,
-      badge:
-        isLoading || typeof window === "undefined"
-          ? "..."
-          : stats.totalAssets?.toLocaleString() || "0",
-    },
-    {
-      title: "Users",
-      href: "/users",
-      icon: Users,
-      badge:
-        isLoading || typeof window === "undefined"
-          ? "..."
-          : stats.totalUsers?.toLocaleString() || "0",
-    },
-    {
-      title: "Locations",
-      href: "/locations",
-      icon: MapPin,
-      badge:
-        isLoading || typeof window === "undefined"
-          ? "..."
-          : stats.totalLocations?.toLocaleString() || "0",
-    },
-    {
-      title: "Import",
-      href: "/imports",
-      icon: Upload,
-    },
-    {
-      title: "Reports",
-      href: "/reports",
-      icon: BarChart3,
-    },
-    {
-      title: "Settings",
-      href: "/settings",
-      icon: Settings,
-    },
-  ];
-
-  const reportCategories = [
-    "Asset Inventory",
-    "Lifecycle Management",
-    "Financial",
-    "Compliance",
-    "Utilization",
-    "Maintenance",
-    "Software License",
-    "Security",
-    "End-of-Life",
-    "Audit",
-  ];
-
-  // Expose mutate function globally for revalidation
-  (globalThis as Record<string, unknown>).mutateDashboard = mutate;
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <>
@@ -147,75 +102,7 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => {
-            // Use optional chaining to avoid errors if pathname is null
-            const isActive =
-              pathname === item.href || pathname?.startsWith(item.href + "/");
-
-            // Add flyout to Reports entry
-            if (item.title === "Reports") {
-              return (
-                <div
-                  key={item.href}
-                  style={{ position: "relative" }}
-                  onMouseEnter={() => setShowReportsFlyout(true)}
-                  onMouseLeave={() => setShowReportsFlyout(false)}
-                >
-                  <Link href={item.href}>
-                    <div
-                      className={cn(
-                        "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                        isActive &&
-                          "bg-accent text-accent-foreground font-medium",
-                        isCollapsed && "justify-center px-2"
-                      )}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <item.icon className="h-4 w-4" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </div>
-                    </div>
-                  </Link>
-                  {/* Flyout menu for report categories */}
-                  {showReportsFlyout && !isCollapsed && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: "100%",
-                        top: 0,
-                        zIndex: 20,
-                        minWidth: 200,
-                        background: "#fff",
-                        border: "1px solid #eee",
-                        borderRadius: 8,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                        padding: "0.5rem 0",
-                      }}
-                    >
-                      {reportCategories.map((cat) => (
-                        <div
-                          key={cat}
-                          onClick={() => {
-                            router.push(
-                              `/reports?report=${encodeURIComponent(cat)}`
-                            );
-                            setShowReportsFlyout(false);
-                          }}
-                          style={{
-                            padding: "0.5rem 1rem",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                            fontWeight: 500,
-                          }}
-                          onMouseDown={(e) => e.preventDefault()}
-                        >
-                          {cat}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            }
+            const isActive = pathname === item.href;
 
             return (
               <Link key={item.href} href={item.href}>
@@ -251,7 +138,76 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Mobile Sidebar - TODO: Implement mobile responsive sidebar */}
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={onMobileMenuClose}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div
+        className={cn(
+          "fixed top-0 left-0 h-full w-64 bg-card border-r z-50 transform transition-transform duration-300 ease-in-out md:hidden",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center space-x-2">
+            <Package className="h-6 w-6 text-primary" />
+            <span className="font-semibold text-lg">AssetMS</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onMobileMenuClose}
+            className="p-2"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Mobile Navigation */}
+        <nav className="flex-1 p-4 space-y-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onMobileMenuClose}
+              >
+                <div
+                  className={cn(
+                    "flex items-center justify-between rounded-lg px-4 py-3 text-base transition-colors hover:bg-accent hover:text-accent-foreground",
+                    isActive && "bg-accent text-accent-foreground font-medium"
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.title}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Mobile Footer */}
+        <div className="p-4 border-t mt-auto">
+          <div className="text-sm text-muted-foreground text-center">
+            Asset Management System v1.0
+          </div>
+        </div>
+      </div>
     </>
   );
 }

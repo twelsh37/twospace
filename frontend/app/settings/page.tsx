@@ -120,71 +120,34 @@ export default function SettingsPage() {
   const isChanged = cacheDuration !== initialValue;
 
   return (
-    // Main container for the settings page
-    <div
-      style={{
-        position: "relative",
-        padding: "2rem",
-        minHeight: "80vh",
-        maxWidth: 700,
-      }}
-    >
+    // Main container for the settings page - mobile-first responsive design
+    <div className="relative p-4 md:p-8 min-h-[80vh] max-w-full md:max-w-2xl mx-auto">
       {/* Settings Page Heading */}
-      <h1
-        style={{
-          fontWeight: "bold",
-          fontSize: "2rem",
-          marginBottom: "2rem",
-          textAlign: "left",
-        }}
-      >
+      <h1 className="font-bold text-2xl md:text-3xl mb-6 md:mb-8 text-left">
         Settings
       </h1>
+
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center py-8">Loading...</p>
       ) : (
-        // Reporting section card
-        <div
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: 10,
-            padding: "1.5rem",
-            maxWidth: 500,
-            background: "#fff",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-            marginBottom: 32,
-          }}
-        >
+        // Reporting section card - mobile-first with responsive spacing
+        <div className="border border-gray-200 rounded-lg p-4 md:p-6 max-w-full md:max-w-lg bg-white shadow-sm mb-6 md:mb-8">
           {/* Section Title */}
-          <h2
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.2rem",
-              marginBottom: "1.5rem",
-              textAlign: "left",
-              letterSpacing: 0.5,
-            }}
-          >
+          <h2 className="font-bold text-lg md:text-xl mb-4 md:mb-6 text-left tracking-wide">
             Reporting
           </h2>
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
               if (isChanged) handleSave();
             }}
           >
-            {/* Settings Form Row - label left, value right */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "2rem",
-              }}
-            >
+            {/* Settings Form Row - mobile stacked, desktop side-by-side */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-6 md:mb-8">
               <label
                 htmlFor="cacheDuration"
-                style={{ fontWeight: 500, textAlign: "left" }}
+                className="font-medium text-sm md:text-base"
               >
                 Report Cache Duration (minutes):
               </label>
@@ -195,56 +158,39 @@ export default function SettingsPage() {
                 max={1440}
                 value={cacheDuration}
                 onChange={(e) => setCacheDuration(Number(e.target.value))}
-                style={{ width: 120, padding: 6, fontSize: 16, marginLeft: 16 }}
+                className="w-full md:w-32 px-3 py-2 md:py-1.5 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                 disabled={saving}
               />
             </div>
+
             {/* Error and Success Messages */}
-            {error && <p style={{ color: "red", marginBottom: 16 }}>{error}</p>}
+            {error && (
+              <p className="text-red-600 mb-4 text-sm md:text-base">{error}</p>
+            )}
             {success && (
-              <p style={{ color: "green", marginBottom: 16 }}>
+              <p className="text-green-600 mb-4 text-sm md:text-base">
                 Settings saved!
               </p>
             )}
           </form>
         </div>
       )}
+
       {/* --- Depreciation Settings Card --- */}
-      <div
-        style={{
-          border: "1px solid #e5e7eb",
-          borderRadius: 10,
-          padding: "1.5rem",
-          maxWidth: 500,
-          background: "#fff",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-          marginBottom: 32,
-        }}
-      >
+      <div className="border border-gray-200 rounded-lg p-4 md:p-6 max-w-full md:max-w-lg bg-white shadow-sm mb-6 md:mb-8">
         {/* Section Title */}
-        <h2
-          style={{
-            fontWeight: "bold",
-            fontSize: "1.2rem",
-            marginBottom: "1.5rem",
-            textAlign: "left",
-            letterSpacing: 0.5,
-          }}
-        >
+        <h2 className="font-bold text-lg md:text-xl mb-4 md:mb-6 text-left tracking-wide">
           Depreciation
         </h2>
-        {/* Depreciation Method and Fields - right-aligned inputs */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+        {/* Depreciation Method and Fields - mobile stacked, desktop side-by-side */}
+        <div className="flex flex-col gap-4 md:gap-5">
           {/* Depreciation Method Dropdown Row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <label htmlFor="depreciationMethod" style={{ fontWeight: 500 }}>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+            <label
+              htmlFor="depreciationMethod"
+              className="font-medium text-sm md:text-base"
+            >
               Depreciation Method:
             </label>
             <select
@@ -255,43 +201,22 @@ export default function SettingsPage() {
                   e.target.value as "straight" | "declining"
                 )
               }
-              style={{
-                padding: "6px 12px",
-                fontSize: 16,
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                width: 200,
-                textAlign: "left",
-                paddingLeft: "1rem",
-              }}
+              className="w-full md:w-48 px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option
-                value="straight"
-                style={{ textAlign: "left", paddingLeft: "1rem" }}
-              >
-                Straight line
-              </option>
-              <option
-                value="declining"
-                style={{ textAlign: "left", paddingLeft: "1rem" }}
-              >
-                Declining balance
-              </option>
+              <option value="straight">Straight line</option>
+              <option value="declining">Declining balance</option>
             </select>
           </div>
+
           {/* Straight Line Fields */}
           {depreciationMethod === "straight" && (
             <>
               {/* Years input row */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <label htmlFor="straightYears" style={{ fontWeight: 500 }}>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                <label
+                  htmlFor="straightYears"
+                  className="font-medium text-sm md:text-base"
+                >
                   Years:
                 </label>
                 <input
@@ -307,74 +232,43 @@ export default function SettingsPage() {
                     );
                     setDepreciationYears(val);
                   }}
-                  style={{
-                    width: 200,
-                    padding: 6,
-                    fontSize: 16,
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                    textAlign: "right",
-                  }}
+                  className="w-full md:w-48 px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
                 />
               </div>
+
               {/* Percentage per year row */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                }}
-              >
-                <label htmlFor="straightPercent" style={{ fontWeight: 500 }}>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                <label
+                  htmlFor="straightPercent"
+                  className="font-medium text-sm md:text-base"
+                >
                   Percentage per year:
                 </label>
-                <div style={{ position: "relative", width: 200 }}>
+                <div className="relative w-full md:w-48">
                   <input
                     id="straightPercent"
                     type="number"
                     value={straightLinePercent}
                     readOnly
-                    style={{
-                      width: "100%",
-                      padding: "6px 28px 6px 6px",
-                      fontSize: 16,
-                      borderRadius: 6,
-                      border: "1px solid #ccc",
-                      background: "#f3f4f6",
-                      textAlign: "right",
-                    }}
+                    className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md bg-gray-50 text-right pr-8"
                   />
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: 10,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#888",
-                      fontSize: 15,
-                    }}
-                  >
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
                     %
                   </span>
                 </div>
               </div>
             </>
           )}
+
           {/* Declining Balance Fields */}
           {depreciationMethod === "declining" && (
             <>
-              {/* Years input row for Declining Balance - right aligned with dropdown */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  marginBottom: 8,
-                }}
-              >
-                <label htmlFor="decliningYears" style={{ fontWeight: 500 }}>
+              {/* Years input row for Declining Balance */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-2">
+                <label
+                  htmlFor="decliningYears"
+                  className="font-medium text-sm md:text-base"
+                >
                   Years:
                 </label>
                 <input
@@ -390,95 +284,51 @@ export default function SettingsPage() {
                     );
                     handleDecliningYearsChange(val);
                   }}
-                  style={{
-                    width: 200,
-                    padding: 6,
-                    fontSize: 16,
-                    borderRadius: 6,
-                    border: "1px solid #ccc",
-                    textAlign: "right",
-                  }}
+                  className="w-full md:w-48 px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
                 />
               </div>
-              {/* Dynamic percentage inputs per year - right aligned under Years input */}
-              <div
-                style={{
-                  width: 200,
-                  marginLeft: "auto",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-end",
-                  gap: 8,
-                }}
-              >
-                {Array.from({ length: depreciationYears }).map((_, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      width: "100%",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <label
-                      style={{
-                        fontWeight: 500,
-                        minWidth: 70,
-                        textAlign: "right",
-                      }}
+
+              {/* Dynamic percentage inputs per year - mobile stacked, desktop right-aligned */}
+              <div className="w-full md:w-48 md:ml-auto">
+                <div className="flex flex-col gap-2 md:gap-3">
+                  {Array.from({ length: depreciationYears }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 md:justify-end"
                     >
-                      Year {idx + 1}:
-                    </label>
-                    <div style={{ position: "relative", width: 80 }}>
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={decliningPercents[idx] || 0}
-                        onChange={(e) =>
-                          handleDecliningPercentChange(
-                            idx,
-                            Number(e.target.value)
-                          )
-                        }
-                        style={{
-                          width: "100%",
-                          padding: "6px 28px 6px 6px",
-                          fontSize: 16,
-                          borderRadius: 6,
-                          border: "1px solid #ccc",
-                          textAlign: "right",
-                          background: "#f3f4f6",
-                        }}
-                      />
-                      <span
-                        style={{
-                          position: "absolute",
-                          right: 10,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          color: "#888",
-                          fontSize: 15,
-                        }}
-                      >
-                        %
-                      </span>
+                      <label className="font-medium text-sm md:text-base md:min-w-[70px] md:text-right">
+                        Year {idx + 1}:
+                      </label>
+                      <div className="relative w-full md:w-20">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={decliningPercents[idx] || 0}
+                          onChange={(e) =>
+                            handleDecliningPercentChange(
+                              idx,
+                              Number(e.target.value)
+                            )
+                          }
+                          className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md bg-gray-50 text-right pr-8"
+                        />
+                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                          %
+                        </span>
+                      </div>
                     </div>
+                  ))}
+
+                  {/* Total and warning */}
+                  <div
+                    className={`mt-2 md:mt-3 font-medium text-sm md:text-base md:self-end ${
+                      decliningWarning ? "text-red-600" : "text-green-600"
+                    }`}
+                  >
+                    Total: {decliningTotal.toFixed(2)}%{" "}
+                    {decliningWarning && "(Should total 100%)"}
                   </div>
-                ))}
-                {/* Total and warning - right aligned with input boxes */}
-                <div
-                  style={{
-                    marginTop: 8,
-                    color: decliningWarning ? "red" : "#16a34a",
-                    fontWeight: 500,
-                    alignSelf: "flex-end",
-                  }}
-                >
-                  Total: {decliningTotal.toFixed(2)}%{" "}
-                  {decliningWarning && "(Should total 100%)"}
                 </div>
               </div>
             </>
@@ -487,53 +337,22 @@ export default function SettingsPage() {
       </div>
 
       {/* --- Tools Section --- */}
-      <div
-        style={{
-          border: "1px solid #e5e7eb",
-          borderRadius: 10,
-          padding: "1.5rem",
-          maxWidth: 500,
-          background: "#fff",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
-          marginBottom: 32,
-        }}
-      >
-        <h2
-          style={{
-            fontWeight: "bold",
-            fontSize: "1.2rem",
-            marginBottom: "1.5rem",
-            textAlign: "left",
-            letterSpacing: 0.5,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <FaBarcode style={{ marginRight: 8 }} /> Tools
+      <div className="border border-gray-200 rounded-lg p-4 md:p-6 max-w-full md:max-w-lg bg-white shadow-sm mb-6 md:mb-8">
+        <h2 className="font-bold text-lg md:text-xl mb-4 md:mb-6 text-left tracking-wide flex items-center gap-2">
+          <FaBarcode className="text-lg md:text-xl" /> Tools
         </h2>
-        <div style={{ marginBottom: 16 }}>
-          <strong>Barcode Scanner Test</strong>
-          <p style={{ margin: "8px 0 0 0", color: "#555" }}>
+
+        <div className="mb-4">
+          <strong className="text-sm md:text-base">Barcode Scanner Test</strong>
+          <p className="mt-2 text-sm md:text-base text-gray-600">
             Test your barcode scanner and verify it works with the system.
             Useful for setup, troubleshooting, and training.
           </p>
         </div>
+
         <Link href="/barcode-test">
           <button
-            style={{
-              background: "#1d4ed8",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              padding: "8px 18px",
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white border-none rounded-md px-4 md:px-5 py-2 md:py-2.5 font-semibold text-sm md:text-base cursor-pointer flex items-center gap-2 transition-colors duration-200"
             aria-label="Go to Barcode Test"
             title="Go to Barcode Test"
           >
@@ -542,26 +361,17 @@ export default function SettingsPage() {
         </Link>
       </div>
 
-      {/* Save Button - absolutely positioned bottom right of the container */}
-      <div style={{ position: "absolute", right: 32, bottom: 32 }}>
+      {/* Save Button - mobile bottom center, desktop bottom right */}
+      <div className="fixed md:absolute bottom-4 md:bottom-8 left-1/2 md:left-auto md:right-8 transform -translate-x-1/2 md:transform-none z-10">
         <button
           type="button"
           onClick={handleSave}
           disabled={!isChanged || saving}
-          style={{
-            minWidth: 100,
-            padding: "0.5rem 1.2rem",
-            fontSize: 15,
-            fontWeight: "bold",
-            background: isChanged && !saving ? "#1d4ed8" : "#aaa",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: isChanged && !saving ? "pointer" : "not-allowed",
-            transition: "background 0.2s",
-            textAlign: "center",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-          }}
+          className={`min-w-[100px] px-4 md:px-5 py-2 md:py-2.5 text-sm md:text-base font-bold text-white border-none rounded-md cursor-pointer transition-all duration-200 text-center shadow-lg ${
+            isChanged && !saving
+              ? "bg-blue-600 hover:bg-blue-700"
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
           aria-label="Save settings"
           title="Save settings"
         >
