@@ -17,41 +17,42 @@ export const VALID_STATE_TRANSITIONS: Record<
   AssetType,
   Record<AssetState, AssetState[]>
 > = {
-  // Mobile Phones, Tablets, Desktops, Laptops: Available → Signed Out → Building → RTGS → Issued
+  // Mobile Phones, Tablets, Desktops, Laptops:
+  // Available → Signed Out → Building → RTGS → Issued → Available (must rebuild)
   [AssetType.MOBILE_PHONE]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
     [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
-    [AssetState.ISSUED]: [AssetState.READY_TO_GO],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED],
+    [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
   },
   [AssetType.TABLET]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
     [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
-    [AssetState.ISSUED]: [AssetState.READY_TO_GO],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED],
+    [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
   },
   [AssetType.DESKTOP]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
     [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
-    [AssetState.ISSUED]: [AssetState.READY_TO_GO],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED],
+    [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
   },
   [AssetType.LAPTOP]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
     [AssetState.SIGNED_OUT]: [AssetState.BUILDING, AssetState.AVAILABLE],
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.BUILDING],
-    [AssetState.ISSUED]: [AssetState.READY_TO_GO],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED],
+    [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
   },
-  // Monitors: Available → Signed Out → RTGS → Issued (no BUILDING state)
+  // Monitors: Available → Signed Out → RTGS → Issued → Available (no BUILDING state)
   [AssetType.MONITOR]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
     [AssetState.SIGNED_OUT]: [AssetState.READY_TO_GO, AssetState.AVAILABLE],
-    [AssetState.READY_TO_GO]: [AssetState.ISSUED, AssetState.SIGNED_OUT],
-    [AssetState.ISSUED]: [AssetState.READY_TO_GO],
+    [AssetState.READY_TO_GO]: [AssetState.ISSUED],
+    [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available
     [AssetState.BUILDING]: [], // Monitors don't use BUILDING state
   },
 };
