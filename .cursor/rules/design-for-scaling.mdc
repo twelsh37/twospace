@@ -1,7 +1,7 @@
 ---
-description: 
+description: Design for scaling
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # Scaling the solution architecture
 
