@@ -8,6 +8,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { getUserById } from "@/lib/supabase-db";
 
+// Define a minimal AppUser type for role-based checks
+interface AppUser {
+  role: string;
+  // Add other fields as needed
+}
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
@@ -20,7 +26,7 @@ export function ProtectedRoute({
   const { user, loading } = useAuth();
   const router = useRouter();
   // State to hold the user's app record (including role)
-  const [appUser, setAppUser] = useState<any>(null);
+  const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [roleLoading, setRoleLoading] = useState(false);
 
   useEffect(() => {

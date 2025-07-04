@@ -6,6 +6,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "./protected-route";
 import * as AuthContext from "@/lib/auth-context";
+import { getUserById } from "@/lib/supabase-db";
 
 // Mock next/navigation router
 jest.mock("next/navigation", () => ({
@@ -37,7 +38,13 @@ const mockPush = jest.fn();
 (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
 
 // Helper to mock AuthContext
-function mockAuthContext({ user, loading }: { user: any; loading: boolean }) {
+function mockAuthContext({
+  user,
+  loading,
+}: {
+  user: { id: string } | null;
+  loading: boolean;
+}) {
   jest.spyOn(AuthContext, "useAuth").mockReturnValue({
     user,
     loading,
@@ -78,8 +85,7 @@ describe("ProtectedRoute", () => {
 
   it("redirects to dashboard if not admin when requireAdmin is true", async () => {
     mockAuthContext({ user: { id: "user-2" }, loading: false });
-    const { getUserById } = require("@/lib/supabase-db");
-    getUserById.mockResolvedValue({ data: { role: "USER" } });
+    jest.mocked(getUserById).mockResolvedValue({ data: { role: "USER" } });
     render(
       <ProtectedRoute requireAdmin>
         <div>Admin Content</div>
@@ -92,8 +98,7 @@ describe("ProtectedRoute", () => {
 
   it("renders children if admin when requireAdmin is true", async () => {
     mockAuthContext({ user: { id: "admin-1" }, loading: false });
-    const { getUserById } = require("@/lib/supabase-db");
-    getUserById.mockResolvedValue({ data: { role: "ADMIN" } });
+    jest.mocked(getUserById).mockResolvedValue({ data: { role: "ADMIN" } });
     render(
       <ProtectedRoute requireAdmin>
         <div>Admin Content</div>
