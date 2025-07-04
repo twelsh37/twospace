@@ -296,11 +296,15 @@ export default function SettingsPage() {
                       key={idx}
                       className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 md:justify-end"
                     >
-                      <label className="font-medium text-sm md:text-base md:min-w-[70px] md:text-right">
+                      <label
+                        htmlFor={`decliningYear${idx + 1}`}
+                        className="font-medium text-sm md:text-base md:min-w-[70px] md:text-right"
+                      >
                         Year {idx + 1}:
                       </label>
                       <div className="relative w-full md:w-20">
                         <input
+                          id={`decliningYear${idx + 1}`}
                           type="number"
                           min={0}
                           max={100}
