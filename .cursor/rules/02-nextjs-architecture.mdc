@@ -1,0 +1,29 @@
+---
+description: Next.js architecture, file conventions, and component patterns.
+globs: app/**/*, pages/**/*
+alwaysApply: false
+---
+
+# Next.js Architecture
+
+## File Structure
+- Use the `/app` directory for routing and server components.
+- Place all client components in `/components` and mark with `"use client"` only when necessary.
+- Use lowercase, dash-separated folder names (e.g., `auth-wizard`).
+
+## Component Patterns
+- Prefer functional components.
+- Use named exports for all components.
+- Export main component first, then helpers, then types.
+
+## Data Fetching
+- Use server components and server actions for data fetching.
+- Use `next-safe-action` for type-safe server actions.
+- Avoid client-side fetching unless strictly necessary.
+
+## Error Handling
+- Use `error.tsx` and `global-error.tsx` for error boundaries.
+- Model expected errors as return values, not exceptions.
+
+## Routing
+- Use file-based routing; avoid dynamic routes unless required.

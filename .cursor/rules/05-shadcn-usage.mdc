@@ -1,0 +1,19 @@
+---
+description: Shadcn UI and Radix best practices for accessible, consistent components.
+globs: **/components/**/*.tsx
+alwaysApply: false
+---
+
+# Shadcn & Radix Usage
+
+## Component Usage
+- Use Shadcn UI components for forms, dialogs, and navigation.
+- Use Radix primitives for accessibility and keyboard navigation.
+
+## Customization
+- Extend Shadcn components via props and Tailwind classes.
+- Avoid direct DOM manipulation; use provided APIs.
+
+## Accessibility
+- Ensure all interactive elements are accessible via keyboard.
+- Use ARIA attributes where required.

@@ -1,0 +1,21 @@
+---
+description: ESLint and code formatting standards for consistent codebase.
+globs: **/*.ts, **/*.tsx
+alwaysApply: false
+---
+
+# ESLint & Formatting Guide
+
+## Linting
+- Use ESLint with the recommended and TypeScript plugins.
+- Fix all lint errors before commit.
+
+## Formatting
+- Use Prettier for code formatting; auto-format on save.
+- Maintain consistent indentation (2 spaces).
+
+## Import Order
+- Use ESLint plugin for import sorting.
+
+## Commit Hooks
+- Use pre-commit hooks to run lint and format checks.

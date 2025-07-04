@@ -127,8 +127,16 @@ export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
           <h4 className="text-sm font-medium mb-2">Transition Rules:</h4>
           <ul className="text-xs text-muted-foreground space-y-1">
             <li>• State changes are tracked in the audit trail</li>
-            <li>• Some transitions may require additional approvals</li>
+            <li>• Issued assets can only return to Available Stock</li>
+            <li>
+              • Mobile phones, tablets, laptops, and desktops must be rebuilt
+              after being issued
+            </li>
             <li>• Monitors skip the BUILDING state in the lifecycle</li>
+            <li>
+              • All devices must go through proper configuration before
+              re-issuance
+            </li>
           </ul>
         </div>
       </CardContent>

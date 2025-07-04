@@ -59,13 +59,13 @@ export function AssetFilters({
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex flex-1 gap-2 flex-wrap">
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <Select
             value={filters.type}
             onValueChange={(value) => onFilterChange("type", value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Asset Type" />
             </SelectTrigger>
             <SelectContent>
@@ -82,7 +82,7 @@ export function AssetFilters({
             value={filters.state}
             onValueChange={(value) => onFilterChange("state", value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Asset State" />
             </SelectTrigger>
             <SelectContent>
@@ -101,7 +101,7 @@ export function AssetFilters({
             value={filters.status}
             onValueChange={(value) => onFilterChange("status", value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Asset Status" />
             </SelectTrigger>
             <SelectContent>
@@ -118,10 +118,10 @@ export function AssetFilters({
               variant="outline"
               size="sm"
               onClick={onClearFilters}
-              className="whitespace-nowrap"
+              className="w-full sm:w-auto"
             >
               <X className="mr-2 h-4 w-4" />
-              Clear
+              Clear Filters
             </Button>
           )}
         </div>

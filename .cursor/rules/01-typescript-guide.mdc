@@ -1,0 +1,35 @@
+---
+description: TypeScript conventions for strict, maintainable, and idiomatic code.
+globs: **/*.ts, **/*.tsx
+alwaysApply: false
+---
+
+# TypeScript Guide
+
+## Strictness & Types
+- Always enable `strict: true` in `tsconfig.json`.
+- Prefer `interface` over `type` for object shapes.
+- Avoid `enum`; use union types or object maps.
+- Use explicit types for function parameters and return values.
+- Prefer type inference for local variables when possible.
+
+## Imports & Declarations
+- Use named imports, not default imports.
+- Use `const` for variables unless reassignment is required.
+- Organize imports: external first, then internal, then styles.
+
+## Null Safety
+- Enable strict null checks.
+- Avoid `any`; use unknown or proper types.
+
+✅ Good:
+
+interface User {
+id: string;
+name: string;
+}
+
+❌ Bad:
+type User = { id: string; name: string };
+
+undefined

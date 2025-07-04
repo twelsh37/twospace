@@ -1,6 +1,6 @@
--- backend/lib/db/optimize-indexes.sql
+-- frontend/lib/db/optimize-indexes.sql
 -- Database Indexing Script for Asset Management System
--- Optimizes Neon PostgreSQL database for faster API query response times
+-- Optimizes Supabase PostgreSQL database for faster API query response times
 --
 -- This script creates strategic indexes based on common query patterns:
 -- 1. Asset filtering and searching (type, state, location, assignedTo)
