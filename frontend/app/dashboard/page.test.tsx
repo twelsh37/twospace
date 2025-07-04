@@ -2,7 +2,7 @@
 // Unit/functional tests for the DashboardPage
 
 import React from "react";
-import { render, screen, waitFor } from "../../lib/test-utils";
+import { render, screen } from "../../lib/test-utils";
 
 // Mock the entire DashboardPage component to avoid async server component issues
 jest.mock("./page", () => {
@@ -47,7 +47,7 @@ describe("DashboardPage", () => {
     render(<DashboardPage />);
 
     expect(screen.getByText("Total Assets: 100")).toBeInTheDocument();
-    expect(screen.getByText(/Assets by State:/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Assets by State:/)).toHaveLength(2);
     expect(screen.getByText(/Recent Activity:/)).toBeInTheDocument();
   });
 

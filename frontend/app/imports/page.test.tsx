@@ -7,7 +7,15 @@ import { render, screen, fireEvent, waitFor } from "../../lib/test-utils";
 // Mock the ImportModal component
 jest.mock("../../components/imports/import-modal", () => ({
   __esModule: true,
-  default: ({ open, onClose, onSuccess }: any) => {
+  default: ({
+    open,
+    onClose,
+    onSuccess,
+  }: {
+    open: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+  }) => {
     if (!open) return null;
     return (
       <div data-testid="import-modal">

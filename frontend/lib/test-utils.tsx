@@ -133,9 +133,7 @@ export const mockApiResponses = {
 };
 
 // Custom render function with providers
-interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
-  // Add any additional options here
-}
+type CustomRenderOptions = Omit<RenderOptions, "wrapper">;
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
@@ -150,7 +148,7 @@ export * from "@testing-library/react";
 export { customRender as render, userEvent };
 
 // Mock fetch function
-export const mockFetch = (response: any, status = 200) => {
+export const mockFetch = (response: unknown, status = 200) => {
   return jest.fn().mockImplementation(() =>
     Promise.resolve({
       ok: status >= 200 && status < 300,

@@ -2,7 +2,7 @@
 // Unit/functional tests for the ReportsPage
 
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "../../lib/test-utils";
+import { render, screen, fireEvent } from "../../lib/test-utils";
 
 // Mock Chart.js components with simpler implementation
 jest.mock("react-chartjs-2", () => ({
