@@ -1,33 +1,18 @@
 // frontend/jest.config.js
-// Jest configuration for Next.js with TypeScript and React Testing Library
+// Jest configuration for Next.js with TypeScript and React Testing Library using ts-jest
 
-const nextJest = require("next/jest");
-
-const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files
-  dir: "./",
-});
-
-// Add any custom config to be passed to Jest
-const customJestConfig = {
-  // Add more setup options before each test is run
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-
-  // Test environment
+module.exports = {
+  preset: "ts-jest", // Use ts-jest for TypeScript transformation
   testEnvironment: "jsdom",
-
-  // Module name mapping for absolute imports
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
+    ".(css|less|scss|sass)$": "identity-obj-proxy", // Mock CSS imports
   },
-
-  // Test file patterns
   testMatch: [
     "<rootDir>/**/__tests__/**/*.{js,jsx,ts,tsx}",
     "<rootDir>/**/*.{test,spec}.{js,jsx,ts,tsx}",
   ],
-
-  // Coverage configuration
   collectCoverageFrom: [
     "app/**/*.{js,jsx,ts,tsx}",
     "components/**/*.{js,jsx,ts,tsx}",
@@ -37,10 +22,8 @@ const customJestConfig = {
     "!**/.next/**",
     "!**/coverage/**",
     "!**/jest.config.js",
-    "!**/jest.setup.js",
+    "!**/jest.setup.ts",
   ],
-
-  // Coverage thresholds
   coverageThreshold: {
     global: {
       branches: 70,
@@ -49,49 +32,33 @@ const customJestConfig = {
       statements: 70,
     },
   },
-
-  // Coverage reporters
   coverageReporters: ["text", "lcov", "html"],
-
-  // Test timeout
   testTimeout: 10000,
-
-  // Clear mocks between tests
   clearMocks: true,
-
-  // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: false, // Set to true when running coverage
-
-  // An array of glob patterns indicating a set of files for which coverage information should be collected
   coverageDirectory: "coverage",
-
-  // An array of regexp pattern strings used to skip coverage collection
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/.next/",
     "/coverage/",
     "/jest.config.js",
-    "/jest.setup.js",
+    "/jest.setup.ts",
   ],
-
-  // Indicates whether each individual test should be reported during the run
   verbose: true,
-
-  // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   testPathIgnorePatterns: [
     "<rootDir>/.next/",
     "<rootDir>/node_modules/",
     "<rootDir>/coverage/",
   ],
-
-  // Transform files with ts-jest
+  // Use ts-jest for TypeScript and allow ESM modules in node_modules to be transformed
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["next/babel"] }],
+    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.(js|jsx)$": "ts-jest",
   },
-
-  // Module file extensions
+  transformIgnorePatterns: [
+    "/node_modules/(?!(isows|@supabase|@supabase/.*|@heroicons|lucide-react)/)",
+  ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig);
+// Reasoning: Updated setupFilesAfterEnv and ignore patterns to use jest.setup.ts for TypeScript/JSX support.

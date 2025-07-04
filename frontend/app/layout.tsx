@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
-import { LayoutWrapper } from "@/components/layout/layout-wrapper";
 import { AuthProvider } from "@/lib/auth-context";
+import ClientLayout from "./client-layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description: "Comprehensive asset management and tracking system",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <ClientLayout>{children}</ClientLayout>
         </AuthProvider>
         {/* Vercel Analytics: Tracks page views and events globally. */}
         <Analytics />
@@ -32,3 +32,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+// Reasoning: layout.tsx is now a server component, exporting metadata and using ClientLayout for client-side auth protection.
