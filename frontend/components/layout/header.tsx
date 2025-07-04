@@ -21,6 +21,7 @@ import {
   SearchResultsModal,
   type SearchResults,
 } from "@/components/search/search-results-modal";
+import { useAuth } from "@/lib/auth-context";
 
 interface HeaderProps {
   onMobileMenuToggle?: () => void;
@@ -32,13 +33,22 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // TODO: Get user data from authentication context
-  const user = {
-    name: "John Doe",
-    email: "john.doe@company.com",
-    role: "Admin",
-    avatar: "", // Empty for initials fallback
-  };
+  const { user, signOut } = useAuth();
+
+  // Get user display info
+  const userDisplay = user
+    ? {
+        name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+        email: user.email || "",
+        role: user.user_metadata?.role || "User",
+        avatar: user.user_metadata?.avatar_url || "",
+      }
+    : {
+        name: "Guest",
+        email: "",
+        role: "Guest",
+        avatar: "",
+      };
 
   const handleSearch = useCallback(async (query: string) => {
     if (query.trim().length < 2) {
@@ -129,11 +139,14 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
                 title="User menu"
               >
                 <Avatar className="h-8 w-8 md:h-9 md:w-9">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage
+                    src={userDisplay.avatar}
+                    alt={userDisplay.name}
+                  />
                   <AvatarFallback className="text-xs md:text-sm">
-                    {user.name
+                    {userDisplay.name
                       .split(" ")
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
@@ -148,13 +161,13 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm md:text-base font-medium leading-none">
-                    {user.name}
+                    {userDisplay.name}
                   </p>
                   <p className="text-xs md:text-sm leading-none text-muted-foreground">
-                    {user.email}
+                    {userDisplay.email}
                   </p>
                   <Badge variant="secondary" className="w-fit mt-1 text-xs">
-                    {user.role}
+                    {userDisplay.role}
                   </Badge>
                 </div>
               </DropdownMenuLabel>
@@ -173,7 +186,10 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="text-destructive text-sm md:text-base">
+              <DropdownMenuItem
+                className="text-destructive text-sm md:text-base"
+                onClick={() => signOut()}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

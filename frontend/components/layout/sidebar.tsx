@@ -7,8 +7,29 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Package, X, Menu } from "lucide-react";
+import {
+  Package,
+  X,
+  Menu,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Report types for the flyout menu
+const reportTypes = [
+  { title: "Asset Inventory", href: "/reports?report=Asset Inventory" },
+  { title: "Lifecycle Management", href: "/reports?report=Lifecycle Management" },
+  { title: "Financial", href: "/reports?report=Financial" },
+  { title: "Compliance", href: "/reports?report=Compliance" },
+  { title: "Utilization", href: "/reports?report=Utilization" },
+  { title: "Maintenance", href: "/reports?report=Maintenance" },
+  { title: "Software License", href: "/reports?report=Software License" },
+  { title: "Security", href: "/reports?report=Security" },
+  { title: "End-of-Life", href: "/reports?report=End-of-Life" },
+  { title: "Audit", href: "/reports?report=Audit" },
+];
 
 // Navigation items with icons and labels
 const navItems = [
@@ -39,8 +60,9 @@ const navItems = [
   {
     title: "Reports",
     href: "/reports",
-    icon: Package,
+    icon: FileText,
     badge: null,
+    hasSubmenu: true,
   },
   {
     title: "Imports",
@@ -67,6 +89,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false); // Only used for mobile
 
   return (
     <>
@@ -104,6 +127,61 @@ export function Sidebar({
           {navItems.map((item) => {
             const isActive = pathname === item.href;
 
+                        // Handle reports submenu
+            if (item.hasSubmenu) {
+              // When collapsed, just show the icon
+              if (isCollapsed) {
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <div
+                      className={cn(
+                        "flex items-center justify-center rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                        isActive && "bg-accent text-accent-foreground font-medium"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                    </div>
+                  </Link>
+                );
+              }
+
+              // When expanded, show the fly-out submenu
+              return (
+                <div key={item.href} className="relative group">
+                  <Link href={item.href}>
+                    <div
+                      className={cn(
+                        "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                        isActive && "bg-accent text-accent-foreground font-medium"
+                      )}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </Link>
+
+                  {/* Fly-out Reports Submenu */}
+                  <div className="absolute left-full top-0 ml-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    {/* Arrow pointing to parent */}
+                    <div className="absolute -left-1 top-4 w-2 h-2 bg-white border-l border-t border-gray-200 transform rotate-45"></div>
+                    <div className="py-2">
+                      {reportTypes.map((report) => (
+                        <Link key={report.href} href={report.href}>
+                          <div className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <span>{report.title}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // Regular navigation items
             return (
               <Link key={item.href} href={item.href}>
                 <div
@@ -174,6 +252,49 @@ export function Sidebar({
           {navItems.map((item) => {
             const isActive = pathname === item.href;
 
+                        // Handle reports submenu for mobile (keep as accordion since no hover on mobile)
+            if (item.hasSubmenu) {
+              return (
+                <div key={item.href}>
+                  <button
+                    onClick={() => setReportsOpen(!reportsOpen)}
+                    className={cn(
+                      "w-full flex items-center justify-between rounded-lg px-4 py-3 text-base transition-colors hover:bg-accent hover:text-accent-foreground",
+                      isActive && "bg-accent text-accent-foreground font-medium"
+                    )}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.title}</span>
+                    </div>
+                    {reportsOpen ? (
+                      <ChevronDown className="h-5 w-5" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5" />
+                    )}
+                  </button>
+
+                  {/* Mobile Reports Submenu */}
+                  {reportsOpen && (
+                    <div className="ml-6 mt-2 space-y-1">
+                      {reportTypes.map((report) => (
+                        <Link
+                          key={report.href}
+                          href={report.href}
+                          onClick={onMobileMenuClose}
+                        >
+                          <div className="flex items-center rounded-lg px-4 py-2 text-base transition-colors hover:bg-accent hover:text-accent-foreground">
+                            <span>{report.title}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // Regular navigation items
             return (
               <Link
                 key={item.href}

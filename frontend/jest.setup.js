@@ -3,6 +3,9 @@
 
 import "@testing-library/jest-dom";
 
+// Mock canvas to prevent native module issues in tests
+jest.mock("canvas", () => ({}));
+
 // Mock Next.js router
 jest.mock("next/navigation", () => ({
   useRouter() {
