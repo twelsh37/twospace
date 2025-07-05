@@ -3,11 +3,13 @@
 
 module.exports = {
   // Removed ts-jest preset, now using babel-jest for all JS/TS files
-  testEnvironment: "jsdom",
+  // Use Node environment for all tests to avoid jsdom/canvas issues
+  testEnvironment: "node",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
     ".(css|less|scss|sass)$": "identity-obj-proxy", // Mock CSS imports
+    "^canvas$": "<rootDir>/__mocks__/canvas.js",
   },
   testMatch: [
     "<rootDir>/**/__tests__/**/*.{js,jsx,ts,tsx}",
