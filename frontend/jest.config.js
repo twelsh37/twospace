@@ -1,10 +1,8 @@
 // frontend/jest.config.js
-// Jest configuration for Next.js with TypeScript and React Testing Library using babel-jest
+// Jest configuration for Next.js with TypeScript and React Testing Library using Babel
 
 module.exports = {
-  // Removed ts-jest preset, now using babel-jest for all JS/TS files
-  // Use Node environment for all tests to avoid jsdom/canvas issues
-  testEnvironment: "node",
+  testEnvironment: "jsdom", // Use jsdom for React component testing
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
@@ -52,7 +50,7 @@ module.exports = {
     "<rootDir>/node_modules/",
     "<rootDir>/coverage/",
   ],
-  // Use babel-jest for all JS/TS/JSX/TSX files
+  // Use Babel for all JavaScript and TypeScript files
   transform: {
     "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
   },
@@ -62,4 +60,5 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
 
-// Reasoning: Switched from ts-jest to babel-jest for JSX/TSX/JS/TS transformation. This allows Jest to understand JSX and TypeScript using Babel.
+// Reasoning: Switched from ts-jest to Babel for transformation to fix Node.js 23.x compatibility.
+// Babel has better support for newer Node.js versions and provides reliable JSX/TSX transformation.
