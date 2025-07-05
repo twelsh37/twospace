@@ -1,29 +1,26 @@
 // Polyfill global Request and Response for Next.js API route compatibility in Jest (synchronous)
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 if (typeof global.Request === "undefined")
-  global.Request = require("node-fetch").Request as any;
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-explicit-any
+  global.Request = require("node-fetch").Request;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 if (typeof global.Response === "undefined")
-  global.Response = require("node-fetch").Response as any;
+  global.Response = require("node-fetch").Response;
 
 import { TextEncoder, TextDecoder } from "util";
 import "@testing-library/jest-dom";
 
 if (typeof global.TextEncoder === "undefined") {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  global.TextEncoder = TextEncoder as any;
+  global.TextEncoder = TextEncoder;
 }
 if (typeof global.TextDecoder === "undefined") {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  global.TextDecoder = TextDecoder as any;
+  global.TextDecoder = TextDecoder;
 }
 
 // Polyfill for setImmediate (needed for SuperTest integration tests)
 if (typeof global.setImmediate === "undefined") {
-  global.setImmediate = (
-    callback: (...args: any[]) => void,
-    ...args: any[]
-  ) => {
+  global.setImmediate = (callback, ...args) => {
     return setTimeout(() => callback(...args), 0);
   };
 }
@@ -48,7 +45,7 @@ jest.mock("next/navigation", () => ({
 // Mock Next.js image component
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: (props: any) => {
+  default: (props) => {
     // eslint-disable-next-line @next/next/no-img-element
     return <img {...props} />;
   },
@@ -72,27 +69,22 @@ jest.mock("quagga", () => ({
 
 // Mock file upload functionality
 global.File = class MockFile {
-  name: string;
-  size: number;
-  type: string;
-  lastModified: number;
-
-  constructor(bits: any[], name: string, options?: any) {
+  constructor(bits, name, options) {
     this.name = name;
     this.size = bits.length;
-    this.type = options?.type || "text/plain";
-    this.lastModified = options?.lastModified || Date.now();
+    this.type = (options && options.type) || "text/plain";
+    this.lastModified = (options && options.lastModified) || Date.now();
   }
-} as any;
+};
 
 global.FileReader = class MockFileReader {
-  onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null =
-    null;
-  onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null =
-    null;
-  result: string | ArrayBuffer | null = null;
+  constructor() {
+    this.onload = null;
+    this.onerror = null;
+    this.result = null;
+  }
 
-  readAsText(blob: Blob) {
+  readAsText(blob) {
     setTimeout(() => {
       if (this.onload) {
         this.result = "mock file content";
@@ -101,7 +93,7 @@ global.FileReader = class MockFileReader {
     }, 0);
   }
 
-  readAsDataURL(blob: Blob) {
+  readAsDataURL(blob) {
     setTimeout(() => {
       if (this.onload) {
         this.result = "data:text/plain;base64,bW9jayBmaWxlIGNvbnRlbnQ=";
@@ -109,4 +101,4 @@ global.FileReader = class MockFileReader {
       }
     }, 0);
   }
-} as any;
+};

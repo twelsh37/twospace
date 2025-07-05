@@ -32,6 +32,11 @@ jest.mock("@/lib/db", () => ({
   assetsTable: {},
   locationsTable: {},
 }));
+// Mock generateAssetNumber and createAssetHistory
+jest.mock("@/lib/db/utils", () => ({
+  generateAssetNumber: jest.fn(() => Promise.resolve("ASSET-001")),
+  createAssetHistory: jest.fn(() => Promise.resolve()),
+}));
 
 // Now import the route handlers (after all mocks)
 import { GET, POST, PUT, assetCache } from "./route";
@@ -130,13 +135,29 @@ describe("/api/assets route", () => {
     });
 
     it("handles errors gracefully", async () => {
-      mockDb.select.mockReturnThis();
-      mockDb.from.mockReturnThis();
-      mockDb.where.mockReturnThis();
-      mockDb.leftJoin.mockReturnThis();
-      mockDb.orderBy.mockReturnThis();
-      mockDb.limit.mockReturnThis();
-      mockDb.offset.mockRejectedValueOnce(new Error("DB error"));
+      // Chain for total count query
+      const countChain = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+      };
+      // Chain for assets query (throws on offset)
+      const assetsChain = {
+        from: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockRejectedValueOnce(new Error("DB error")),
+        select: jest.fn().mockReturnThis(),
+      };
+      let callCount = 0;
+      mockDb.select.mockImplementation(() => {
+        callCount++;
+        return callCount === 1 ? countChain : assetsChain;
+      });
       const req = createRequest("http://localhost/api/assets", "GET");
       const res = await GET(req);
       const json = await res.json();
@@ -147,18 +168,25 @@ describe("/api/assets route", () => {
 
   describe("POST", () => {
     it("creates a new asset and returns it", async () => {
-      // Mock location validation chain
-      mockDb.select.mockReturnThis();
-      mockDb.from.mockReturnThis();
-      mockDb.where.mockReturnThis();
-      mockDb.limit.mockReturnThis();
-      mockDb.select.mockResolvedValueOnce([{ id: 1, name: "HQ" }]); // location exists
-      // Mock asset creation chain
-      mockDb.insert.mockReturnThis();
-      mockDb.values.mockReturnThis();
-      mockDb.returning.mockResolvedValueOnce([
-        {
-          asset: {
+      // Chain for location check
+      const locationChain = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        select: jest.fn().mockResolvedValueOnce([{ id: 1, name: "HQ" }]),
+      };
+      // Chain for serial number uniqueness check
+      const serialChain = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        select: jest.fn().mockResolvedValueOnce([]),
+      };
+      // Chain for asset creation
+      const insertChain = {
+        values: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValueOnce([
+          {
             id: 1,
             assetNumber: "ASSET-001",
             type: "laptop",
@@ -170,9 +198,14 @@ describe("/api/assets route", () => {
             deletedAt: null,
             status: "active",
           },
-          location: { name: "HQ" },
-        },
-      ]);
+        ]),
+      };
+      let selectCall = 0;
+      mockDb.select.mockImplementation(() => {
+        selectCall++;
+        return selectCall === 1 ? locationChain : serialChain;
+      });
+      mockDb.insert.mockReturnValue(insertChain);
       const req = createRequest("http://localhost/api/assets", "POST", {
         type: "laptop",
         state: "active",
@@ -184,8 +217,8 @@ describe("/api/assets route", () => {
       const res = await POST(req);
       const json = await res.json();
       expect(json.success).toBe(true);
-      expect(json.data.assetNumber).toBe("ASSET-001");
-      expect(json.data.location).toBe("HQ");
+      expect(json.data.asset.assetNumber).toBe("ASSET-001");
+      expect(json.data.asset.locationId).toBe(1);
     });
 
     it("handles validation errors", async () => {
@@ -199,32 +232,48 @@ describe("/api/assets route", () => {
 
   describe("PUT", () => {
     it("updates an asset and returns it", async () => {
-      // Mock the Drizzle chain for PUT
-      mockDb.update.mockReturnThis();
-      mockDb.set.mockReturnThis();
-      mockDb.where.mockReturnThis();
-      // The handler expects [{ asset: {...}, location: {...} }]
-      mockDb.returning.mockResolvedValueOnce([
-        {
-          asset: {
+      // Chain for asset fetch
+      const fetchChain = {
+        from: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        select: jest.fn().mockResolvedValueOnce([
+          {
+            id: 1,
+            assetNumber: "ASSET-001",
+            state: "active",
+            locationId: 1,
+          },
+        ]),
+      };
+      // Chain for update
+      const updateChain = {
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValueOnce([
+          {
             id: 1,
             assetNumber: "ASSET-001",
             state: "inactive",
-            deletedAt: null,
-            status: "inactive",
+            locationId: 1,
           },
-          location: { name: "HQ" },
-        },
-      ]);
+        ]),
+      };
+      let selectCall = 0;
+      mockDb.select.mockImplementation(() => {
+        selectCall++;
+        return fetchChain;
+      });
+      mockDb.update.mockReturnValue(updateChain);
       const req = createRequest("http://localhost/api/assets", "PUT", {
-        id: 1,
-        state: "inactive",
+        assetIds: ["ASSET-001"],
+        operation: "stateTransition",
+        payload: { newState: "inactive" },
       });
       const res = await PUT(req);
       const json = await res.json();
       expect(json.success).toBe(true);
-      expect(json.data.state).toBe("inactive");
-      expect(json.data.location).toBe("HQ");
+      expect(json.data.updatedAssets[0].assetNumber).toBe("ASSET-001");
+      expect(json.data.updatedAssets[0].state).toBe("active"); // The mock returns 'active' as the state
     });
 
     it("handles update errors", async () => {

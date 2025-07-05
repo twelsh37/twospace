@@ -1,9 +1,10 @@
 // frontend/jest.config.js
 // Jest configuration for Next.js with TypeScript and React Testing Library using Babel
+// NOTE: Uses babel-jest.config.js for test transformation. This config is for tests only; Next.js app uses SWC for runtime.
 
 module.exports = {
   testEnvironment: "jsdom", // Use jsdom for React component testing
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.tsx"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
     ".(css|less|scss|sass)$": "identity-obj-proxy", // Mock CSS imports
@@ -22,7 +23,7 @@ module.exports = {
     "!**/.next/**",
     "!**/coverage/**",
     "!**/jest.config.js",
-    "!**/jest.setup.ts",
+    "!**/jest.setup.tsx",
   ],
   coverageThreshold: {
     global: {
@@ -42,7 +43,7 @@ module.exports = {
     "/.next/",
     "/coverage/",
     "/jest.config.js",
-    "/jest.setup.ts",
+    "/jest.setup.tsx",
   ],
   verbose: true,
   testPathIgnorePatterns: [
@@ -50,15 +51,15 @@ module.exports = {
     "<rootDir>/node_modules/",
     "<rootDir>/coverage/",
   ],
-  // Use Babel for all JavaScript and TypeScript files
+  // Use Babel for all JavaScript and TypeScript files, with explicit config file
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
+    "^.+\\.(js|jsx|ts|tsx)$": [
+      "babel-jest",
+      { configFile: "./babel-jest.config.js" },
+    ],
   },
   transformIgnorePatterns: [
     "/node_modules/(?!(isows|@supabase|@supabase/.*|@heroicons|lucide-react)/)",
   ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
-
-// Reasoning: Switched from ts-jest to Babel for transformation to fix Node.js 23.x compatibility.
-// Babel has better support for newer Node.js versions and provides reliable JSX/TSX transformation.
