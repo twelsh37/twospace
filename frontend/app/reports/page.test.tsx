@@ -15,6 +15,7 @@ global.fetch = jest.fn();
 
 // Mock the entire ReportsPage component to avoid complex Chart.js issues
 jest.mock("./page", () => {
+  const React = require("react");
   return function MockReportsPage() {
     const [activeReport, setActiveReport] = React.useState("Asset Inventory");
 

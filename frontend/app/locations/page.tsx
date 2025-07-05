@@ -1,6 +1,7 @@
 // frontend/app/locations/page.tsx
 // Locations Management Page
-"use client";
+import React from "react";
+("use client");
 
 import { Suspense, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";

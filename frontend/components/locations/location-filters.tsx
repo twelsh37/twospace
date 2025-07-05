@@ -1,6 +1,7 @@
 // frontend/components/locations/location-filters.tsx
 // Filter bar for locations page
 
+import React from "react";
 import { useEffect, useState } from "react";
 import {
   Select,

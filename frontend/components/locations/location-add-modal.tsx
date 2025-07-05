@@ -1,5 +1,6 @@
 // frontend/components/locations/location-add-modal.tsx
 // Modal for adding a new location
+import React from "react";
 
 import {
   Dialog,
