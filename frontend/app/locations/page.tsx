@@ -88,18 +88,16 @@ export default function LocationsPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
+    <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
       <Card
         style={{
           maxWidth: 1200,
-          margin: "0 auto",
+          width: "100%",
           boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
           borderRadius: 16,
         }}
       >
-        <CardHeader
-          style={{ padding: "1.5rem 1.5rem 0 1.5rem", width: "100%" }}
-        >
+        <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle
@@ -127,7 +125,7 @@ export default function LocationsPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent style={{ padding: "1.5rem" }}>
+        <CardContent className="pt-0">
           <LocationAddModal
             open={addModalOpen}
             onOpenChange={setAddModalOpen}
@@ -149,7 +147,8 @@ export default function LocationsPage() {
             onFilterChange={handleFilterChange}
             onClearFilters={handleClearFilters}
           />
-          <div style={{ marginTop: 24 }}>
+          {/* Match /assets: mt-4 below filters */}
+          <div className="mt-4">
             <Suspense fallback={<LocationsLoadingSkeleton />}>
               <LocationTable
                 key={`${refreshTrigger}-${page}-${filters.location}-${filters.isActive}`}

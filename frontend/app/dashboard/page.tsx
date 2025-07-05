@@ -41,10 +41,7 @@ export default async function DashboardPage() {
 
   return (
     // Mobile-first responsive dashboard layout
-    <div
-      className="flex-1 space-y-4 pt-4 md:pt-8 pb-0 px-3 md:px-6 lg:px-8 bg-gray-50"
-      style={{ marginTop: "-30px" }}
-    >
+    <div className="flex-1 space-y-4 pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8 bg-gray-50">
       {/* Page Header */}
       <div className="flex items-center justify-center md:justify-end">
         <QuickActions />

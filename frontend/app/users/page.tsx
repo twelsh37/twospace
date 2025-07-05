@@ -95,7 +95,7 @@ function UsersPageContent() {
   };
 
   return (
-    <div className="flex-1 flex justify-center items-start p-2 md:p-4">
+    <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
       <Card
         style={{
           maxWidth: 1200,
@@ -105,13 +105,7 @@ function UsersPageContent() {
           borderRadius: 16,
         }}
       >
-        <CardHeader
-          style={{
-            padding: "1rem 1.5rem 0.5rem 1.5rem",
-            width: "100%",
-            marginBottom: 0,
-          }}
-        >
+        <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle
@@ -147,13 +141,14 @@ function UsersPageContent() {
             </div>
           </div>
         </CardHeader>
-        <CardContent style={{ padding: "1rem 1.5rem 1.5rem 1.5rem" }}>
+        <CardContent className="pt-0">
           <UserFilters
             filters={filters}
             onFilterChange={handleFilterChange}
             onClearFilters={handleClearFilters}
           />
-          <div style={{ marginTop: 12 }}>
+          {/* Match /assets: mt-4 below filters */}
+          <div className="mt-4">
             <Suspense fallback={<UsersLoadingSkeleton />}>
               <UserTable
                 filters={filters}

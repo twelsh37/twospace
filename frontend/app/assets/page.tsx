@@ -118,12 +118,16 @@ function AssetsPageContent() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-3 md:p-6 pt-4 md:pt-8">
+    <div className="flex-1 space-y-4 pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
       {/* Assets Table */}
       <Card className="shadow-lg border rounded-xl">
         <CardHeader className="pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="text-center md:text-left">
-            <CardTitle className="text-xl md:text-2xl">Assets</CardTitle>
+            <CardTitle
+              style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+            >
+              Assets
+            </CardTitle>
             <p className="text-muted-foreground text-sm mt-1">
               Manage your organization&apos;s assets and track their lifecycle
             </p>
