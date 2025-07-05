@@ -160,8 +160,11 @@ export async function GET(request: NextRequest) {
 
     const totalCountResult = await totalCountQuery;
 
-    const totalAssets = totalCountResult[0]?.count || 0;
+    console.log("totalCountResult:", totalCountResult);
+    const totalAssets = Number(totalCountResult[0]?.count) || 0;
     const totalPages = Math.ceil(totalAssets / limit);
+
+    console.log("After count query:", { totalAssets, totalPages });
 
     // Get assets with location details
     const assetsQuery = db
@@ -173,6 +176,8 @@ export async function GET(request: NextRequest) {
       .leftJoin(locationsTable, eq(assetsTable.locationId, locationsTable.id))
       .where(and(...whereConditions));
 
+    console.log("Before assets query");
+
     const assetsWithLocations = await assetsQuery
       .orderBy(
         sortOrder === "desc"
@@ -181,6 +186,8 @@ export async function GET(request: NextRequest) {
       )
       .limit(limit)
       .offset(offset);
+
+    console.log("After assets query, before return success");
 
     const durationMs = Date.now() - start; // End timing
 
@@ -211,7 +218,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response, { headers: corsHeaders });
   } catch (error) {
     const durationMs = Date.now() - start;
-    console.error("Error fetching assets:", error, `Timing: ${durationMs}ms`);
+    console.error(
+      "Error fetching assets (caught):",
+      error,
+      `Timing: ${durationMs}ms`
+    );
     return NextResponse.json(
       {
         success: false,
