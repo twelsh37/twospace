@@ -1,39 +1,34 @@
 // frontend/app/api/assets/route.test.ts
-// Tests for the Asset Management API Route
-// IMPORTANT: All jest.mock calls must come before importing the route handlers to avoid duplicate declaration errors.
+// Unit tests for the /api/assets API route handlers
 
-// Mock Next.js server request/response for Jest environment
-jest.mock("next/server", () => {
-  return {
-    NextRequest: class {},
-    NextResponse: {
-      json: (data: any, opts?: any) => ({
-        json: async () => data,
-        status: opts?.status || 200,
-        headers: opts?.headers || {},
-      }),
-    },
-  };
-});
+// Mock Next.js server components
+jest.mock("next/server", () => ({
+  NextRequest: class {},
+  NextResponse: {
+    json: jest.fn((data, options) => ({
+      json: async () => data,
+      status: options?.status || 200,
+      headers: options?.headers || {},
+    })),
+  },
+}));
 
 // Mock the database and utility functions
-const mockDb = {
-  select: jest.fn(),
-  from: jest.fn(),
-  where: jest.fn(),
-  leftJoin: jest.fn(),
-  orderBy: jest.fn(),
-  limit: jest.fn(),
-  offset: jest.fn(),
-  insert: jest.fn(),
-  values: jest.fn(),
-  returning: jest.fn(),
-  update: jest.fn(),
-  set: jest.fn(),
-};
-
 jest.mock("@/lib/db", () => ({
-  db: mockDb,
+  db: {
+    select: jest.fn(),
+    from: jest.fn(),
+    where: jest.fn(),
+    leftJoin: jest.fn(),
+    orderBy: jest.fn(),
+    limit: jest.fn(),
+    offset: jest.fn(),
+    insert: jest.fn(),
+    values: jest.fn(),
+    returning: jest.fn(),
+    update: jest.fn(),
+    set: jest.fn(),
+  },
   assetsTable: {},
   locationsTable: {},
 }));
@@ -41,6 +36,9 @@ jest.mock("@/lib/db", () => ({
 // Now import the route handlers (after all mocks)
 import { GET, POST, PUT, assetCache } from "./route";
 import { NextRequest } from "next/server";
+
+// Get the mocked db
+const { db: mockDb } = require("@/lib/db");
 
 // Utility to create a mock NextRequest
 function createRequest(url: string, method: string, body?: any) {
