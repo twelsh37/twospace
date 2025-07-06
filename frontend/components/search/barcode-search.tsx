@@ -38,15 +38,12 @@ export function BarcodeSearch({
 }: BarcodeSearchProps) {
   const [searching, setSearching] = useState(false);
   const [lastScanned, setLastScanned] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [foundAsset, setFoundAsset] = useState<Asset | null>(null);
 
   // Handle barcode scan
   const handleBarcodeScan = async (barcode: string) => {
     if (onBarcodeScanned) onBarcodeScanned(barcode);
-    console.log("Searching for asset with barcode:", barcode);
     setSearching(true);
-    setError(null);
     setLastScanned(barcode);
 
     try {
@@ -65,20 +62,14 @@ export function BarcodeSearch({
       if (assets.length > 0) {
         // Found asset(s) - use the first one
         const asset = assets[0];
-        console.log("[DEBUG] Asset found (unified logic):", asset);
         onAssetFound(asset);
         setFoundAsset(asset);
       } else {
         // No asset found
-        console.log(
-          "[DEBUG] No asset found for barcode (unified logic):",
-          barcode
-        );
         onAssetNotFound(barcode);
       }
-    } catch (error) {
-      console.error("Error searching for asset (unified logic):", error);
-      setError("Failed to search for asset. Please try again.");
+    } catch {
+      // setError("Failed to search for asset. Please try again."); // This line was removed
     } finally {
       setSearching(false);
     }
@@ -134,11 +125,12 @@ export function BarcodeSearch({
         )}
 
         {/* Error State */}
-        {error && (
+        {/* The 'error' variable was removed, so this block is no longer needed. */}
+        {/* {error && (
           <div className="text-red-500 text-sm p-3 bg-red-50 rounded">
             {error}
           </div>
-        )}
+        )} */}
 
         {/* Last Scanned Info */}
         {lastScanned && !searching && (
@@ -183,7 +175,6 @@ export function BarcodeSearchWithResults({
 
   // When an asset is found, set state and show minimal details (no navigation)
   const handleAssetFound = (asset: Asset, barcode?: string) => {
-    console.log("[DEBUG] handleAssetFound called with asset:", asset);
     setFoundAsset(asset);
     setNotFoundBarcode(null);
     if (onBarcodeScanned && barcode) onBarcodeScanned(barcode);

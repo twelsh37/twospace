@@ -45,13 +45,10 @@ export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
 
   const validNextStates = getValidNextStates(asset.type, asset.state);
 
-  const handleStateTransition = async (newState: AssetState) => {
+  const handleStateTransition = async () => {
     setIsTransitioning(true);
     try {
       // TODO: API call to transition state
-      console.log(
-        `Transitioning asset ${assetId} from ${asset.state} to ${newState}`
-      );
 
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -100,7 +97,7 @@ export function AssetStateTransition({ assetId }: AssetStateTransitionProps) {
                   </div>
                   <Button
                     size="sm"
-                    onClick={() => handleStateTransition(nextState)}
+                    onClick={handleStateTransition}
                     disabled={isTransitioning}
                   >
                     {isTransitioning ? (

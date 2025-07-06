@@ -61,13 +61,11 @@ export function AssetFormWithBarcode({
 
   // Handle barcode scan for asset number
   const handleAssetNumberScan = (barcode: string) => {
-    console.log("Asset number scanned:", barcode);
     setFormData((prev) => ({ ...prev, assetNumber: barcode }));
   };
 
   // Handle barcode scan for serial number
   const handleSerialNumberScan = (barcode: string) => {
-    console.log("Serial number scanned:", barcode);
     setFormData((prev) => ({ ...prev, serialNumber: barcode }));
   };
 
@@ -91,7 +89,6 @@ export function AssetFormWithBarcode({
 
     try {
       await onSubmit(formData);
-      console.log(`${mode} asset with barcode:`, formData);
     } catch (error) {
       console.error("Error submitting form:", error);
       setErrors(["An error occurred while saving the asset"]);

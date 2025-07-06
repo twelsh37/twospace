@@ -62,7 +62,6 @@ export function BarcodeScanner({
   // Process scanned barcode
   const handleBarcodeScanned = useCallback(
     (scannedBarcode: string) => {
-      console.log("Barcode scanned:", scannedBarcode);
       onScan(scannedBarcode);
       setBarcode("");
 
@@ -120,7 +119,6 @@ export function BarcodeScanner({
             return;
           }
 
-          console.log("Quagga initialized successfully");
           Quagga.start();
         }
       );
@@ -138,7 +136,6 @@ export function BarcodeScanner({
           typeof result.codeResult.code === "string"
         ) {
           const code = (result as QuaggaResult).codeResult.code;
-          console.log("Camera detected barcode:", code);
           // Stop scanning and close camera
           Quagga.stop();
           setIsCameraOpen(false);

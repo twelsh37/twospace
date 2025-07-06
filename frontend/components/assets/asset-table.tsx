@@ -83,8 +83,6 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
         throw new Error("Failed to fetch assets");
       }
       const result = await response.json();
-      // DEBUG: Log the assets array to help debug deleted asset issues
-      console.log("[AssetTable] Assets fetched:", result.data?.assets);
       setData(result.data);
     } catch (error) {
       console.error("Error fetching assets:", error);
@@ -141,7 +139,6 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
       setDeleteModalOpen(false);
       setDeleteAssetNumber(null);
       // Immediately refetch assets to ensure UI is up to date
-      // DEBUG: This ensures deleted assets disappear right away
       await fetchAssets();
       if (
         typeof window !== "undefined" &&

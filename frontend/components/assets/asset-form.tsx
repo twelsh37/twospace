@@ -63,7 +63,6 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
       if (onSubmit) {
         await onSubmit(formData);
       }
-      console.log(`${mode} asset:`, formData);
 
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1000));

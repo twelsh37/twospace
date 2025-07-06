@@ -49,9 +49,8 @@ export function ProtectedRoute({
       if (!user) {
         // Redirect to login if not authenticated
         router.push("/auth/login");
-      } else if (requireAdmin && !roleLoading) {
-        // If admin is required, check the user's role
-        if (!appUser || appUser.role !== "ADMIN") {
+      } else if (requireAdmin && !roleLoading && appUser) {
+        if (appUser.role?.toLowerCase() !== "admin") {
           // Redirect non-admins to dashboard or another page
           router.push("/dashboard");
         }
@@ -72,7 +71,10 @@ export function ProtectedRoute({
   }
 
   // Don't render children if not authenticated or not admin (handled by redirect)
-  if (!user || (requireAdmin && (!appUser || appUser.role !== "ADMIN"))) {
+  if (
+    !user ||
+    (requireAdmin && (!appUser || appUser.role?.toLowerCase() !== "admin"))
+  ) {
     return null;
   }
 

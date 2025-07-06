@@ -73,7 +73,6 @@ export default function BarcodeTestPage() {
 
   // Show a brief visual confirmation on scan
   const handleBasicScan = (barcode: string) => {
-    console.log("Basic scan:", barcode);
     setScannedBarcodes((prev) => [...prev, barcode]);
     setLastScan(barcode);
     setShowSuccess(true);
