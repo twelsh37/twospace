@@ -7,6 +7,7 @@ import { Eye, Edit, Trash2 } from "lucide-react";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { LocationDetailModal } from "./location-detail-modal";
 import { LocationEditModal } from "./location-edit-modal";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export type Location = {
   id: string;
@@ -166,7 +167,96 @@ export function LocationTable({
           "This action cannot be undone. To confirm, type 'confirm deletion' below to delete this location."
         }
       />
-      <div>
+      {/* Touch-friendly card layout for mobile */}
+      <div className="block md:hidden space-y-4">
+        {locations.map((loc) => (
+          <Card
+            key={loc.id}
+            className="rounded-xl shadow-md p-4 flex flex-col gap-2"
+          >
+            <CardHeader className="flex flex-row items-center justify-between px-0 pb-2">
+              <CardTitle className="text-lg font-bold">{loc.name}</CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleLocationClick(loc.id)}
+                  title="View details"
+                >
+                  <Eye className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleEditClick(loc.id)}
+                  title="Edit location"
+                >
+                  <Edit className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDeleteClick(loc.id)}
+                  title="Delete location"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="px-0 pb-2">
+              <div className="text-sm text-muted-foreground mb-1">
+                {loc.description || "—"}
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`font-semibold ${
+                    loc.isActive ? "text-green-600" : "text-red-500"
+                  }`}
+                >
+                  {loc.isActive ? "Active" : "Inactive"}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      {/* Pagination controls and count: always visible, styled for mobile */}
+      {pagination && (
+        <div className="flex flex-col sm:flex-row items-center justify-between p-4 mt-3 gap-4">
+          <div className="text-sm text-muted-foreground text-center sm:text-left">
+            Showing {locations.length} of {pagination.totalLocations} locations
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-4 py-2 md:size-sm"
+              onClick={() => onPageChange(pagination.page - 1)}
+              disabled={!pagination.hasPrevPage}
+              aria-label="Previous page"
+              title="Previous page"
+            >
+              Previous
+            </Button>
+            <span className="text-sm font-medium">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-4 py-2 md:size-sm"
+              onClick={() => onPageChange(pagination.page + 1)}
+              disabled={!pagination.hasNextPage}
+              aria-label="Next page"
+              title="Next page"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
+      {/* Table layout for desktop/tablet */}
+      <div className="hidden md:block">
         <table
           style={{
             width: "100%",
@@ -344,35 +434,6 @@ export function LocationTable({
           </tbody>
         </table>
       </div>
-      {/* Pagination and count */}
-      {pagination && (
-        <div className="flex items-center justify-between p-4 mt-3">
-          <div className="text-sm text-muted-foreground">
-            Showing {locations.length} of {pagination.totalLocations} locations
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(pagination.page - 1)}
-              disabled={!pagination.hasPrevPage}
-            >
-              Previous
-            </Button>
-            <span>
-              Page {pagination.page} of {pagination.totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(pagination.page + 1)}
-              disabled={!pagination.hasNextPage}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

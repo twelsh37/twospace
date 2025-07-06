@@ -56,7 +56,8 @@ export async function getUsers(
       is_active,
       employee_id,
       departments!inner(name)
-    `
+    `,
+      { count: "exact" } // Ensure we get the total count for pagination
     )
     .eq("is_active", true)
     .range((page - 1) * limit, page * limit - 1)
