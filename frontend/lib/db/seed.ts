@@ -301,26 +301,40 @@ async function seedDatabase() {
       .onConflictDoNothing();
     // Fetch all departments with IDs for user seeding
     const departments = await db.select().from(departmentsTable);
-    // Insert admin user (assign to London Office, IT Department)
-    const londonOffice = locations.find((l) => l.name === "London Office");
-    const londonITDept = departments.find(
-      (d) => d.name === "IT Department" && d.locationId === londonOffice?.id
-    );
+    // Always-seeded users for Supabase Auth integration
     await db
       .insert(usersTable)
       .values({
-        name: "System Administrator",
-        email: "admin@theaiaa.co.uk",
-        employeeId: "ADMIN001",
-        locationId: londonOffice?.id,
-        departmentId: londonITDept?.id,
+        id: "717fd75f-9b7a-41a7-9ea3-db8e6d7a2550",
+        name: "Demo Account",
+        email: "demo@example.com",
+        employeeId: "EMP1010133",
+        locationId: "229036f7-37dd-4c6e-b243-8e460d19644b",
+        departmentId: "23e69455-dfa7-45dc-8dcf-eaa97c35e2f3",
+        role: "USER",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as schema.NewUser)
+      .onConflictDoNothing();
+    await db
+      .insert(usersTable)
+      .values({
+        id: "23c897f7-480c-4440-8571-6e16bc61b5bc",
+        name: "Tom Welsh",
+        email: "tom.welsh@theaiaa.com",
+        employeeId: "EMP1010166",
+        locationId: "229036f7-37dd-4c6e-b243-8e460d19644b",
+        departmentId: "23e69455-dfa7-45dc-8dcf-eaa97c35e2f3",
         role: "ADMIN",
         isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       } as schema.NewUser)
       .onConflictDoNothing();
-    console.log("   ✓ Locations, departments, and admin user seeded.");
+    console.log(
+      "   ✓ Locations, departments, and permanent Supabase users seeded."
+    );
 
     // --- Stage 3: Generate and Insert Users ---
     console.log(`\n--- Stage 3: Generating ${TOTAL_USERS} Users ---`);

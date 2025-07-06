@@ -12,6 +12,7 @@ import {
   pgEnum,
   integer,
   jsonb,
+  serial, // <-- add serial import
 } from "drizzle-orm/pg-core";
 
 // Enum definitions
@@ -44,6 +45,13 @@ export const assetStatusEnum = pgEnum("asset_status", [
   "active",
   "retired",
   "stock",
+]);
+
+// Enum for holding asset status
+export const holdingAssetStatusEnum = pgEnum("holding_asset_status", [
+  "pending", // Just imported, not yet processed
+  "processed", // Moved to assets table
+  "error", // Import/validation error
 ]);
 
 // Departments table for department management per location
@@ -192,6 +200,30 @@ export const archivedAssetsTable = pgTable("archived_assets", {
   archiveReason: text("archive_reason"), // Why archived
 });
 
+// Table for assets in holding (awaiting asset number assignment)
+export const holdingAssetsTable = pgTable("holding_assets", {
+  id: uuid("id").primaryKey().defaultRandom(), // Will become the asset's UUID in assets table
+  serialNumber: varchar("serial_number", { length: 255 }).notNull().unique(),
+  description: text("description").notNull(),
+  supplier: varchar("supplier", { length: 255 }), // Optional: supplier name
+  importedBy: uuid("imported_by").references(() => usersTable.id), // Optional: who imported
+  importedAt: timestamp("imported_at", { withTimezone: true }).defaultNow(),
+  status: holdingAssetStatusEnum("status").notNull().default("pending"),
+  rawData: jsonb("raw_data"), // Optional: original import row
+  notes: text("notes"), // Optional: admin notes or error messages
+});
+
+// Roles table for assigning roles to users by email
+// REASONING: This table allows associating a user (by email) with a role (Admin/User). Useful for role-based access control and migration compatibility.
+export const rolesTable = pgTable("roles", {
+  id: serial("id").primaryKey(), // Auto-incrementing integer ID
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(), // When the role was assigned
+  userId: varchar("user_id", { length: 255 }).notNull(), // User's email address
+  role: varchar("role", { length: 32 }).notNull(), // Role name (e.g., 'Admin', 'User')
+});
+
 // Type exports for use in application
 export type User = typeof usersTable.$inferSelect;
 export type NewUser = typeof usersTable.$inferInsert;
@@ -207,3 +239,5 @@ export type Department = typeof departmentsTable.$inferSelect;
 export type NewDepartment = typeof departmentsTable.$inferInsert;
 export type ArchivedAsset = typeof archivedAssetsTable.$inferSelect;
 export type NewArchivedAsset = typeof archivedAssetsTable.$inferInsert;
+export type Role = typeof rolesTable.$inferSelect;
+export type NewRole = typeof rolesTable.$inferInsert;
