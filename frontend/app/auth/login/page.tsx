@@ -44,35 +44,46 @@ export default function LoginPage() {
   };
 
   return (
+    // Outer container: centers card, sets background
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-4xl h-[500px] flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Logo section (left) */}
-        <div className="flex-1 flex items-center justify-center bg-white md:h-full h-64">
-          <Image
-            src="/assetms-logo.png"
-            alt="AssetMS Logo"
-            width={350}
-            height={350}
-            priority
-            className="object-contain"
-          />
+      {/* Responsive Card: smaller on mobile, larger on desktop, less vertical padding */}
+      <Card className="w-full max-w-sm md:max-w-4xl h-auto md:h-[500px] my-2 flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Logo section: much larger for desktop, balanced layout */}
+        <div className="flex items-center justify-center bg-white md:h-full w-full md:w-1/2 md:order-none order-first">
+          {/* Logo container: very large for desktop, object-contain, balanced */}
+          <div className="w-full flex justify-center items-center pt-2 pb-1 md:pt-0 md:pb-0">
+            <div className="w-full max-w-[340px] h-[160px] md:max-w-[800px] md:h-[400px] bg-white rounded flex items-center justify-center overflow-hidden">
+              <Image
+                src="/assetms-logo.png"
+                alt="AssetMS Logo"
+                fill={false}
+                width={400}
+                height={200}
+                // Much larger image size for desktop
+                className="object-contain object-center w-full h-full md:w-[800px] md:h-[400px]"
+                priority
+              />
+            </div>
+          </div>
         </div>
-        {/* Login form section (right) */}
-        <div className="flex-1 flex items-center justify-center bg-white md:h-full h-auto">
-          <div className="w-full max-w-md p-8">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-center text-2xl font-bold">
+        {/* Login form section: increase max width for balance on desktop */}
+        <div className="flex-1 flex items-start justify-center bg-white md:h-full h-auto">
+          <div className="w-full max-w-xs md:max-w-lg pt-2 md:pt-8 pb-6 md:pb-8 px-4 md:px-8">
+            <CardHeader className="pb-2 md:pb-4 mt-0">
+              <CardTitle className="text-center text-xl md:text-2xl font-bold">
                 Login
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                {/* Error alert if login fails */}
                 {error && (
                   <Alert variant="destructive">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-                <div className="space-y-2">
+                {/* Email field */}
+                <div className="space-y-1 md:space-y-2">
                   <Label htmlFor="email">Email address</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -89,7 +100,8 @@ export default function LoginPage() {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                {/* Password field */}
+                <div className="space-y-1 md:space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -117,8 +129,9 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </div>
+                {/* Forgot password link */}
                 <div className="flex items-center justify-between">
-                  <div className="text-sm">
+                  <div className="text-xs md:text-sm">
                     <Link
                       href="/auth/forgot-password"
                       className="font-medium text-blue-600 hover:text-blue-500"
@@ -127,14 +140,16 @@ export default function LoginPage() {
                     </Link>
                   </div>
                 </div>
+                {/* Login button: always visible, full width */}
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Signing in..." : "Sign in"}
                 </Button>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Login: demo@example.com<br />
+                {/* Demo credentials (for testing): moved up for better balance */}
+                <div className="text-center mt-2 md:mt-4">
+                  <p className="text-xs md:text-sm text-gray-600">
+                    Login: demo@example.com
+                    <br />
                     Password: password01
-
                   </p>
                 </div>
               </form>
