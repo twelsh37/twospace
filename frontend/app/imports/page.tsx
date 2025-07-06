@@ -9,6 +9,8 @@ import ImportModal from "@/components/imports/import-modal";
 import { Button } from "@/components/ui/button";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { AssetState } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 // Main Imports Page component
 const ImportsPage: React.FC = () => {
@@ -106,67 +108,73 @@ const ImportsPage: React.FC = () => {
   });
 
   return (
-    // Use the same container classes as the assets page for left alignment and full width
-    <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-      {/* Page title - match assets page style */}
-      <h1 className="text-3xl font-bold tracking-tight mb-2">
-        Bulk Import Data
-      </h1>
-      {/* Explanatory text - match assets page style */}
-      <p className="text-muted-foreground mb-4">
-        System Administrators can bulk import Assets, Users, or Locations using
-        CSV or XLSX files. Imported assets will appear in the holding area until
-        they are signed out and tagged.
-      </p>
-      {/* Import Data button */}
-      <Button onClick={handleOpenModal} className="mb-8">
-        Import Data
-      </Button>
-      {/* Import Modal (conditionally rendered) */}
-      {modalOpen && (
-        <ImportModal
-          open={modalOpen}
-          onClose={handleCloseModal}
-          onSuccess={async () => {
-            handleCloseModal();
-            await handleImportSuccess();
-          }}
-        />
-      )}
-      {/* Display imported data in a table if available */}
-      {displayData.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold mb-2">Recently Imported Data</h2>
-          <div className="overflow-x-auto rounded-md border bg-white">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr>
-                  {columns.map((col) => (
-                    <th
-                      key={col.key}
-                      className="border-b px-4 py-2 text-left font-medium bg-gray-50"
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {displayData.map((row, idx) => (
-                  <tr key={idx} className="even:bg-gray-50">
-                    {columns.map((col) => (
-                      <td key={col.key} className="px-4 py-2 border-b">
-                        {row[col.key]}
-                      </td>
+    // Only ADMIN users can access this page
+    <ProtectedRoute requireAdmin={true}>
+      <div className="flex min-h-[80vh] items-center justify-center p-4">
+        <Card className="w-full max-w-md md:max-w-2xl shadow-lg border rounded-xl">
+          <CardContent className="py-8 flex flex-col items-center">
+            {/* Page title - match assets page style */}
+            <h1 className="text-3xl font-bold tracking-tight mb-2 text-center">
+              Bulk Import Data
+            </h1>
+            {/* Explanatory text - match assets page style */}
+            <p className="text-muted-foreground mb-6 text-center">
+              System Administrators can bulk import Assets, Users, or Locations
+              using CSV or XLSX files. Imported assets will appear in the
+              holding area until they are signed out and tagged.
+            </p>
+            {/* Import Data button */}
+            <Button onClick={handleOpenModal} className="mb-4 w-full max-w-xs">
+              Import Data
+            </Button>
+            {/* Import Modal (conditionally rendered) */}
+            {modalOpen && (
+              <ImportModal
+                open={modalOpen}
+                onClose={handleCloseModal}
+                onSuccess={async () => {
+                  handleCloseModal();
+                  await handleImportSuccess();
+                }}
+              />
+            )}
+            {/* Display imported data in a table if available */}
+            {displayData.length > 0 && (
+              <div className="mt-8 w-full overflow-x-auto rounded-md border bg-white">
+                <h2 className="text-lg font-semibold mb-2 text-center">
+                  Recently Imported Data
+                </h2>
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr>
+                      {columns.map((col) => (
+                        <th
+                          key={col.key}
+                          className="border-b px-4 py-2 text-left font-medium bg-gray-50"
+                        >
+                          {col.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {displayData.map((row, idx) => (
+                      <tr key={idx} className="even:bg-gray-50">
+                        {columns.map((col) => (
+                          <td key={col.key} className="px-4 py-2 border-b">
+                            {row[col.key]}
+                          </td>
+                        ))}
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </ProtectedRoute>
   );
 };
 

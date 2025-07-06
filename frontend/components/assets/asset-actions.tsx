@@ -27,8 +27,7 @@ export function AssetActions() {
   // TODO: This would be connected to asset table selection
   const hasSelectedAssets = selectedAssets.length > 0;
 
-  const handleBulkAction = (action: string) => {
-    console.log(`Performing bulk action: ${action} on assets:`, selectedAssets);
+  const handleBulkAction = () => {
     // TODO: Implement bulk actions
   };
 
@@ -48,20 +47,12 @@ export function AssetActions() {
 
       <div className="flex items-center gap-2">
         {/* Quick Actions */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleBulkAction("move")}
-        >
+        <Button variant="outline" size="sm" onClick={handleBulkAction}>
           <Move className="mr-2 h-4 w-4" />
           Move Location
         </Button>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleBulkAction("export")}
-        >
+        <Button variant="outline" size="sm" onClick={handleBulkAction}>
           <FileText className="mr-2 h-4 w-4" />
           Export
         </Button>
@@ -74,16 +65,16 @@ export function AssetActions() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleBulkAction("assign")}>
+            <DropdownMenuItem onClick={handleBulkAction}>
               <Mail className="mr-2 h-4 w-4" />
               Bulk Assign
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleBulkAction("archive")}>
+            <DropdownMenuItem onClick={handleBulkAction}>
               <Archive className="mr-2 h-4 w-4" />
               Archive Assets
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => handleBulkAction("delete")}
+              onClick={handleBulkAction}
               className="text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
