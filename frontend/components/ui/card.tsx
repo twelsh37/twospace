@@ -1,3 +1,7 @@
+// filepath: frontend/components/ui/card.tsx
+// Card component: Use as the base for all card layouts, including reports, for consistent UI/UX across the app.
+// Provides Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter.
+// See Shadcn UI best practices for usage.
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
