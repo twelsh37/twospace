@@ -11,11 +11,13 @@ import { ASSET_STATE_LABELS } from "@/lib/constants";
 import { AssetState } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 
 // Main Imports Page component
 const ImportsPage: React.FC = () => {
   // State to control modal visibility
   const [modalOpen, setModalOpen] = useState(false);
+  const [holdingModalOpen, setHoldingModalOpen] = useState(false);
   // State to store imported data for display
   // The imported data is an array of objects, where each object represents a row from the imported CSV/XLSX file.
   // The keys are column names and the values are dynamic (string, number, boolean, etc.), so we use Record<string, unknown> for type safety.
@@ -127,6 +129,14 @@ const ImportsPage: React.FC = () => {
             <Button onClick={handleOpenModal} className="mb-4 w-full max-w-xs">
               Import Data
             </Button>
+            {/* View Holding Assets button */}
+            <Button
+              onClick={() => setHoldingModalOpen(true)}
+              className="mb-4 w-full max-w-xs"
+              variant="secondary"
+            >
+              View Holding Assets
+            </Button>
             {/* Import Modal (conditionally rendered) */}
             {modalOpen && (
               <ImportModal
@@ -137,6 +147,22 @@ const ImportsPage: React.FC = () => {
                   await handleImportSuccess();
                 }}
               />
+            )}
+            {/* Holding Assets Modal (flyout) */}
+            {holdingModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded shadow-lg max-w-2xl w-full">
+                  <HoldingAssetsTable userId="admin-user-id" />
+                  <div className="flex justify-end mt-4">
+                    <Button
+                      onClick={() => setHoldingModalOpen(false)}
+                      variant="secondary"
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
             {/* Display imported data in a table if available */}
             {displayData.length > 0 && (

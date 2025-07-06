@@ -241,3 +241,4 @@ export type ArchivedAsset = typeof archivedAssetsTable.$inferSelect;
 export type NewArchivedAsset = typeof archivedAssetsTable.$inferInsert;
 export type Role = typeof rolesTable.$inferSelect;
 export type NewRole = typeof rolesTable.$inferInsert;
+export type NewHoldingAsset = typeof holdingAssetsTable.$inferInsert;

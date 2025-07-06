@@ -8,14 +8,9 @@ import { parse as parseCSV } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 import {
   db,
-  assetsTable,
-  locationsTable,
-  type NewAsset,
-  Location,
-  assetTypeEnum,
-  assetStateEnum,
-  assignmentTypeEnum,
+  holdingAssetsTable, // Only import what is needed
 } from "@/lib/db";
+import type { NewHoldingAsset } from "@/lib/db/schema";
 
 // Helper to parse CSV buffer
 function parseCsvBuffer(buffer: Buffer) {
@@ -146,58 +141,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // If importing assets, insert them into the database with status 'holding'
+    // If importing assets, insert them into the holding_assets table (not assets)
     if (type === "assets" && Array.isArray(parsedData)) {
-      // Get all locations for mapping name to id
-      const locations: Location[] = await db.select().from(locationsTable);
-      // Find the IT Department - store room location
-      const itStoreRoom = locations.find(
-        (loc) => loc.name.trim().toLowerCase() === "it department - store room"
-      );
-      if (!itStoreRoom) {
-        return NextResponse.json(
-          { error: "IT Department - store room location not found." },
-          { status: 500 }
-        );
-      }
-      const assetsToInsert: NewAsset[] = [];
+      // Use the correct type for insert
+      const holdingAssetsToInsert: NewHoldingAsset[] = [];
       for (const row of parsedData as Record<string, unknown>[]) {
-        // Validate and map enums
-        const typeValue = isAssetType(row.type) ? row.type : null;
-        // --- Normalize state using canonicalizeState utility ---
-        const normalizedState = canonicalizeState(row.state);
-        const stateValue = isAssetState(normalizedState)
-          ? normalizedState
-          : "AVAILABLE";
-        const assignmentTypeValue = isAssignmentType(row.assignmentType)
-          ? row.assignmentType
-          : "INDIVIDUAL";
-        if (!typeValue) {
-          console.warn(`Skipping asset with invalid type: ${row.type}`);
-          continue;
-        }
-        // Always use IT Department - store room for imported assets
-        const locationId = itStoreRoom.id;
-        assetsToInsert.push({
-          // Do not set assetNumber for imported assets; it will be assigned later
-          assetNumber: null,
-          type: typeValue,
-          state: stateValue,
+        // Only require serialNumber and description
+        if (!row.serialNumber || !row.description) continue;
+        holdingAssetsToInsert.push({
           serialNumber: String(row.serialNumber),
           description: String(row.description),
-          purchasePrice: row.purchasePrice ? String(row.purchasePrice) : "0",
-          locationId,
-          assignmentType: assignmentTypeValue,
-          assignedTo: row.assignedTo ? String(row.assignedTo) : null,
-          employeeId: row.employeeId ? String(row.employeeId) : null,
-          department: row.department ? String(row.department) : null,
-          createdAt: parseValidDate(row.createdAt),
-          updatedAt: parseValidDate(row.updatedAt),
-          status: "holding",
+          supplier: row.supplier ? String(row.supplier) : null,
+          status: "pending", // Use the literal value to match enum
+          rawData: row, // Store original row for traceability
+          notes: row.notes ? String(row.notes) : null,
         });
       }
-      if (assetsToInsert.length > 0) {
-        await db.insert(assetsTable).values(assetsToInsert);
+      if (holdingAssetsToInsert.length > 0) {
+        await db.insert(holdingAssetsTable).values(holdingAssetsToInsert);
       }
     }
     return NextResponse.json({
