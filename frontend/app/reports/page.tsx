@@ -21,6 +21,7 @@ import {
   Legend,
 } from "chart.js";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ReportCard } from "@/components/ui/report-card";
 
 // Register Chart.js components
 ChartJS.register(
@@ -93,8 +94,6 @@ function AssetInventoryReport() {
   const [byTypeInReadyToGo, setByTypeInReadyToGo] = useState<{
     [type: string]: number;
   }>({});
-  // State for export loading
-  const [exportLoading, setExportLoading] = useState(false);
 
   // Use generic refs for Bar charts to avoid type errors
   const chartTypeRef = useRef(null);
@@ -121,53 +120,6 @@ function AssetInventoryReport() {
     }
     fetchSummary();
   }, []);
-
-  // Export handler: get chart images and send to API
-  const handleExport = async () => {
-    setExportLoading(true);
-    try {
-      // Get chart images as data URLs
-      const chart1 = (chartTypeRef as any).current?.toBase64Image() || "";
-      const chart2 = (chartStateRef as any).current?.toBase64Image() || "";
-      const chart3 = (chartBuildingRef as any).current?.toBase64Image() || "";
-      const chart4 = (chartReadyRef as any).current?.toBase64Image() || "";
-      // Send to API with real table data
-      const res = await fetch("/api/reports/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chart1,
-          chart2,
-          chart3,
-          chart4,
-          assetTypes: Object.keys(assetCounts).sort(),
-          assetCounts,
-          stateTypes: Object.keys(stateCounts).sort(),
-          stateCounts,
-          buildingTypes: Object.keys(byTypeInBuilding).sort(),
-          byTypeInBuilding,
-          readyTypes: Object.keys(byTypeInReadyToGo).sort(),
-          byTypeInReadyToGo,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to generate PDF");
-      const blob = await res.blob();
-      // Download the PDF as before
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "asset-inventory-report.pdf";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      alert("Failed to export PDF. Please try again.");
-      console.error(err);
-    } finally {
-      setExportLoading(false);
-    }
-  };
 
   // Prepare chart and table data for asset type
   const labels = Object.keys(assetCounts).sort();
@@ -272,668 +224,471 @@ function AssetInventoryReport() {
     ],
   };
 
+  // Render loading, error, or charts
   return (
-    <div style={{ padding: "1rem" }}>
-      {/* Page Header - match Assets page */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">
-          Asset Inventory Report
-        </h2>
-        <p className="text-muted-foreground">Prepared on: {printTime || "—"}</p>
-      </div>
-      {/* Four charts/tables in a single horizontal row, using full page width */}
-      <div
+    <div className="flex-1 flex flex-col pt-4 md:pt-6 pb-2 md:pb-4 px-4 md:px-8">
+      <Card
         style={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: "1rem",
-          marginTop: "2.5rem",
-          marginBottom: "2.5rem",
+          maxWidth: 1200,
           width: "100%",
-          overflowX: "visible",
-          justifyContent: "center",
-          boxSizing: "border-box",
+          margin: 0,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+          borderRadius: 16,
         }}
+        className="shadow-lg border"
       >
-        {/* Assets by Type */}
-        <Card
-          style={{
-            flex: "1 1 350px",
-            maxWidth: 400,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                textAlign: "center",
-                whiteSpace: "normal",
-                overflow: "visible",
-                textOverflow: "unset",
-                width: "100%",
-              }}
-            >
-              Assets by Type
-            </CardTitle>
-          </CardHeader>
-          <CardContent
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "0 0.5rem 0.5rem 0.5rem",
-            }}
+        <CardHeader className="pb-2">
+          <CardTitle
+            style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
           >
-            <div
-              className="print-chart"
-              style={{
-                marginBottom: "1rem",
-                width: "350px",
-                height: "200px",
-                margin: "0 auto",
-              }}
-            >
-              <Bar ref={chartTypeRef as any} data={data} options={options} />
-            </div>
-            <div
-              className="print-table"
-              style={{
-                width: "100%",
-                marginTop: "0.5rem",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                  borderRadius: "0 0 12px 12px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                  fontSize: "12px",
-                }}
-              >
-                <thead>
-                  <tr
+            Asset Inventory Report
+          </CardTitle>
+          <p className="text-muted-foreground text-sm mt-1">
+            Prepared on: {printTime || "—"}
+          </p>
+        </CardHeader>
+        <CardContent>
+          {/* Responsive grid for chart+table cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ReportCard title="Assets by Type" date={printTime || "—"}>
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Bar
+                    ref={chartTypeRef as any}
+                    data={data}
+                    options={options}
+                  />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
                     style={{
-                      background: "#1d4ed8",
-                      color: "#fff",
-                      fontWeight: 700,
-                      fontSize: "1rem",
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
                     }}
                   >
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopLeftRadius: "12px",
-                        textAlign: "left",
-                      }}
-                    >
-                      Asset Type
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopRightRadius: "12px",
-                        textAlign: "right",
-                      }}
-                    >
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {labels.map((type, idx) => (
-                    <tr
-                      key={type}
-                      style={{
-                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                        transition: "background 0.2s",
-                        borderBottom:
-                          idx === labels.length - 1
-                            ? "none"
-                            : "1px solid #cbd5e1",
-                        cursor: "pointer",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#e0e7ff")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          idx % 2 === 0 ? "#f8fafc" : "#fff")
-                      }
-                    >
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "left",
-                        }}
-                      >
-                        {type}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "right",
-                          fontFamily:
-                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
-                        }}
-                      >
-                        {new Intl.NumberFormat().format(assetCounts[type])}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-        {/* Assets by State */}
-        <Card
-          style={{
-            flex: "1 1 350px",
-            maxWidth: 400,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                textAlign: "center",
-                whiteSpace: "normal",
-                overflow: "visible",
-                textOverflow: "unset",
-                width: "100%",
-              }}
-            >
-              Assets by State
-            </CardTitle>
-          </CardHeader>
-          <CardContent
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "0 0.5rem 0.5rem 0.5rem",
-            }}
-          >
-            <div
-              className="print-chart"
-              style={{
-                marginBottom: "1rem",
-                width: "350px",
-                height: "200px",
-                margin: "0 auto",
-              }}
-            >
-              <Bar
-                ref={chartStateRef as any}
-                data={stateData}
-                options={stateOptions}
-              />
-            </div>
-            <div
-              className="print-table"
-              style={{
-                width: "100%",
-                marginTop: "0.5rem",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                  borderRadius: "0 0 12px 12px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                  fontSize: "12px",
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      background: "#1d4ed8",
-                      color: "#fff",
-                      fontWeight: 700,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopLeftRadius: "12px",
-                        textAlign: "left",
-                      }}
-                    >
-                      Asset State
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopRightRadius: "12px",
-                        textAlign: "right",
-                      }}
-                    >
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stateLabels.map((state, idx) => (
-                    <tr
-                      key={state}
-                      style={{
-                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                        transition: "background 0.2s",
-                        borderBottom:
-                          idx === stateLabels.length - 1
-                            ? "none"
-                            : "1px solid #cbd5e1",
-                        cursor: "pointer",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#e0e7ff")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          idx % 2 === 0 ? "#f8fafc" : "#fff")
-                      }
-                    >
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "left",
-                        }}
-                      >
-                        {state}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "right",
-                          fontFamily:
-                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
-                        }}
-                      >
-                        {new Intl.NumberFormat().format(stateCounts[state])}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-        {/* Assets in Building State */}
-        <Card
-          style={{
-            flex: "1 1 260px",
-            maxWidth: 400,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                textAlign: "center",
-                whiteSpace: "normal",
-                overflow: "visible",
-                textOverflow: "unset",
-                width: "100%",
-              }}
-            >
-              Assets in Building State
-            </CardTitle>
-          </CardHeader>
-          <CardContent
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "0 0.5rem 0.5rem 0.5rem",
-            }}
-          >
-            <div
-              className="print-chart"
-              style={{
-                marginBottom: "1rem",
-                width: "350px",
-                height: "200px",
-                margin: "0 auto",
-              }}
-            >
-              <Bar
-                ref={chartBuildingRef as any}
-                data={buildingData}
-                options={options}
-              />
-            </div>
-            <div
-              className="print-table"
-              style={{
-                width: "100%",
-                marginTop: "0.5rem",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                  borderRadius: "0 0 12px 12px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                  fontSize: "12px",
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      background: "#1d4ed8",
-                      color: "#fff",
-                      fontWeight: 700,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopLeftRadius: "12px",
-                        textAlign: "left",
-                      }}
-                    >
-                      Asset Type
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopRightRadius: "12px",
-                        textAlign: "right",
-                      }}
-                    >
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {buildingLabels.map((type, idx) => (
-                    <tr
-                      key={type}
-                      style={{
-                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                        transition: "background 0.2s",
-                        borderBottom:
-                          idx === buildingLabels.length - 1
-                            ? "none"
-                            : "1px solid #cbd5e1",
-                        cursor: "pointer",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#e0e7ff")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          idx % 2 === 0 ? "#f8fafc" : "#fff")
-                      }
-                    >
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "left",
-                        }}
-                      >
-                        {type}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "right",
-                          fontFamily:
-                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
-                        }}
-                      >
-                        {new Intl.NumberFormat().format(byTypeInBuilding[type])}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-        {/* Assets Ready to Go */}
-        <Card
-          style={{
-            flex: "1 1 260px",
-            maxWidth: 400,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                textAlign: "center",
-                whiteSpace: "normal",
-                overflow: "visible",
-                textOverflow: "unset",
-                width: "100%",
-              }}
-            >
-              Assets Ready to Go
-            </CardTitle>
-          </CardHeader>
-          <CardContent
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "0 0.5rem 0.5rem 0.5rem",
-            }}
-          >
-            <div
-              className="print-chart"
-              style={{
-                marginBottom: "1rem",
-                width: "350px",
-                height: "200px",
-                margin: "0 auto",
-              }}
-            >
-              <Bar
-                ref={chartReadyRef as any}
-                data={{
-                  labels: Object.keys(byTypeInReadyToGo).sort(),
-                  datasets: [
-                    {
-                      data: Object.keys(byTypeInReadyToGo)
-                        .sort()
-                        .map((type) => byTypeInReadyToGo[type]),
-                      backgroundColor: Object.keys(byTypeInReadyToGo)
-                        .sort()
-                        .map((type) => {
-                          switch (type) {
-                            case "LAPTOP":
-                              return "#3B82F6";
-                            case "MONITOR":
-                              return "#22C55E";
-                            case "MOBILE_PHONE":
-                              return "#A21CAF";
-                            case "DESKTOP":
-                              return "#F59E42";
-                            case "TABLET":
-                              return "#EC4899";
-                            default:
-                              return "#6B7280";
-                          }
-                        }),
-                    },
-                  ],
-                }}
-                options={options}
-              />
-            </div>
-            <div
-              className="print-table"
-              style={{
-                width: "100%",
-                marginTop: "0.5rem",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                  borderRadius: "0 0 12px 12px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                  fontSize: "12px",
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      background: "#1d4ed8",
-                      color: "#fff",
-                      fontWeight: 700,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopLeftRadius: "12px",
-                        textAlign: "left",
-                      }}
-                    >
-                      Asset Type
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopRightRadius: "12px",
-                        textAlign: "right",
-                      }}
-                    >
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(byTypeInReadyToGo)
-                    .sort()
-                    .map((type, idx, arr) => (
+                    <thead>
                       <tr
-                        key={type}
                         style={{
-                          background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                          transition: "background 0.2s",
-                          borderBottom:
-                            idx === arr.length - 1
-                              ? "none"
-                              : "1px solid #cbd5e1",
-                          cursor: "pointer",
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
                         }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.background = "#e0e7ff")
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.background =
-                            idx % 2 === 0 ? "#f8fafc" : "#fff")
-                        }
                       >
-                        <td
+                        <th
                           style={{
                             padding: "0.5rem",
                             border: "none",
+                            borderTopLeftRadius: "12px",
                             textAlign: "left",
                           }}
                         >
-                          {type}
-                        </td>
-                        <td
+                          Asset Type
+                        </th>
+                        <th
                           style={{
                             padding: "0.5rem",
                             border: "none",
+                            borderTopRightRadius: "12px",
                             textAlign: "right",
-                            fontFamily:
-                              'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                           }}
                         >
-                          {new Intl.NumberFormat().format(
-                            byTypeInReadyToGo[type]
-                          )}
-                        </td>
+                          Count
+                        </th>
                       </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      {/* Action buttons moved to bottom, left-aligned with title */}
-      <div
-        className="print-hide"
-        style={{
-          marginTop: "2rem",
-          display: "flex",
-          gap: "1rem",
-          justifyContent: "flex-end",
-        }}
-      >
-        {/* Export PDF functionality */}
-        <button
-          onClick={handleExport}
-          disabled={exportLoading}
-          style={{
-            padding: "0.5rem 1.5rem",
-            borderRadius: 6,
-            border: "1px solid #1d4ed8",
-            background: exportLoading ? "#aaa" : "#1d4ed8",
-            color: "white",
-            fontWeight: 600,
-            fontSize: 16,
-            cursor: exportLoading ? "not-allowed" : "pointer",
-          }}
-          aria-label="Export report as PDF"
-          title="Export report as PDF"
-        >
-          {exportLoading ? "Exporting..." : "Export"}
-        </button>
-      </div>
+                    </thead>
+                    <tbody>
+                      {labels.map((type, idx) => (
+                        <tr
+                          key={type}
+                          style={{
+                            background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                            transition: "background 0.2s",
+                            borderBottom:
+                              idx === labels.length - 1
+                                ? "none"
+                                : "1px solid #cbd5e1",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.background = "#e0e7ff")
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.background =
+                              idx % 2 === 0 ? "#f8fafc" : "#fff")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "left",
+                            }}
+                          >
+                            {type}
+                          </td>
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "right",
+                              fontFamily:
+                                'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                            }}
+                          >
+                            {new Intl.NumberFormat().format(assetCounts[type])}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ReportCard>
+            <ReportCard title="Assets by State" date={printTime || "—"}>
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Bar
+                    ref={chartStateRef as any}
+                    data={stateData}
+                    options={stateOptions}
+                  />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                        }}
+                      >
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopLeftRadius: "12px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Asset State
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopRightRadius: "12px",
+                            textAlign: "right",
+                          }}
+                        >
+                          Count
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stateLabels.map((state, idx) => (
+                        <tr
+                          key={state}
+                          style={{
+                            background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                            transition: "background 0.2s",
+                            borderBottom:
+                              idx === stateLabels.length - 1
+                                ? "none"
+                                : "1px solid #cbd5e1",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.background = "#e0e7ff")
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.background =
+                              idx % 2 === 0 ? "#f8fafc" : "#fff")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "left",
+                            }}
+                          >
+                            {state}
+                          </td>
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "right",
+                              fontFamily:
+                                'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                            }}
+                          >
+                            {new Intl.NumberFormat().format(stateCounts[state])}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ReportCard>
+            <ReportCard
+              title="Assets in Building State"
+              date={printTime || "—"}
+            >
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Bar
+                    ref={chartBuildingRef as any}
+                    data={buildingData}
+                    options={options}
+                  />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                        }}
+                      >
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopLeftRadius: "12px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Asset Type
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopRightRadius: "12px",
+                            textAlign: "right",
+                          }}
+                        >
+                          Count
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {buildingLabels.map((type, idx) => (
+                        <tr
+                          key={type}
+                          style={{
+                            background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                            transition: "background 0.2s",
+                            borderBottom:
+                              idx === buildingLabels.length - 1
+                                ? "none"
+                                : "1px solid #cbd5e1",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.background = "#e0e7ff")
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.background =
+                              idx % 2 === 0 ? "#f8fafc" : "#fff")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "left",
+                            }}
+                          >
+                            {type}
+                          </td>
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "right",
+                              fontFamily:
+                                'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                            }}
+                          >
+                            {new Intl.NumberFormat().format(
+                              byTypeInBuilding[type]
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ReportCard>
+            <ReportCard title="Assets Ready to Go" date={printTime || "—"}>
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Bar
+                    ref={chartReadyRef as any}
+                    data={{
+                      labels: Object.keys(byTypeInReadyToGo).sort(),
+                      datasets: [
+                        {
+                          data: Object.keys(byTypeInReadyToGo)
+                            .sort()
+                            .map((type) => byTypeInReadyToGo[type]),
+                          backgroundColor: Object.keys(byTypeInReadyToGo)
+                            .sort()
+                            .map((type) => {
+                              switch (type) {
+                                case "LAPTOP":
+                                  return "#3B82F6";
+                                case "MONITOR":
+                                  return "#22C55E";
+                                case "MOBILE_PHONE":
+                                  return "#A21CAF";
+                                case "DESKTOP":
+                                  return "#F59E42";
+                                case "TABLET":
+                                  return "#EC4899";
+                                default:
+                                  return "#6B7280";
+                              }
+                            }),
+                        },
+                      ],
+                    }}
+                    options={options}
+                  />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                        }}
+                      >
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopLeftRadius: "12px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Asset Type
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopRightRadius: "12px",
+                            textAlign: "right",
+                          }}
+                        >
+                          Count
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.keys(byTypeInReadyToGo)
+                        .sort()
+                        .map((type, idx, arr) => (
+                          <tr
+                            key={type}
+                            style={{
+                              background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                              transition: "background 0.2s",
+                              borderBottom:
+                                idx === arr.length - 1
+                                  ? "none"
+                                  : "1px solid #cbd5e1",
+                              cursor: "pointer",
+                            }}
+                            onMouseOver={(e) =>
+                              (e.currentTarget.style.background = "#e0e7ff")
+                            }
+                            onMouseOut={(e) =>
+                              (e.currentTarget.style.background =
+                                idx % 2 === 0 ? "#f8fafc" : "#fff")
+                            }
+                          >
+                            <td
+                              style={{
+                                padding: "0.5rem",
+                                border: "none",
+                                textAlign: "left",
+                              }}
+                            >
+                              {type}
+                            </td>
+                            <td
+                              style={{
+                                padding: "0.5rem",
+                                border: "none",
+                                textAlign: "right",
+                                fontFamily:
+                                  'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                              }}
+                            >
+                              {new Intl.NumberFormat().format(
+                                byTypeInReadyToGo[type]
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ReportCard>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -1013,167 +768,134 @@ function LifecycleManagementReport() {
   };
 
   // Render loading, error, or chart + table
+  if (loading) return <div>Loading chart...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+
   return (
-    <div style={{ padding: "1rem" }}>
-      {/* Page Header - match Asset Inventory page */}
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">
-          Lifecycle Management Report
-        </h2>
-        <p className="text-muted-foreground">Prepared on: {printTime || "—"}</p>
-      </div>
-      {loading ? (
-        <div>Loading chart...</div>
-      ) : error ? (
-        <div style={{ color: "red" }}>Error: {error}</div>
-      ) : (
-        <Card
-          style={{
-            flex: "1 1 350px",
-            maxWidth: 400,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginTop: "2.5rem",
-            marginBottom: "2.5rem",
-          }}
-        >
-          <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                textAlign: "center",
-                whiteSpace: "normal",
-                overflow: "visible",
-                textOverflow: "unset",
-                width: "100%",
-              }}
-            >
-              Assets by Year
-            </CardTitle>
-          </CardHeader>
-          <CardContent
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "0 0.5rem 0.5rem 0.5rem",
-            }}
+    <div className="flex-1 flex flex-col pt-4 md:pt-6 pb-2 md:pb-4 px-4 md:px-8">
+      <Card
+        style={{
+          maxWidth: 1200,
+          width: "100%",
+          margin: 0,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+          borderRadius: 16,
+        }}
+        className="shadow-lg border"
+      >
+        <CardHeader className="pb-2">
+          <CardTitle
+            style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
           >
-            <div
-              style={{
-                width: "100%",
-                margin: 0,
-                marginBottom: "1rem",
-                height: 200,
-              }}
-            >
-              <Bar
-                data={data}
-                options={{
-                  ...options,
-                  plugins: { ...options.plugins, title: { display: false } },
-                  scales: {
-                    ...options.scales,
-                    x: { ...options.scales.x, title: { display: false } },
-                    y: { ...options.scales.y, title: { display: false } },
-                  },
-                }}
-              />
-            </div>
-            <div style={{ width: "100%", marginTop: "2rem" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                  borderRadius: "0 0 12px 12px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                  fontSize: "12px",
-                }}
-              >
-                <thead>
-                  <tr
+            Lifecycle Management Report
+          </CardTitle>
+          <p className="text-muted-foreground text-sm mt-1">
+            Prepared on: {printTime || "—"}
+          </p>
+        </CardHeader>
+        <CardContent>
+          {/* Responsive grid for chart+table cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Card 1: Bar Chart + Table */}
+            <ReportCard title="Assets by Year" date={printTime || "—"}>
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Bar data={data} options={options} />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
                     style={{
-                      background: "#1d4ed8",
-                      color: "#fff",
-                      fontWeight: 700,
-                      fontSize: "1rem",
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
                     }}
                   >
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopLeftRadius: "12px",
-                        textAlign: "left",
-                      }}
-                    >
-                      Year
-                    </th>
-                    <th
-                      style={{
-                        padding: "0.5rem",
-                        border: "none",
-                        borderTopRightRadius: "12px",
-                        textAlign: "right",
-                      }}
-                    >
-                      Count
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {years.map((year, idx) => (
-                    <tr
-                      key={year}
-                      style={{
-                        background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                        transition: "background 0.2s",
-                        borderBottom:
-                          idx === years.length - 1
-                            ? "none"
-                            : "1px solid #cbd5e1",
-                        cursor: "pointer",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#e0e7ff")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          idx % 2 === 0 ? "#f8fafc" : "#fff")
-                      }
-                    >
-                      <td
+                    <thead>
+                      <tr
                         style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "left",
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
                         }}
                       >
-                        {year}
-                      </td>
-                      <td
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          textAlign: "right",
-                          fontFamily:
-                            'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
-                        }}
-                      >
-                        {new Intl.NumberFormat().format(yearCounts[year])}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopLeftRadius: "12px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Year
+                        </th>
+                        <th
+                          style={{
+                            padding: "0.5rem",
+                            border: "none",
+                            borderTopRightRadius: "12px",
+                            textAlign: "right",
+                          }}
+                        >
+                          Count
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {years.map((year, idx) => (
+                        <tr
+                          key={year}
+                          style={{
+                            background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                            transition: "background 0.2s",
+                            borderBottom:
+                              idx === years.length - 1
+                                ? "none"
+                                : "1px solid #cbd5e1",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.background = "#e0e7ff")
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.background =
+                              idx % 2 === 0 ? "#f8fafc" : "#fff")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "left",
+                            }}
+                          >
+                            {year}
+                          </td>
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "right",
+                              fontFamily:
+                                'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                            }}
+                          >
+                            {new Intl.NumberFormat().format(yearCounts[year])}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ReportCard>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -1297,306 +1019,238 @@ function FinancialReport() {
     scales: { y: { beginAtZero: true } },
   };
   // Render loading, error, or charts
+  if (loading) return <div>Loading financial data...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+
   return (
-    <div style={{ padding: "1rem" }}>
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Financial Report</h2>
-        <p className="text-muted-foreground">Prepared on: {printTime || "—"}</p>
-      </div>
-      {loading ? (
-        <div>Loading financial data...</div>
-      ) : error ? (
-        <div style={{ color: "red" }}>Error: {error}</div>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "2rem",
-            marginTop: "2.5rem",
-            marginBottom: "2.5rem",
-            width: "auto",
-            overflowX: "auto",
-            justifyContent: "center",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* Bar Chart: Value by Type */}
-          <Card
-            style={{
-              flex: "1 1 350px",
-              maxWidth: 400,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
+    <div className="flex-1 flex flex-col pt-4 md:pt-6 pb-2 md:pb-4 px-4 md:px-8">
+      <Card
+        style={{
+          maxWidth: 1200,
+          width: "100%",
+          margin: 0,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+          borderRadius: 16,
+        }}
+        className="shadow-lg border"
+      >
+        <CardHeader className="pb-2">
+          <CardTitle
+            style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
           >
-            <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-              <CardTitle
-                style={{
-                  fontSize: "1rem",
-                  textAlign: "center",
-                  whiteSpace: "normal",
-                  overflow: "visible",
-                  textOverflow: "unset",
-                  width: "100%",
-                }}
-              >
-                Current Value of Assets
-              </CardTitle>
-            </CardHeader>
-            <CardContent
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "0 0.5rem 0.5rem 0.5rem",
-              }}
+            Financial Report
+          </CardTitle>
+          <p className="text-muted-foreground text-sm mt-1">
+            Prepared on: {printTime || "—"}
+          </p>
+        </CardHeader>
+        <CardContent>
+          {/* Responsive grid for chart+table cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Card 1: Bar Chart + Value Table */}
+            <ReportCard
+              title="Current Value by Asset Type"
+              date={printTime || "—"}
             >
-              <div
-                style={{
-                  marginBottom: "1rem",
-                  width: "350px",
-                  height: "200px",
-                  margin: "0 auto",
-                }}
-              >
-                <Bar data={barData} options={barOptions} />
-              </div>
-              {/* Table of values */}
-              <div style={{ width: "100%", marginTop: "2rem" }}>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "separate",
-                    borderSpacing: 0,
-                    borderRadius: "0 0 12px 12px",
-                    overflow: "hidden",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                    fontSize: "12px",
-                  }}
-                >
-                  <thead>
-                    <tr
-                      style={{
-                        background: "#1d4ed8",
-                        color: "#fff",
-                        fontWeight: 700,
-                        fontSize: "1rem",
-                      }}
-                    >
-                      <th
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          borderTopLeftRadius: "12px",
-                          textAlign: "left",
-                        }}
-                      >
-                        Asset Type
-                      </th>
-                      <th
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          borderTopRightRadius: "12px",
-                          textAlign: "right",
-                        }}
-                      >
-                        Current Value (£)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {typeLabels.map((type, idx) => (
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Bar data={barData} options={barOptions} />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <thead>
                       <tr
-                        key={type}
                         style={{
-                          background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                          transition: "background 0.2s",
-                          borderBottom:
-                            idx === typeLabels.length - 1
-                              ? "none"
-                              : "1px solid #cbd5e1",
-                          cursor: "pointer",
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
                         }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.background = "#e0e7ff")
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.background =
-                            idx % 2 === 0 ? "#f8fafc" : "#fff")
-                        }
                       >
-                        <td
+                        <th
                           style={{
                             padding: "0.5rem",
                             border: "none",
+                            borderTopLeftRadius: "12px",
                             textAlign: "left",
                           }}
                         >
-                          {type}
-                        </td>
-                        <td
+                          Asset Type
+                        </th>
+                        <th
                           style={{
                             padding: "0.5rem",
                             border: "none",
+                            borderTopRightRadius: "12px",
                             textAlign: "right",
-                            fontFamily:
-                              'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                           }}
                         >
-                          {byType[type].toLocaleString(undefined, {
-                            maximumFractionDigits: 2,
-                          })}
-                        </td>
+                          Current Value (£)
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {typeLabels.map((type, idx) => (
+                        <tr
+                          key={type}
+                          style={{
+                            background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                            transition: "background 0.2s",
+                            borderBottom:
+                              idx === typeLabels.length - 1
+                                ? "none"
+                                : "1px solid #cbd5e1",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.background = "#e0e7ff")
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.background =
+                              idx % 2 === 0 ? "#f8fafc" : "#fff")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "left",
+                            }}
+                          >
+                            {type}
+                          </td>
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "right",
+                              fontFamily:
+                                'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                            }}
+                          >
+                            {byType[type].toLocaleString(undefined, {
+                              maximumFractionDigits: 2,
+                            })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-          {/* Line Chart: Value over Years */}
-          <Card
-            style={{
-              flex: "1 1 350px",
-              maxWidth: 400,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <CardHeader style={{ padding: "0.5rem 0 0 0", width: "100%" }}>
-              <CardTitle
-                style={{
-                  fontSize: "1rem",
-                  textAlign: "center",
-                  whiteSpace: "normal",
-                  overflow: "visible",
-                  textOverflow: "unset",
-                  width: "100%",
-                }}
-              >
-                Asset Value Over Years
-              </CardTitle>
-            </CardHeader>
-            <CardContent
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "0 0.5rem 0.5rem 0.5rem",
-              }}
-            >
-              <div
-                style={{
-                  marginBottom: "1rem",
-                  width: "350px",
-                  height: "200px",
-                  margin: "0 auto",
-                }}
-              >
-                <Line data={lineData} options={lineOptions} />
-              </div>
-              {/* Table of values */}
-              <div style={{ width: "100%", marginTop: "2rem" }}>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "separate",
-                    borderSpacing: 0,
-                    borderRadius: "0 0 12px 12px",
-                    overflow: "hidden",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                    fontSize: "12px",
-                  }}
-                >
-                  <thead>
-                    <tr
-                      style={{
-                        background: "#1d4ed8",
-                        color: "#fff",
-                        fontWeight: 700,
-                        fontSize: "1rem",
-                      }}
-                    >
-                      <th
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          borderTopLeftRadius: "12px",
-                          textAlign: "left",
-                        }}
-                      >
-                        Year
-                      </th>
-                      <th
-                        style={{
-                          padding: "0.5rem",
-                          border: "none",
-                          borderTopRightRadius: "12px",
-                          textAlign: "right",
-                        }}
-                      >
-                        Total Value (£)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {yearLabels.map((year, idx) => (
+            </ReportCard>
+            {/* Card 2: Line Chart + Yearly Value Table */}
+            <ReportCard title="Asset Value Over Years" date={printTime || "—"}>
+              <div className="w-full flex flex-col gap-4 items-center">
+                <div className="w-full max-w-xs mx-auto">
+                  <Line data={lineData} options={lineOptions} />
+                </div>
+                <div className="w-full overflow-x-auto">
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                      borderRadius: "0 0 12px 12px",
+                      overflow: "hidden",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <thead>
                       <tr
-                        key={year}
                         style={{
-                          background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                          transition: "background 0.2s",
-                          borderBottom:
-                            idx === yearLabels.length - 1
-                              ? "none"
-                              : "1px solid #cbd5e1",
-                          cursor: "pointer",
+                          background: "#1d4ed8",
+                          color: "#fff",
+                          fontWeight: 700,
+                          fontSize: "1rem",
                         }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.background = "#e0e7ff")
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.background =
-                            idx % 2 === 0 ? "#f8fafc" : "#fff")
-                        }
                       >
-                        <td
+                        <th
                           style={{
                             padding: "0.5rem",
                             border: "none",
+                            borderTopLeftRadius: "12px",
                             textAlign: "left",
                           }}
                         >
-                          {year}
-                        </td>
-                        <td
+                          Year
+                        </th>
+                        <th
                           style={{
                             padding: "0.5rem",
                             border: "none",
+                            borderTopRightRadius: "12px",
                             textAlign: "right",
-                            fontFamily:
-                              'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
                           }}
                         >
-                          {byYear[year].toLocaleString(undefined, {
-                            maximumFractionDigits: 2,
-                          })}
-                        </td>
+                          Total Value (£)
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {yearLabels.map((year, idx) => (
+                        <tr
+                          key={year}
+                          style={{
+                            background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                            transition: "background 0.2s",
+                            borderBottom:
+                              idx === yearLabels.length - 1
+                                ? "none"
+                                : "1px solid #cbd5e1",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.background = "#e0e7ff")
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.background =
+                              idx % 2 === 0 ? "#f8fafc" : "#fff")
+                          }
+                        >
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "left",
+                            }}
+                          >
+                            {year}
+                          </td>
+                          <td
+                            style={{
+                              padding: "0.5rem",
+                              border: "none",
+                              textAlign: "right",
+                              fontFamily:
+                                'Consolas, "Liberation Mono", Menlo, Monaco, "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, sans-serif',
+                            }}
+                          >
+                            {byYear[year].toLocaleString(undefined, {
+                              maximumFractionDigits: 2,
+                            })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </ReportCard>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
