@@ -111,9 +111,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Asset Details */}
         <div className="space-y-6">
-          <AssetDetail assetId={id} />
+          {asset && <AssetDetail asset={asset} />}
           {/* Only show state transition if asset exists */}
-          {asset && <AssetStateTransition assetId={id} />}
+          {asset && <AssetStateTransition asset={asset} setAsset={setAsset} />}
         </div>
         {/* Only show asset history if asset exists */}
         <div>{asset && <AssetHistory assetId={id} />}</div>

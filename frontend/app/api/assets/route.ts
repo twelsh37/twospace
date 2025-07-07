@@ -371,7 +371,7 @@ export async function PUT(request: NextRequest) {
     const {
       assetIds,
       operation,
-      payload: { newState, ...updateData } = {},
+      payload: { newState, userId, ...updateData } = {},
     } = body;
 
     // Validate input
@@ -393,6 +393,18 @@ export async function PUT(request: NextRequest) {
           error: "Missing operation",
           details:
             'operation is required (e.g., "stateTransition", "bulkUpdate")',
+        },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    // Require userId for state transitions (audit trail)
+    if (operation === "stateTransition" && !userId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Missing userId",
+          details: "userId is required for state transitions",
         },
         { status: 400, headers: corsHeaders }
       );
@@ -432,7 +444,7 @@ export async function PUT(request: NextRequest) {
           await createAssetHistory(
             asset.id,
             newState,
-            "system-bulk",
+            userId, // Use the provided userId for audit
             "Bulk state transition",
             asset.state as "AVAILABLE" | "ISSUED"
           );
@@ -441,6 +453,8 @@ export async function PUT(request: NextRequest) {
           .update(assetsTable)
           .set({ state: newState, updatedAt: new Date() })
           .where(inArray(assetsTable.assetNumber, assetIds));
+        // Clear in-memory asset cache to ensure fresh data
+        assetCache.clear();
         break;
 
       case "bulkUpdate":

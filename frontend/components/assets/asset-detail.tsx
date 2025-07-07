@@ -10,7 +10,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 interface AssetDetailProps {
-  assetId: string;
+  asset: Asset;
 }
 
 // Utility function to map asset state to solid background color classes
@@ -45,39 +45,8 @@ function safeFormatDate(dateValue: unknown): string {
   return isNaN(dateObj.getTime()) ? "N/A" : formatDate(dateObj);
 }
 
-export function AssetDetail({ assetId }: AssetDetailProps) {
-  const [asset, setAsset] = useState<Asset | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchAsset() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/assets/${assetId}`);
-        if (!res.ok) throw new Error("Failed to fetch asset");
-        const json = await res.json();
-        setAsset(json.data as Asset);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchAsset();
-  }, [assetId]);
-
-  if (loading) {
-    return <div className="p-4">Loading asset details...</div>;
-  }
-  if (error || !asset) {
-    return (
-      <div className="p-4 text-destructive">
-        Error: {error || "Asset not found."}
-      </div>
-    );
-  }
+export function AssetDetail({ asset }: AssetDetailProps) {
+  // Asset is now passed as a prop and always available
 
   return (
     <Card>
