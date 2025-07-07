@@ -116,7 +116,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           {asset && <AssetStateTransition asset={asset} setAsset={setAsset} />}
         </div>
         {/* Only show asset history if asset exists */}
-        <div>{asset && <AssetHistory assetId={id} />}</div>
+        <div>{asset && <AssetHistory assetNumber={asset.assetNumber} />}</div>
       </div>
     </div>
   );

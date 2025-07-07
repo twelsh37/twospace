@@ -4,23 +4,22 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ASSET_STATE_LABELS } from "@/lib/constants";
-import { getRelativeTime } from "@/lib/utils";
 import { History, ArrowRight } from "lucide-react";
 import { AssetState } from "@/lib/types";
+import useSWR from "swr";
 
 interface AssetHistoryProps {
-  assetId: string;
+  assetNumber?: string; // Optionally pass assetNumber for direct API fetch
 }
 
-type AssetHistoryType = {
-  id: string;
-  assetId: string;
+// Type for asset history API response
+type AssetHistoryEntry = {
   previousState?: AssetState;
   newState: AssetState;
   changedBy: string;
-  timestamp: Date;
+  timestamp: string;
   changeReason?: string;
-  details?: Record<string, unknown>;
+  userName?: string;
 };
 
 // Utility function to map asset state to solid background color classes
@@ -41,46 +40,21 @@ const getStateColorClass = (state: AssetState) => {
   }
 };
 
-export function AssetHistory({ assetId }: AssetHistoryProps) {
-  // TODO: Fetch asset history from API
-  const history: AssetHistoryType[] = [
-    {
-      id: "1",
-      assetId,
-      newState: AssetState.AVAILABLE,
-      changedBy: "system",
-      timestamp: new Date("2024-01-15T10:00:00"),
-      details: { action: "created", reason: "Initial asset creation" },
-    },
-    {
-      id: "2",
-      assetId,
-      previousState: AssetState.AVAILABLE,
-      newState: AssetState.SIGNED_OUT,
-      changedBy: "john.doe",
-      timestamp: new Date("2024-01-16T14:30:00"),
-      changeReason: "Asset signed out for configuration",
-      details: {
-        action: "state_transition",
-        signedOutBy: "John Doe",
-        purpose: "Device setup and configuration",
-      },
-    },
-    {
-      id: "3",
-      assetId,
-      previousState: AssetState.SIGNED_OUT,
-      newState: AssetState.BUILDING,
-      changedBy: "mike.tech",
-      timestamp: new Date("2024-01-17T11:15:00"),
-      changeReason: "Asset configuration completed",
-      details: {
-        action: "state_transition",
-        configuredBy: "Mike Tech",
-        configurationNotes: "iOS setup, corporate apps installed",
-      },
-    },
-  ];
+export function AssetHistory({ assetNumber }: AssetHistoryProps) {
+  // Fetch assetNumber if not provided (for backward compatibility)
+  // In your usage, pass assetNumber directly for best performance
+  const assetNum = assetNumber;
+  // Fetch real asset history from API
+  const { data, error, isLoading } = useSWR(
+    assetNum ? `/api/assets/${assetNum}/history` : null,
+    async (url) => {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch asset history");
+      return res.json();
+    }
+  );
+  // Show the 6 most recent transactions, including 'Bulk state transition' entries
+  const history: AssetHistoryEntry[] = data?.data ? data.data.slice(0, 6) : [];
 
   const getStateColor = (state: AssetState) => {
     switch (state) {
@@ -100,27 +74,36 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
   };
 
   return (
-    <Card>
+    <Card className="flex flex-col h-full min-h-[600px]">
+      {" "}
+      {/* Adjust min-h as needed */}
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5" />
           Asset History
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        {history.length === 0 ? (
+      <CardContent className="flex-1 flex flex-col justify-between">
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">
+            Loading history...
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-destructive">
+            Error loading history
+          </div>
+        ) : history.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             No history available for this asset
           </div>
         ) : (
           <div className="space-y-4">
             {history.map((entry, index) => (
-              <div key={entry.id} className="relative">
+              <div key={index} className="relative">
                 {/* Timeline line */}
                 {index < history.length - 1 && (
                   <div className="absolute left-3 top-8 w-0.5 h-16 bg-border" />
                 )}
-
                 <div className="flex items-start space-x-4">
                   {/* Timeline dot */}
                   <div
@@ -130,9 +113,8 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
                   >
                     <div className="w-2 h-2 bg-white rounded-full" />
                   </div>
-
                   {/* Entry content */}
-                  <div className="flex-1 min-w-0 pb-4">
+                  <div className="flex-1 min-w-0 pb-1">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         {entry.previousState && (
@@ -157,57 +139,21 @@ export function AssetHistory({ assetId }: AssetHistoryProps) {
                         </Badge>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        {getRelativeTime(entry.timestamp)}
+                        {new Date(entry.timestamp).toLocaleString()}
                       </span>
                     </div>
-
+                    {entry.userName && (
+                      <div className="text-xs text-muted-foreground mb-1">
+                        By: {entry.userName}
+                      </div>
+                    )}
                     {entry.changeReason && (
                       <p className="text-sm font-medium mb-1">
-                        {entry.changeReason}
+                        {entry.changeReason === "Bulk state transition"
+                          ? "State Transition"
+                          : entry.changeReason}
                       </p>
                     )}
-
-                    {entry.details &&
-                      typeof entry.details === "object" &&
-                      entry.details !== null && (
-                        <div className="text-sm text-muted-foreground space-y-1">
-                          {"configurationNotes" in entry.details && (
-                            <p>
-                              Notes:{" "}
-                              {
-                                (entry.details as Record<string, unknown>)[
-                                  "configurationNotes"
-                                ] as string
-                              }
-                            </p>
-                          )}
-                          {"purpose" in entry.details && (
-                            <p>
-                              Purpose:{" "}
-                              {
-                                (entry.details as Record<string, unknown>)[
-                                  "purpose"
-                                ] as string
-                              }
-                            </p>
-                          )}
-                          {"reason" in entry.details && (
-                            <p>
-                              Reason:{" "}
-                              {
-                                (entry.details as Record<string, unknown>)[
-                                  "reason"
-                                ] as string
-                              }
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                    <div className="text-xs text-muted-foreground mt-2">
-                      Changed by{" "}
-                      <span className="font-medium">{entry.changedBy}</span>
-                    </div>
                   </div>
                 </div>
               </div>
