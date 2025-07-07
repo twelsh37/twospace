@@ -185,7 +185,7 @@ const ImportsPage: React.FC = () => {
             {holdingModalOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded shadow-lg max-w-2xl w-full">
-                  <HoldingAssetsTable userId="admin-user-id" />
+                  <HoldingAssetsTable />
                   <div className="flex justify-end mt-4">
                     <Button
                       onClick={() => setHoldingModalOpen(false)}

@@ -8,51 +8,7 @@ import {
 } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
-const IT_STORE_ROOM_ID = "0d964e1a-fabd-4833-9dad-aadab0ea1e1e";
-
-// Helper to parse asset type from asset number prefix
-function getAssetTypeFromNumber(assetNumber: string): string | null {
-  const prefix = assetNumber.slice(0, 2);
-  switch (prefix) {
-    case "01":
-      return "MOBILE_PHONE";
-    case "02":
-      return "TABLET";
-    case "03":
-      return "LAPTOP";
-    case "04":
-      return "DESKTOP";
-    case "05":
-      return "MONITOR";
-    default:
-      return null;
-  }
-}
-
-// Utility to robustly convert a value to ISO string
-function toIsoStringSafe(val: unknown): string {
-  if (typeof val === "string") return val;
-  if (val instanceof Date) return val.toISOString();
-  if (
-    val &&
-    typeof val === "object" &&
-    "toISOString" in val &&
-    typeof (val as any).toISOString === "function"
-  ) {
-    try {
-      return (val as any).toISOString();
-    } catch {}
-  }
-  if (val !== undefined && val !== null) {
-    console.warn(
-      "[assign] Unexpected createdAt value:",
-      val,
-      "type:",
-      typeof val
-    );
-  }
-  return new Date().toISOString();
-}
+// Remove unused: IT_STORE_ROOM_ID, getAssetTypeFromNumber, toIsoStringSafe
 
 export async function POST(req: NextRequest) {
   try {
@@ -112,19 +68,17 @@ export async function POST(req: NextRequest) {
       const assetInsert = {
         id: holdingAsset[0].id,
         assetNumber,
-        type, // Use the provided type from the request
-        state: "AVAILABLE",
+        type: type as (typeof assetsTable.$inferInsert)["type"],
+        state: "AVAILABLE" as (typeof assetsTable.$inferInsert)["state"],
         serialNumber: holdingAsset[0].serialNumber,
         description: holdingAsset[0].description,
         purchasePrice: "0.00",
-        locationId:
-          holdingAsset[0].locationId || "0d964e1a-fabd-4833-9dad-aadab0ea1e1e",
-        assignmentType: "INDIVIDUAL",
-        createdAt: holdingAsset[0].createdAt
-          ? new Date(holdingAsset[0].createdAt)
-          : new Date(),
+        locationId: "0d964e1a-fabd-4833-9dad-aadab0ea1e1e",
+        assignmentType:
+          "INDIVIDUAL" as (typeof assetsTable.$inferInsert)["assignmentType"],
+        createdAt: new Date(),
         updatedAt: new Date(),
-        status: "stock",
+        status: "stock" as (typeof assetsTable.$inferInsert)["status"],
         // Do NOT include rawData or notes here
       };
       console.log("[assign] Inserting asset:", assetInsert);
@@ -133,7 +87,8 @@ export async function POST(req: NextRequest) {
       const assetHistoryInsert = {
         assetId: holdingAsset[0].id,
         previousState: null,
-        newState: "AVAILABLE",
+        newState:
+          "AVAILABLE" as (typeof assetHistoryTable.$inferInsert)["newState"],
         changedBy: userId,
         changeReason: "Asset assigned number and moved from holding_assets",
         timestamp: new Date(), // Pass Date object, not string
@@ -150,11 +105,8 @@ export async function POST(req: NextRequest) {
       const deleteResult = await trx
         .delete(holdingAssetsTable)
         .where(eq(holdingAssetsTable.id, holdingAssetId));
-      if (deleteResult.rowCount === 0) {
-        console.warn(
-          `Warning: Asset ${holdingAssetId} was not removed from holding_assets after assignment.`
-        );
-      }
+      // Optionally log the result for debugging
+      console.log("[assign] Delete result:", deleteResult);
     });
     // Optionally, confirm removal after transaction
     const stillExists = await db
@@ -174,7 +126,11 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("Error in assign asset:", err);
     return NextResponse.json(
-      { error: "Failed to assign asset. " + (err?.message || err) },
+      {
+        error:
+          "Failed to assign asset. " +
+          (err instanceof Error ? err.message : String(err)),
+      },
       { status: 500 }
     );
   }

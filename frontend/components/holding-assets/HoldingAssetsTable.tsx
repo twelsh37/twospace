@@ -12,11 +12,7 @@ interface HoldingAsset {
   notes?: string;
 }
 
-interface Props {
-  userId: string;
-}
-
-const HoldingAssetsTable: React.FC<Props> = ({ userId }) => {
+const HoldingAssetsTable: React.FC = () => {
   const [assets, setAssets] = useState<HoldingAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<HoldingAsset | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -116,7 +112,6 @@ const HoldingAssetsTable: React.FC<Props> = ({ userId }) => {
           <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
             <EditHoldingAssetModal
               asset={selectedAsset}
-              userId={userId}
               onClose={handleModalClose}
               onSuccess={handleModalSuccess}
             />
