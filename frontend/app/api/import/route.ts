@@ -11,6 +11,7 @@ import {
   holdingAssetsTable, // Only import what is needed
 } from "@/lib/db";
 import type { NewHoldingAsset } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
 
 // Helper to parse CSV buffer
 function parseCsvBuffer(buffer: Buffer) {
@@ -74,20 +75,94 @@ export async function POST(req: NextRequest) {
     if (type === "assets" && Array.isArray(parsedData)) {
       // Use the correct type for insert
       const holdingAssetsToInsert: NewHoldingAsset[] = [];
-      for (const row of parsedData as Record<string, unknown>[]) {
-        // Only require serialNumber and description
-        if (!row.serialNumber || !row.description) continue;
+      const allSerialNumbers: string[] = [];
+      console.log("Parsed data:", parsedData);
+      let firstRowKeys: string[] = [];
+      let firstNormalizedKeys: string[] = [];
+      for (const [i, row] of (
+        parsedData as Record<string, unknown>[]
+      ).entries()) {
+        if (i === 0) firstRowKeys = Object.keys(row);
+        // Robustly strip BOM and whitespace from all keys
+        const normalizedRow: Record<string, unknown> = {};
+        for (const key in row) {
+          const cleanKey = key.replace(/^[\uFEFF\s]+/, "");
+          normalizedRow[cleanKey] = row[key];
+        }
+        if (i === 0) firstNormalizedKeys = Object.keys(normalizedRow);
+        // Accept both camelCase and snake_case keys
+        const serialNumber =
+          normalizedRow.serialNumber ||
+          normalizedRow["serialNumber"] ||
+          normalizedRow.serial_number ||
+          normalizedRow["serial_number"];
+        const description =
+          normalizedRow.description ||
+          normalizedRow["description"] ||
+          normalizedRow.Description ||
+          normalizedRow["Description"];
+        if (!serialNumber || !description) continue;
+        allSerialNumbers.push(String(serialNumber));
         holdingAssetsToInsert.push({
-          serialNumber: String(row.serialNumber),
-          description: String(row.description),
-          supplier: row.supplier ? String(row.supplier) : null,
+          serialNumber: String(serialNumber),
+          description: String(description),
+          supplier: normalizedRow.supplier
+            ? String(normalizedRow.supplier)
+            : null,
           status: "pending", // Use the literal value to match enum
-          rawData: row, // Store original row for traceability
-          notes: row.notes ? String(row.notes) : null,
+          rawData: normalizedRow, // Store original row for debugging
+          notes: normalizedRow.notes ? String(normalizedRow.notes) : null,
         });
       }
+      // Log normalized keys for debugging
+      if (firstRowKeys.length > 0) {
+        console.log("First row original keys:", firstRowKeys);
+        console.log("First row normalized keys:", firstNormalizedKeys);
+      }
+      // Check for existing serial numbers in the DB
+      let existingSerials: string[] = [];
       if (holdingAssetsToInsert.length > 0) {
-        await db.insert(holdingAssetsTable).values(holdingAssetsToInsert);
+        const dbSerials = await db
+          .select({ serialNumber: holdingAssetsTable.serialNumber })
+          .from(holdingAssetsTable)
+          .where(inArray(holdingAssetsTable.serialNumber, allSerialNumbers));
+        existingSerials = dbSerials.map((row) => row.serialNumber);
+      }
+      // Filter out duplicates
+      const uniqueAssetsToInsert = holdingAssetsToInsert.filter(
+        (asset) => !existingSerials.includes(asset.serialNumber)
+      );
+      const skippedSerials = holdingAssetsToInsert
+        .filter((asset) => existingSerials.includes(asset.serialNumber))
+        .map((asset) => asset.serialNumber);
+      if (skippedSerials.length > 0) {
+        console.log("Skipped duplicate serial numbers:", skippedSerials);
+      }
+      if (uniqueAssetsToInsert.length === 0) {
+        return NextResponse.json(
+          {
+            warning:
+              "All serial numbers in your import already exist in the holding assets table.",
+            skippedSerials,
+            parsedData,
+            firstRowKeys,
+            firstNormalizedKeys,
+          },
+          { status: 400 }
+        );
+      }
+      // Insert only unique assets
+      await db.insert(holdingAssetsTable).values(uniqueAssetsToInsert);
+      // Return a warning if some were skipped, otherwise success
+      if (skippedSerials.length > 0) {
+        return NextResponse.json(
+          {
+            message: "Import completed with some duplicates skipped.",
+            skippedSerials,
+            insertedCount: uniqueAssetsToInsert.length,
+          },
+          { status: 200 }
+        );
       }
     }
     return NextResponse.json({

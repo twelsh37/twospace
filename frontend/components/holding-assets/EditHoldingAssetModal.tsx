@@ -1,21 +1,22 @@
 // frontend/components/holding-assets/EditHoldingAssetModal.tsx
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
-// Helper to parse asset type from asset number prefix
-function getAssetTypeFromNumber(assetNumber: string): string | null {
+// Helper to parse asset type from asset number prefix (returns enum value)
+function getAssetTypeEnumFromNumber(assetNumber: string): string | null {
   const prefix = assetNumber.slice(0, 2);
   switch (prefix) {
     case "01":
-      return "Mobile Phone";
+      return "MOBILE_PHONE";
     case "02":
-      return "Tablet";
+      return "TABLET";
     case "03":
-      return "Laptop";
+      return "LAPTOP";
     case "04":
-      return "Desktop";
+      return "DESKTOP";
     case "05":
-      return "Monitor";
+      return "MONITOR";
     default:
       return null;
   }
@@ -31,12 +32,10 @@ interface HoldingAsset {
 
 export default function EditHoldingAssetModal({
   asset,
-  userId,
   onClose,
   onSuccess,
 }: {
   asset: HoldingAsset;
-  userId: string;
   onClose: () => void;
   onSuccess: () => void;
 }) {
@@ -48,14 +47,17 @@ export default function EditHoldingAssetModal({
   const [loading, setLoading] = useState(false);
   // State for error message
   const [error, setError] = useState("");
+  const { user } = useAuth();
 
-  // Parse asset type from asset number
-  const assetType = getAssetTypeFromNumber(assetNumber);
+  // Parse asset type from asset number (enum value)
+  const assetTypeEnum = getAssetTypeEnumFromNumber(assetNumber);
 
   // Handler for assigning asset number (shows confirmation dialog)
   const handleAssign = () => {
-    if (!assetNumber || !assetType) {
-      setError("Please enter a valid asset number (prefix 01-05).");
+    if (!assetNumber || !assetTypeEnum) {
+      setError(
+        "Please enter a valid asset number (prefix 01-05). Type is required."
+      );
       return;
     }
     setError("");
@@ -72,7 +74,8 @@ export default function EditHoldingAssetModal({
         body: JSON.stringify({
           holdingAssetId: asset.id,
           assetNumber,
-          userId,
+          userId: user?.id, // Use the real user UUID
+          type: assetTypeEnum, // Send the enum value
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -119,7 +122,7 @@ export default function EditHoldingAssetModal({
         <div className="mb-2">
           <span>Type:&nbsp;</span>
           <b>
-            {assetType || (
+            {assetTypeEnum || (
               <span className="text-red-500">Unknown (check prefix)</span>
             )}
           </b>
@@ -143,7 +146,7 @@ export default function EditHoldingAssetModal({
               Asset Number: <b>{assetNumber}</b>
             </div>
             <div className="mb-2">
-              Type: <b>{assetType}</b>
+              Type: <b>{assetTypeEnum}</b>
             </div>
             <div className="mb-2">
               Serial Number: <b>{asset.serialNumber}</b>

@@ -3,7 +3,7 @@
 // Imports Page for bulk importing assets, users, and locations
 // This page provides an 'Import Data' button to open the import modal dialog
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // Import the ImportModal component (to be created)
 import ImportModal from "@/components/imports/import-modal";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ const ImportsPage: React.FC = () => {
   // State to control modal visibility
   const [modalOpen, setModalOpen] = useState(false);
   const [holdingModalOpen, setHoldingModalOpen] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null); // Persistent error area
+  const [hasUnassignedAssets, setHasUnassignedAssets] = useState(false); // Track if there are unassigned assets
   // State to store imported data for display
   // The imported data is an array of objects, where each object represents a row from the imported CSV/XLSX file.
   // The keys are column names and the values are dynamic (string, number, boolean, etc.), so we use Record<string, unknown> for type safety.
@@ -30,8 +32,27 @@ const ImportsPage: React.FC = () => {
   // Handler to close the modal
   const handleCloseModal = () => setModalOpen(false);
 
+  // Fetch count of unassigned assets
+  const fetchUnassignedAssets = async () => {
+    try {
+      const res = await fetch("/api/holding-assets");
+      const data = await res.json();
+      setHasUnassignedAssets(
+        Array.isArray(data?.data?.assets) && data.data.assets.length > 0
+      );
+    } catch {
+      setHasUnassignedAssets(false);
+    }
+  };
+
+  // Fetch on page load
+  useEffect(() => {
+    fetchUnassignedAssets();
+  }, []);
+
   // Handler to refresh data after successful import
   const handleImportSuccess = async () => {
+    await fetchUnassignedAssets();
     // Fetch the latest imported assets with status 'holding' from the backend
     try {
       const res = await fetch("/api/assets?status=holding&limit=20");
@@ -129,11 +150,22 @@ const ImportsPage: React.FC = () => {
             <Button onClick={handleOpenModal} className="mb-4 w-full max-w-xs">
               Import Data
             </Button>
+            {/* Persistent error area for easier copying */}
+            {errorDetails && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-xs whitespace-pre-wrap break-all w-full">
+                <strong>Error Details:</strong>
+                <pre className="overflow-x-auto">{errorDetails}</pre>
+              </div>
+            )}
             {/* View Holding Assets button */}
             <Button
               onClick={() => setHoldingModalOpen(true)}
-              className="mb-4 w-full max-w-xs"
-              variant="secondary"
+              className={`mb-4 w-full max-w-xs ${
+                hasUnassignedAssets
+                  ? "bg-green-600 text-white hover:bg-green-700"
+                  : ""
+              }`}
+              variant={hasUnassignedAssets ? undefined : "secondary"}
             >
               View Holding Assets
             </Button>
@@ -146,6 +178,7 @@ const ImportsPage: React.FC = () => {
                   handleCloseModal();
                   await handleImportSuccess();
                 }}
+                setErrorDetails={setErrorDetails}
               />
             )}
             {/* Holding Assets Modal (flyout) */}

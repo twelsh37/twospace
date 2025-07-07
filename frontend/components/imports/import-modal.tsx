@@ -2,7 +2,7 @@
 // Modal dialog for importing assets, users, or locations in CSV/XLSX format
 // Provides a step-by-step UI for selecting type, format, uploading file, and importing
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -51,13 +51,15 @@ function Toast({
 interface ImportModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: () => void; // Callback for parent to refresh data
+  onSuccess: () => void;
+  setErrorDetails: (details: string | null) => void;
 }
 
 const ImportModal: React.FC<ImportModalProps> = ({
   open,
   onClose,
   onSuccess,
+  setErrorDetails,
 }) => {
   // State for selected data type
   const [dataType, setDataType] = useState<string>(DATA_TYPES[0].value);
@@ -72,6 +74,8 @@ const ImportModal: React.FC<ImportModalProps> = ({
   } | null>(null);
   // State for loading
   const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null); // Error visible inside modal
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handler for file input change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,12 +88,18 @@ const ImportModal: React.FC<ImportModalProps> = ({
   // Handler for import button click
   const handleImport = async () => {
     if (!file) {
-      setToast({ message: "Please select a file to import.", type: "error" });
-      setTimeout(() => setToast(null), 2000);
+      const msg = "Please select a file to import.";
+      setToast({ message: msg, type: "error" });
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
+      setErrorDetails(msg);
+      setModalError(msg);
       return;
     }
     setLoading(true);
     setToast(null);
+    setErrorDetails(null); // Clear previous error
+    setModalError(null); // Clear previous modal error
     try {
       // Prepare form data for upload
       const formData = new FormData();
@@ -103,21 +113,38 @@ const ImportModal: React.FC<ImportModalProps> = ({
       });
       if (res.ok) {
         setToast({ message: "Import successful!", type: "success" });
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+        toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
+        setErrorDetails(null); // Clear error on success
+        setModalError(null);
         setFile(null); // Reset file input
-        // After 2 seconds, close modal and notify parent
-        setTimeout(() => {
-          setToast(null);
-          onClose();
-          if (onSuccess) onSuccess();
-        }, 2000);
+        onSuccess();
+        onClose(); // Only close modal on success
       } else {
-        const error = await res.text();
-        setToast({ message: `Import failed: ${error}`, type: "error" });
-        setTimeout(() => setToast(null), 2000);
+        let error = {} as Record<string, unknown>;
+        let errorText = "";
+        try {
+          error = await res.json();
+          errorText = JSON.stringify(error, null, 2);
+        } catch {
+          errorText = await res.text();
+        }
+        const msg = `Import failed. See error details below.\n${errorText}`;
+        setToast({ message: msg, type: "error" });
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+        toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
+        setErrorDetails(msg);
+        setModalError(msg);
+        // Always log error
+        console.error("Import error response:", errorText);
       }
     } catch {
-      setToast({ message: "An error occurred during import.", type: "error" });
-      setTimeout(() => setToast(null), 2000);
+      const msg = "An error occurred during import.";
+      setToast({ message: msg, type: "error" });
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
+      setErrorDetails(msg);
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -206,6 +233,12 @@ const ImportModal: React.FC<ImportModalProps> = ({
         </div>
         {/* Step 4: Import button */}
         <div className="flex gap-2 items-center">
+          {modalError && (
+            <div className="mt-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-xs whitespace-pre-wrap break-all">
+              <strong>Error/Debug Info:</strong>
+              <pre className="overflow-x-auto">{modalError}</pre>
+            </div>
+          )}
           <Button onClick={handleImport} disabled={loading}>
             {loading ? "Importing..." : "Import"}
           </Button>
