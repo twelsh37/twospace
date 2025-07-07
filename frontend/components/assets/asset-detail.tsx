@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { AssetState, Asset } from "@/lib/types";
 import { ASSET_TYPE_LABELS, ASSET_STATE_LABELS } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 interface AssetDetailProps {
   asset: Asset;

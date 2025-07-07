@@ -7,7 +7,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AssetType, AssetState, Asset } from "@/lib/types";
+import { AssetState, Asset } from "@/lib/types";
 import {
   ASSET_STATE_LABELS,
   getValidNextStates,
@@ -19,13 +19,7 @@ import React from "react";
 import { mutate } from "swr";
 
 interface AssetStateTransitionProps {
-  asset: {
-    id: string;
-    assetNumber: string; // Add assetNumber for backend API compatibility
-    type: AssetType;
-    state: AssetState;
-    // Add other fields as needed
-  };
+  asset: Asset;
   setAsset: (asset: Asset) => void; // Use Asset type for setAsset
 }
 
@@ -60,11 +54,33 @@ export function AssetStateTransition({
   // Get valid next states for this asset
   const validNextStates = getValidNextStates(asset.type, currentState);
 
-  // Define the ordered lifecycle for this asset type
-  // (For simplicity, use the keys from VALID_STATE_TRANSITIONS for the asset type)
-  const lifecycleStates = Object.keys(
-    VALID_STATE_TRANSITIONS[asset.type]
-  ) as AssetState[];
+  // Build the ordered lifecycle for this asset type by traversing the valid transitions
+  function getLifecycleStates(type: Asset["type"]): AssetState[] {
+    // Start from AVAILABLE and follow the first transition path
+    const transitions = VALID_STATE_TRANSITIONS[type];
+    const visited = new Set<AssetState>();
+    const order: AssetState[] = [];
+    let current: AssetState = AssetState.AVAILABLE;
+    while (current && !visited.has(current)) {
+      order.push(current);
+      visited.add(current);
+      const next: AssetState | undefined = transitions[current]?.[0];
+      if (!next || visited.has(next)) break;
+      current = next;
+    }
+    // For monitors, add READY_TO_GO if not present (since it's a valid transition)
+    if (type === "MONITOR" && !order.includes(AssetState.READY_TO_GO)) {
+      order.push(AssetState.READY_TO_GO);
+    }
+    // Always add ISSUED as the last state if not present
+    if (!order.includes(AssetState.ISSUED)) {
+      order.push(AssetState.ISSUED);
+    }
+    return order;
+  }
+
+  // Use the correct lifecycle for this asset type
+  const lifecycleStates = getLifecycleStates(asset.type);
 
   // Find the index of the current state
   const currentIndex = lifecycleStates.indexOf(currentState);
