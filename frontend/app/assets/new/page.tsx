@@ -16,14 +16,14 @@ export default function NewAssetPage() {
       {/* Background card container */}
       <Card
         style={{
-          maxWidth: 900,
-          width: "100%",
+          maxWidth: 800,
+          width: "fit-content",
           margin: 0,
           boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
           borderRadius: 16,
         }}
       >
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 px-8 py-8">
           {/* Page Header */}
           <div className="flex items-center space-x-2 mb-4">
             <Link href="/assets">
@@ -56,11 +56,9 @@ export default function NewAssetPage() {
           </div>
         </CardHeader>
 
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-8 pb-8">
           {/* Asset Creation Form */}
-          <div className="max-w-2xl">
-            <AssetForm mode="create" />
-          </div>
+          <AssetForm mode="create" />
         </CardContent>
       </Card>
     </div>
