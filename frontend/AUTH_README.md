@@ -50,6 +50,30 @@ This document explains how authentication works in this project, how to set up S
   3. Set the email and password. For the initial admin, use the desired admin email and a strong password.
 - **Via App Sign-Up:**
   - Users can sign up via the app's sign-up page (if enabled).
+
+### Demo User Setup
+
+If you're having trouble logging in with the demo user (`demo@example.com`), it's likely because the user exists in the application database but not in Supabase Auth. To fix this:
+
+1. **Quick Fix (Recommended):**
+   ```bash
+   # Add your Supabase service role key to .env.local first
+   cd frontend
+   node scripts/setup-demo-user.js
+   ```
+
+2. **Manual Setup:**
+   - Go to Supabase Dashboard > Authentication > Users
+   - Create user: `demo@example.com` / `password01`
+   - Check "Auto-confirm email"
+
+3. **For Windows Users:**
+   ```powershell
+   cd frontend
+   .\scripts\setup-demo-user.ps1
+   ```
+
+See `scripts/fix-auth-issue.md` for detailed troubleshooting.
 - **Via API:**
   - Use the Supabase Admin API to programmatically create users (see Supabase docs).
 

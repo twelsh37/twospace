@@ -1,9 +1,11 @@
 // frontend/app/assets/new/page.tsx
 // New Asset Creation Page
 
+"use client";
+
 import { AssetForm } from "@/components/assets/asset-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -11,17 +13,17 @@ export default function NewAssetPage() {
   return (
     // Outer container for page padding and spacing
     <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
-      {/* Background card, left-aligned, with x and y padding of 8 */}
+      {/* Background card container */}
       <Card
         style={{
-          maxWidth: 900, // Slightly narrower than users page for form
-          width: "100%",
+          maxWidth: 800,
+          width: "fit-content",
           margin: 0,
           boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
           borderRadius: 16,
         }}
       >
-        <CardContent className="px-8 py-8">
+        <CardHeader className="pb-2 px-8 py-8">
           {/* Page Header */}
           <div className="flex items-center space-x-2 mb-4">
             <Link href="/assets">
@@ -32,21 +34,31 @@ export default function NewAssetPage() {
             </Link>
           </div>
 
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight">
+              <CardTitle
+                style={{
+                  fontSize: "2rem",
+                  textAlign: "left",
+                  marginBottom: 0,
+                  lineHeight: 1.1,
+                }}
+              >
                 Add New Asset
-              </h2>
-              <p className="text-muted-foreground">
+              </CardTitle>
+              <p
+                className="text-muted-foreground"
+                style={{ marginTop: 2, marginBottom: 0 }}
+              >
                 Create a new asset record and add it to your inventory
               </p>
             </div>
           </div>
+        </CardHeader>
 
+        <CardContent className="pt-0 px-8 pb-8">
           {/* Asset Creation Form */}
-          <div className="max-w-2xl">
-            <AssetForm mode="create" />
-          </div>
+          <AssetForm mode="create" />
         </CardContent>
       </Card>
     </div>
