@@ -3,9 +3,9 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Asset, AssetType, AssignmentType } from "@/lib/types";
-import { ASSET_TYPE_LABELS, INITIAL_LOCATIONS } from "@/lib/constants";
+import { ASSET_TYPE_LABELS } from "@/lib/constants";
 import { validateAsset } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,29 +44,75 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
 
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [assetNumber, setAssetNumber] = useState("");
+  const [suggestedAssetNumber, setSuggestedAssetNumber] = useState("");
+
+  // Fetch locations from the API on mount
+  useEffect(() => {
+    async function fetchLocations() {
+      try {
+        const res = await fetch("/api/locations");
+        const json = await res.json();
+        if (json.data && Array.isArray(json.data)) {
+          setLocations(json.data.map((l: any) => ({ id: l.id, name: l.name })));
+        } else {
+          setLocations([]);
+        }
+      } catch {
+        setLocations([]);
+      }
+    }
+    fetchLocations();
+  }, []);
+
+  // Fetch suggested asset number when type changes
+  useEffect(() => {
+    async function fetchSuggestedAssetNumber() {
+      if (!formData.type) return;
+      try {
+        const res = await fetch(
+          `/api/assets/next-asset-number?type=${formData.type}`
+        );
+        const json = await res.json();
+        if (json.success && json.assetNumber) {
+          setSuggestedAssetNumber(json.assetNumber);
+          // Only set if user hasn't typed anything
+          if (!assetNumber) setAssetNumber(json.assetNumber);
+        }
+      } catch {
+        setSuggestedAssetNumber("");
+      }
+    }
+    fetchSuggestedAssetNumber();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.type]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     // Validate form data
     const validationErrors = validateAsset(formData);
+    if (!assetNumber) validationErrors.push("Asset number is required");
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       return;
     }
-
     setIsSubmitting(true);
     setErrors([]);
-
     try {
-      // TODO: Replace with actual API call
+      // Send assetNumber to API
+      const submitData = {
+        ...formData,
+        locationId: formData.location, // location holds the id now
+        assetNumber,
+      };
       if (onSubmit) {
-        await onSubmit(formData);
+        await onSubmit(submitData);
       }
-
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // Reset form if creating new asset
       if (mode === "create") {
         setFormData({
@@ -80,6 +126,8 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
           employeeId: "",
           department: "",
         });
+        setAssetNumber("");
+        setSuggestedAssetNumber("");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -142,6 +190,23 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
             </Select>
           </div>
 
+          {/* Asset Number (user input, can scan or type) */}
+          <div className="space-y-2">
+            <Label htmlFor="assetNumber">Asset Number *</Label>
+            <Input
+              id="assetNumber"
+              value={assetNumber}
+              onChange={(e) => setAssetNumber(e.target.value)}
+              placeholder={suggestedAssetNumber || "Scan or enter asset number"}
+              autoComplete="off"
+            />
+            {suggestedAssetNumber && (
+              <div className="text-xs text-muted-foreground mt-1">
+                Suggested: {suggestedAssetNumber} (can override)
+              </div>
+            )}
+          </div>
+
           {/* Serial Number */}
           <div className="space-y-2">
             <Label htmlFor="serialNumber">Serial Number *</Label>
@@ -185,18 +250,25 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
             <Select
               value={formData.location}
               onValueChange={(value) => updateField("location", value)}
+              disabled={locations.length === 0}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent>
-                {INITIAL_LOCATIONS.map((location) => (
-                  <SelectItem key={location} value={location}>
-                    {location}
+                {locations.map((location) => (
+                  <SelectItem key={location.id} value={location.id}>
+                    {location.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {/* If no locations, show a message below the dropdown */}
+            {locations.length === 0 && (
+              <div className="text-sm text-muted-foreground mt-1">
+                No locations available. Please add a location first.
+              </div>
+            )}
           </div>
 
           {/* Assignment Type */}

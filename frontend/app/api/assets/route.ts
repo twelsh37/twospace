@@ -15,7 +15,7 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { db, assetsTable, locationsTable } from "@/lib/db";
-import { generateAssetNumber, createAssetHistory } from "@/lib/db/utils";
+import { createAssetHistory, generateAssetNumber } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 import { settingsTable } from "@/lib/db/schema";
 
@@ -50,6 +50,32 @@ async function getCacheDurationFromSettings(): Promise<number> {
  * Retrieve assets with optional filtering, searching, and pagination
  */
 export async function GET(request: NextRequest) {
+  // Support /api/assets/next-asset-number?type=TYPE
+  const { pathname, searchParams } = new URL(request.url);
+  if (pathname.endsWith("/next-asset-number")) {
+    const type = searchParams.get("type");
+    if (!type) {
+      return NextResponse.json(
+        { success: false, error: "Missing type" },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+    try {
+      // Use the existing generateAssetNumber utility
+      const assetNumber = await generateAssetNumber(
+        type as "MOBILE_PHONE" | "TABLET" | "DESKTOP" | "LAPTOP" | "MONITOR"
+      );
+      return NextResponse.json(
+        { success: true, assetNumber },
+        { headers: corsHeaders }
+      );
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "Failed to generate asset number" },
+        { status: 500, headers: corsHeaders }
+      );
+    }
+  }
   const start = Date.now(); // Start timing
   try {
     const { searchParams } = new URL(request.url);
@@ -244,6 +270,7 @@ export async function POST(request: NextRequest) {
       assignedTo,
       employeeId,
       department,
+      assetNumber, // Accept assetNumber from user
     } = body;
 
     // Basic validation
@@ -252,14 +279,15 @@ export async function POST(request: NextRequest) {
       !serialNumber ||
       !description ||
       !purchasePrice ||
-      !locationId
+      !locationId ||
+      !assetNumber // Require assetNumber from user
     ) {
       return NextResponse.json(
         {
           success: false,
           error: "Missing required fields",
           details:
-            "type, serialNumber, description, purchasePrice, and locationId are required",
+            "type, serialNumber, description, purchasePrice, locationId, and assetNumber are required",
         },
         { status: 400, headers: corsHeaders }
       );
@@ -283,30 +311,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if serial number is unique
-    const existingAsset = await db
+    // Check if asset number is unique
+    const existingAssetNumber = await db
       .select()
       .from(assetsTable)
-      .where(eq(assetsTable.serialNumber, serialNumber))
+      .where(eq(assetsTable.assetNumber, assetNumber))
       .limit(1);
-
-    if (existingAsset.length > 0) {
+    if (existingAssetNumber.length > 0) {
       return NextResponse.json(
         {
           success: false,
-          error: "Serial number already exists",
-          details: "An asset with this serial number already exists",
+          error: "Asset number already exists",
+          details: "An asset with this asset number already exists",
         },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Generate asset number
-    const assetNumber = await generateAssetNumber(
-      type as "LAPTOP" | "MONITOR" | "DESKTOP" | "TABLET" | "MOBILE_PHONE"
-    );
-
-    // Create new asset
+    // Create new asset (assetNumber is now provided by user)
     const newAssetData: NewAsset = {
       assetNumber,
       type: type as "LAPTOP",
