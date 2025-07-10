@@ -1,38 +1,31 @@
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_state') THEN
-    CREATE TYPE "public"."asset_state" AS ENUM('AVAILABLE', 'SIGNED_OUT', 'BUILT', 'READY_TO_GO', 'ISSUED', 'holding');
-  END IF;
-END$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_status') THEN
-    CREATE TYPE "public"."asset_status" AS ENUM('holding', 'active', 'retired', 'stock');
-  END IF;
-END$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_type') THEN
-    CREATE TYPE "public"."asset_type" AS ENUM('MOBILE_PHONE', 'TABLET', 'DESKTOP', 'LAPTOP', 'MONITOR');
-  END IF;
-END$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'assignment_type') THEN
-    CREATE TYPE "public"."assignment_type" AS ENUM('INDIVIDUAL', 'SHARED');
-  END IF;
-END$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-    CREATE TYPE "public"."user_role" AS ENUM('ADMIN', 'USER');
-  END IF;
-END$$;
-
+CREATE TYPE "public"."asset_state" AS ENUM('AVAILABLE', 'SIGNED_OUT', 'BUILDING', 'READY_TO_GO', 'ISSUED', 'holding');--> statement-breakpoint
+CREATE TYPE "public"."asset_status" AS ENUM('holding', 'active', 'recycled', 'stock');--> statement-breakpoint
+CREATE TYPE "public"."asset_type" AS ENUM('MOBILE_PHONE', 'TABLET', 'DESKTOP', 'LAPTOP', 'MONITOR');--> statement-breakpoint
+CREATE TYPE "public"."assignment_type" AS ENUM('INDIVIDUAL', 'SHARED');--> statement-breakpoint
+CREATE TYPE "public"."holding_asset_status" AS ENUM('pending', 'processed', 'error');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('ADMIN', 'USER');--> statement-breakpoint
+CREATE TABLE "archived_assets" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"asset_number" varchar(10),
+	"type" "asset_type" NOT NULL,
+	"state" "asset_state" NOT NULL,
+	"serial_number" varchar(255) NOT NULL,
+	"description" text NOT NULL,
+	"purchase_price" numeric(10, 2) NOT NULL,
+	"location_id" uuid NOT NULL,
+	"assignment_type" "assignment_type" NOT NULL,
+	"assigned_to" varchar(255),
+	"employee_id" varchar(50),
+	"department" varchar(255),
+	"created_at" timestamp with time zone,
+	"updated_at" timestamp with time zone,
+	"deleted_at" timestamp with time zone,
+	"status" "asset_status" NOT NULL,
+	"archived_at" timestamp with time zone DEFAULT now(),
+	"archived_by" uuid NOT NULL,
+	"archive_reason" text
+);
+--> statement-breakpoint
 CREATE TABLE "asset_assignments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"asset_id" uuid NOT NULL,
@@ -90,6 +83,19 @@ CREATE TABLE "departments" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "holding_assets" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"serial_number" varchar(255) NOT NULL,
+	"description" text NOT NULL,
+	"supplier" varchar(255),
+	"imported_by" uuid,
+	"imported_at" timestamp with time zone DEFAULT now(),
+	"status" "holding_asset_status" DEFAULT 'pending' NOT NULL,
+	"raw_data" jsonb,
+	"notes" text,
+	CONSTRAINT "holding_assets_serial_number_unique" UNIQUE("serial_number")
+);
+--> statement-breakpoint
 CREATE TABLE "locations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -98,6 +104,20 @@ CREATE TABLE "locations" (
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	CONSTRAINT "locations_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
+CREATE TABLE "roles" (
+	"id" integer PRIMARY KEY NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"user_id" varchar(255) NOT NULL,
+	"role" varchar(32) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "settings" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"report_cache_duration" integer DEFAULT 30 NOT NULL,
+	"depreciation_settings" jsonb,
+	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
@@ -116,6 +136,7 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_employee_id_unique" UNIQUE("employee_id")
 );
 --> statement-breakpoint
+ALTER TABLE "archived_assets" ADD CONSTRAINT "archived_assets_archived_by_users_id_fk" FOREIGN KEY ("archived_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_assignments" ADD CONSTRAINT "asset_assignments_asset_id_assets_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."assets"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_assignments" ADD CONSTRAINT "asset_assignments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_assignments" ADD CONSTRAINT "asset_assignments_location_id_locations_id_fk" FOREIGN KEY ("location_id") REFERENCES "public"."locations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -124,5 +145,6 @@ ALTER TABLE "asset_history" ADD CONSTRAINT "asset_history_asset_id_assets_id_fk"
 ALTER TABLE "asset_history" ADD CONSTRAINT "asset_history_changed_by_users_id_fk" FOREIGN KEY ("changed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "assets" ADD CONSTRAINT "assets_location_id_locations_id_fk" FOREIGN KEY ("location_id") REFERENCES "public"."locations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "departments" ADD CONSTRAINT "departments_location_id_locations_id_fk" FOREIGN KEY ("location_id") REFERENCES "public"."locations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "holding_assets" ADD CONSTRAINT "holding_assets_imported_by_users_id_fk" FOREIGN KEY ("imported_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_location_id_locations_id_fk" FOREIGN KEY ("location_id") REFERENCES "public"."locations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "users" ADD CONSTRAINT "users_department_id_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."departments"("id") ON DELETE no action ON UPDATE no action;

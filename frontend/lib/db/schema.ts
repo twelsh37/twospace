@@ -12,7 +12,6 @@ import {
   pgEnum,
   integer,
   jsonb,
-  serial, // <-- add serial import
 } from "drizzle-orm/pg-core";
 
 // Enum definitions
@@ -43,7 +42,7 @@ export const userRoleEnum = pgEnum("user_role", ["ADMIN", "USER"]);
 export const assetStatusEnum = pgEnum("asset_status", [
   "holding",
   "active",
-  "retired",
+  "recycled",
   "stock",
 ]);
 
@@ -216,7 +215,7 @@ export const holdingAssetsTable = pgTable("holding_assets", {
 // Roles table for assigning roles to users by email
 // REASONING: This table allows associating a user (by email) with a role (Admin/User). Useful for role-based access control and migration compatibility.
 export const rolesTable = pgTable("roles", {
-  id: serial("id").primaryKey(), // Auto-incrementing integer ID
+  id: integer("id").primaryKey(), // Auto-incrementing integer ID
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(), // When the role was assigned

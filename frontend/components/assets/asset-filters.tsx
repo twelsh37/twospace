@@ -108,7 +108,7 @@ export function AssetFilters({
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="stock">Stock</SelectItem>
-              <SelectItem value="retired">Retired</SelectItem>
+              <SelectItem value="recycled">Recycled</SelectItem>
               <SelectItem value="holding">Holding (Imported)</SelectItem>
             </SelectContent>
           </Select>

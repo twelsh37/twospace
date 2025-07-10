@@ -249,7 +249,7 @@ export const generateTestAssets = (count: number) => {
     description: `Test Asset ${i + 1}`,
     location: `Building ${String.fromCharCode(65 + (i % 3))}`,
     department: ["IT", "HR", "Finance"][i % 3],
-    state: ["active", "maintenance", "retired"][i % 3],
+    state: ["active", "maintenance", "recycled"][i % 3],
     purchaseDate: "2023-01-01",
     purchasePrice: 1000 + i * 100,
     currentValue: 800 + i * 80,
