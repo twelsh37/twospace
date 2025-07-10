@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
 import { Save, Loader2 } from "lucide-react";
 
 // Remove assignment-related props from AssetFormProps
@@ -162,7 +161,8 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
       )}
 
       {/* Asset Type */}
-      <div className="space-y-2">
+      {/* Reduced margin-top to halve the space above the asset type dropdown */}
+      <div className="space-y-2 mt-2">
         <Label htmlFor="type">Asset Type *</Label>
         <Select
           value={formData.type}
@@ -210,14 +210,15 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
       </div>
 
       {/* Description */}
+      {/* Changed from Textarea to single-line Input as per user request */}
       <div className="space-y-2">
         <Label htmlFor="description">Description *</Label>
-        <Textarea
+        <Input
           id="description"
           value={formData.description || ""}
           onChange={(e) => updateField("description", e.target.value)}
           placeholder="Enter asset description"
-          rows={3}
+          maxLength={100}
         />
       </div>
 

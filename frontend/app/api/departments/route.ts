@@ -7,22 +7,21 @@ import { departmentsTable } from "@/lib/db/schema";
 
 export async function GET() {
   try {
-    // Query for all unique department names, ordered alphabetically
+    // Query for all department ids and names, ordered alphabetically
     const result = await db
-      .select({ department: departmentsTable.name })
+      .select({ id: departmentsTable.id, name: departmentsTable.name })
       .from(departmentsTable)
       .orderBy(departmentsTable.name);
 
-    // Deduplicate department names
+    // Deduplicate by name, but keep id
     const seen = new Set<string>();
-    const departments = result
-      .map((row) => row.department)
-      .filter((name) => {
-        if (!name || seen.has(name)) return false;
-        seen.add(name);
-        return true;
-      });
+    const departments = result.filter((row) => {
+      if (!row.name || seen.has(row.name)) return false;
+      seen.add(row.name);
+      return true;
+    });
 
+    // Return array of { id, name }
     return NextResponse.json({ departments });
   } catch (error) {
     console.error("Error fetching departments:", error);

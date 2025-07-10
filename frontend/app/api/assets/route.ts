@@ -457,7 +457,7 @@ export async function PUT(request: NextRequest) {
             {
               success: false,
               error: "Missing newState",
-              details: "newState is required for stateTransition operation",
+              details: "newState is required for stateTransition operation",g
             },
             { status: 400, headers: corsHeaders }
           );

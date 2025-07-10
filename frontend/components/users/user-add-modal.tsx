@@ -68,12 +68,20 @@ export function UserAddModal({
   onOpenChange: (open: boolean) => void;
   onAdded?: () => void;
 }) {
-  const [departments, setDepartments] = useState<string[]>([]);
+  const [departments, setDepartments] = useState<
+    { id: string; name: string }[]
+  >([]);
   const [departmentsLoading, setDepartmentsLoading] = useState(false);
+  // Fetch locations
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>(
+    []
+  );
+  const [locationsLoading, setLocationsLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
-    department: "",
+    departmentId: "",
+    locationId: "",
     role: "USER",
     isActive: "true",
     employeeId: "",
@@ -89,6 +97,7 @@ export function UserAddModal({
       try {
         const res = await fetch("/api/departments");
         const json = await res.json();
+        // Store array of { id, name }
         if (json.departments && Array.isArray(json.departments)) {
           setDepartments(json.departments);
         } else {
@@ -120,12 +129,37 @@ export function UserAddModal({
     fetchNextEmployeeId();
   }, [open]);
 
+  // Fetch locations
+  useEffect(() => {
+    if (!open) return;
+    setLocationsLoading(true);
+    async function fetchLocations() {
+      try {
+        const res = await fetch("/api/locations?limit=1000");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          setLocations(
+            json.data.map((loc: any) => ({ id: loc.id, name: loc.name }))
+          );
+        } else {
+          setLocations([]);
+        }
+      } catch {
+        setLocations([]);
+      } finally {
+        setLocationsLoading(false);
+      }
+    }
+    fetchLocations();
+  }, [open]);
+
   // Field validation
   const validate = () => {
     if (!form.name.trim()) return "Name is required.";
     if (!form.email.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email))
       return "Valid email is required.";
-    if (!form.department) return "Department is required.";
+    if (!form.departmentId) return "Department is required.";
+    if (!form.locationId) return "Location is required.";
     if (!form.role) return "Role is required.";
     if (!form.employeeId.trim()) return "Employee ID is required.";
     return null;
@@ -150,8 +184,13 @@ export function UserAddModal({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
+          name: form.name,
+          email: form.email,
+          departmentId: form.departmentId,
+          locationId: form.locationId, // send locationId
+          role: form.role,
           isActive: form.isActive === "true",
+          employeeId: form.employeeId,
         }),
       });
       if (!res.ok) throw new Error("Failed to add user");
@@ -159,7 +198,8 @@ export function UserAddModal({
       setForm({
         name: "",
         email: "",
-        department: "",
+        departmentId: "",
+        locationId: "",
         role: "USER",
         isActive: "true",
         employeeId: "",
@@ -178,7 +218,8 @@ export function UserAddModal({
     setForm({
       name: "",
       email: "",
-      department: "",
+      departmentId: "",
+      locationId: "",
       role: "USER",
       isActive: "true",
       employeeId: "",
@@ -237,8 +278,10 @@ export function UserAddModal({
                   </div>
                 ) : (
                   <Select
-                    value={form.department}
-                    onValueChange={(value) => handleChange("department", value)}
+                    value={form.departmentId}
+                    onValueChange={(value) =>
+                      handleChange("departmentId", value)
+                    }
                     disabled={saving}
                   >
                     <SelectTrigger>
@@ -246,8 +289,35 @@ export function UserAddModal({
                     </SelectTrigger>
                     <SelectContent>
                       {departments.map((dept) => (
-                        <SelectItem key={dept} value={dept}>
-                          {dept}
+                        <SelectItem key={dept.id} value={dept.id}>
+                          {dept.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Location
+                </label>
+                {locationsLoading ? (
+                  <div className="text-sm text-muted-foreground">
+                    Loading locations...
+                  </div>
+                ) : (
+                  <Select
+                    value={form.locationId}
+                    onValueChange={(value) => handleChange("locationId", value)}
+                    disabled={saving}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locations.map((loc) => (
+                        <SelectItem key={loc.id} value={loc.id}>
+                          {loc.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -296,7 +366,12 @@ export function UserAddModal({
                 <label className="block text-sm font-medium mb-1">
                   Employee ID
                 </label>
-                <Input value={form.employeeId} disabled readOnly required />
+                {/* Made Employee ID editable by removing disabled and readOnly */}
+                <Input
+                  value={form.employeeId}
+                  onChange={(e) => handleChange("employeeId", e.target.value)}
+                  required
+                />
               </div>
               {error && <div className="text-red-500 text-sm">{error}</div>}
             </form>

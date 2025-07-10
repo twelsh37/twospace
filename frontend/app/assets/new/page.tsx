@@ -23,7 +23,8 @@ export default function NewAssetPage() {
           borderRadius: 16,
         }}
       >
-        <CardHeader className="pb-2 px-8 py-8">
+        {/* CardHeader now uses the provided class for layout and spacing consistency */}
+        <CardHeader className="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 px-8 py-4">
           {/* Page Header */}
           <div className="flex items-center space-x-2 mb-4">
             <Link href="/assets">

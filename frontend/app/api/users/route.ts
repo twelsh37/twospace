@@ -40,23 +40,37 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, department, role, isActive, employeeId } = body;
+    const {
+      name,
+      email,
+      departmentId,
+      locationId,
+      role,
+      isActive,
+      employeeId,
+    } = body;
 
-    if (!name || !email || !department || !role || !employeeId) {
+    if (
+      !name ||
+      !email ||
+      !departmentId ||
+      !locationId ||
+      !role ||
+      !employeeId
+    ) {
       return NextResponse.json(
         { error: "Missing required fields." },
         { status: 400 }
       );
     }
 
-    // For now, we'll create a basic user record
-    // TODO: Implement proper department/location lookup
+    // Use the provided departmentId and locationId
     const userData = {
       name,
       email,
       employee_id: employeeId,
-      location_id: "00000000-0000-0000-0000-000000000000", // Placeholder
-      department_id: "00000000-0000-0000-0000-000000000000", // Placeholder
+      location_id: locationId, // Use real locationId
+      department_id: departmentId, // Use real departmentId
       role: role.toUpperCase() as "ADMIN" | "USER",
       is_active: !!isActive,
     };
