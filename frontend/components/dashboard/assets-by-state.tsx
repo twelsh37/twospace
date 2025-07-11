@@ -49,7 +49,7 @@ export function AssetsByState({
         return AssetState.AVAILABLE;
       case "holding":
         return "HOLDING";
-      case "retired":
+      case "recycled":
         return null; // Not a lifecycle state
       default:
         return null;

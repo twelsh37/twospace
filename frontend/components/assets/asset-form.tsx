@@ -4,7 +4,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Asset, AssetType } from "@/lib/types";
+import { Asset, AssetType, AssetState } from "@/lib/types";
 import { ASSET_TYPE_LABELS } from "@/lib/constants";
 import { validateAsset } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ type AssetFormProps = {
 export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
   const [formData, setFormData] = useState<Partial<Asset>>({
     type: AssetType.MOBILE_PHONE,
+    state: AssetState.AVAILABLE, // Set default state to Available Stock
     serialNumber: "",
     description: "",
     purchasePrice: "0",
@@ -118,6 +119,7 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
       if (mode === "create") {
         setFormData({
           type: AssetType.MOBILE_PHONE,
+          state: AssetState.AVAILABLE, // Reset to Available Stock
           serialNumber: "",
           description: "",
           purchasePrice: "0",
