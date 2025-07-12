@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-06-11
+
+### Added
+
+- Default filter state for assets, users, and locations now set to 'ALL' for all dropdowns.
+- Asset filters always show 'All Types', 'All States', and 'All Statuses' as default options.
+- Consistent filter UX and clear filters button across assets, users, and locations pages.
+- Documentation of all filter designators in `FILTERS_DESIGNATORS.md`.
+
+### Changed
+
+- Filter logic updated to never send 'ALL' to the backend; 'ALL' is treated as no filter.
+- All filter designators and enums are now uppercase in both frontend and backend.
+- Improved URL query param handling for filters to use uppercase consistently.
+- Asset page now always shows all assets by default.
+
+### Fixed
+
+- Fixed issues where selecting 'ALL' would cause enum errors in the backend.
+- Ensured clear filters resets all dropdowns to 'ALL' and shows all assets.
+
 ## [1.1.0] - 2024-06-10
 
 ### Added
