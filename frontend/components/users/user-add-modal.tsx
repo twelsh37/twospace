@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Location } from "@/lib/db/schema";
 
 // Simple toast utility (if not found in codebase)
 function showToast({
@@ -139,7 +140,8 @@ export function UserAddModal({
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           setLocations(
-            json.data.map((loc: any) => ({ id: loc.id, name: loc.name }))
+            // Use the Location type instead of any for type safety
+            json.data.map((loc: Location) => ({ id: loc.id, name: loc.name }))
           );
         } else {
           setLocations([]);

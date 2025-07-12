@@ -6,6 +6,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { createClientComponentClient } from "./supabase";
+import { useRouter, usePathname } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -28,16 +29,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClientComponentClient();
+  const router = useRouter();
+  const pathname = usePathname();
+  // Used to prevent repeated sign-outs in a single render cycle
+  const [hasHandledInvalidToken, setHasHandledInvalidToken] = useState(false);
 
   useEffect(() => {
-    // Get initial session
+    // Helper to handle invalid refresh token error gracefully
+    const handleInvalidRefreshToken = async () => {
+      // Only handle once per mount
+      if (hasHandledInvalidToken) return;
+      setHasHandledInvalidToken(true);
+      // Sign out to clear tokens
+      await supabase.auth.signOut();
+      // Only redirect if not already on login page
+      if (pathname && !pathname.startsWith("/auth/login")) {
+        router.replace("/auth/login");
+      }
+    };
+
+    // Get initial session with error handling
     const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error: unknown) {
+        // Type guard for error object
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          ("message" in error || "error_description" in error)
+        ) {
+          const message = error as {
+            message?: string;
+            error_description?: string;
+          };
+          if (
+            message.message?.includes("Invalid Refresh Token") ||
+            message.error_description?.includes("Refresh Token Not Found")
+          ) {
+            // Handle invalid refresh token by signing out and redirecting
+            await handleInvalidRefreshToken();
+            return;
+          }
+        }
+        // Other errors: log and set loading false
+        console.error("Error fetching initial session:", error);
+        setLoading(false);
+      }
     };
 
     getInitialSession();
@@ -49,10 +92,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      // If session is null, check for invalid refresh token error
+      if (!session && !hasHandledInvalidToken) {
+        // Try to fetch session to see if error is thrown
+        try {
+          await supabase.auth.getSession();
+        } catch (error: unknown) {
+          // Type guard for error object
+          if (
+            typeof error === "object" &&
+            error !== null &&
+            ("message" in error || "error_description" in error)
+          ) {
+            const message = error as {
+              message?: string;
+              error_description?: string;
+            };
+            if (
+              message.message?.includes("Invalid Refresh Token") ||
+              message.error_description?.includes("Refresh Token Not Found")
+            ) {
+              await handleInvalidRefreshToken();
+            }
+          }
+        }
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  }, [supabase.auth, router, pathname, hasHandledInvalidToken]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -62,7 +130,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, userData: Record<string, unknown>) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    userData: Record<string, unknown>
+  ) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
