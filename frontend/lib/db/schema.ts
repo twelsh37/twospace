@@ -40,10 +40,11 @@ export const assignmentTypeEnum = pgEnum("assignment_type", [
 export const userRoleEnum = pgEnum("user_role", ["ADMIN", "USER"]);
 
 export const assetStatusEnum = pgEnum("asset_status", [
-  "holding",
-  "active",
-  "recycled",
-  "stock",
+  "HOLDING",
+  "ACTIVE",
+  "RECYCLED",
+  "STOCK",
+  "REPAIR", // Added to designate assets in repair condition
 ]);
 
 // Enum for holding asset status

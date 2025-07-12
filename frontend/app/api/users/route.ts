@@ -12,13 +12,17 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
-    const department = searchParams.get("department") || "all";
-    const role = searchParams.get("role") || "all";
+    const department = searchParams.get("department") || "ALL";
+    const role = searchParams.get("role") || "ALL";
 
-    const filters = {
-      department: department !== "all" ? department : undefined,
-      role: role !== "all" ? role : undefined,
-    };
+    // Only include filters if not 'ALL'
+    const filters: { department?: string; role?: string } = {};
+    if (department && department.toUpperCase() !== "ALL") {
+      filters.department = department;
+    }
+    if (role && role.toUpperCase() !== "ALL") {
+      filters.role = role;
+    }
 
     const result = await getUsers(page, limit, filters);
     const responseTime = Date.now() - start;

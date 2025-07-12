@@ -22,8 +22,8 @@ export interface RoleOption {
 }
 
 export interface UserFilterState {
-  department: DepartmentOption | null;
-  role: RoleOption | null;
+  department: string; // Use 'ALL' for all departments
+  role: string; // Use 'ALL' for all roles
 }
 
 export interface UserFiltersProps {
@@ -36,7 +36,7 @@ export interface UserFiltersProps {
 }
 
 const ROLE_OPTIONS: RoleOption[] = [
-  { value: "all", label: "All Roles" },
+  { value: "ALL", label: "All Roles" },
   { value: "ADMIN", label: "Admin" },
   { value: "USER", label: "User" },
 ];
@@ -79,19 +79,14 @@ export function UserFilters({
     <div className="flex flex-wrap items-center gap-4 pb-4">
       {/* Department Filter */}
       <Select
-        value={filters.department?.id || "all"}
+        value={filters.department || "ALL"}
         onValueChange={(value) => {
-          // Debug log to see what value is selected for department
-          console.log("UserFilters department onValueChange", value);
-          // Type guard: ensure value is a string (id)
-          if (value === "all") {
-            onFilterChange("department", null);
+          if (value === "ALL") {
+            onFilterChange("department", "ALL");
           } else if (typeof value === "string") {
-            const selected = departments.find((d) => d.id === value) || null;
-            onFilterChange("department", selected);
+            onFilterChange("department", value);
           } else {
-            console.warn("Department value is not a string:", value);
-            onFilterChange("department", null);
+            onFilterChange("department", "ALL");
           }
         }}
       >
@@ -99,10 +94,10 @@ export function UserFilters({
           <SelectValue placeholder="All Departments" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Departments</SelectItem>
+          <SelectItem value="ALL">All Departments</SelectItem>
           {departments.map((dept) => (
             <SelectItem key={dept.id} value={dept.id}>
-              {dept.name}
+              {dept.name.toUpperCase()}
             </SelectItem>
           ))}
         </SelectContent>
@@ -110,20 +105,14 @@ export function UserFilters({
 
       {/* Role Filter */}
       <Select
-        value={filters.role?.value || "all"}
+        value={filters.role || "ALL"}
         onValueChange={(value) => {
-          // Debug log to see what value is selected for role
-          console.log("UserFilters role onValueChange", value);
-          // Type guard: ensure value is a string (role value)
-          if (value === "all") {
-            onFilterChange("role", null);
+          if (value === "ALL") {
+            onFilterChange("role", "ALL");
           } else if (typeof value === "string") {
-            const selected =
-              ROLE_OPTIONS.find((r) => r.value === value) || null;
-            onFilterChange("role", selected);
+            onFilterChange("role", value);
           } else {
-            console.warn("Role value is not a string:", value);
-            onFilterChange("role", null);
+            onFilterChange("role", "ALL");
           }
         }}
       >

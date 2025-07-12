@@ -120,7 +120,8 @@ export async function GET(request: NextRequest) {
     // Build where conditions
     const whereConditions = [isNull(assetsTable.deletedAt)];
 
-    if (type !== "all") {
+    // Only add type filter if not 'ALL'
+    if (type && type.toUpperCase() !== "ALL") {
       whereConditions.push(
         eq(
           assetsTable.type,
@@ -129,7 +130,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (state !== "all") {
+    // Only add state filter if not 'ALL'
+    if (state && state.toUpperCase() !== "ALL") {
       whereConditions.push(
         eq(
           assetsTable.state,
@@ -138,8 +140,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Only filter by status if not 'all'
-    if (status !== "all") {
+    // Only add status filter if not 'ALL'
+    if (status && status.toUpperCase() !== "ALL") {
       whereConditions.push(
         eq(
           assetsTable.status,

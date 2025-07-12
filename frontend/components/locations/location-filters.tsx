@@ -12,8 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 export type LocationFilterState = {
-  location: string;
-  isActive: string; // "all" | "true" | "false"
+  location: string; // Use 'ALL' for all locations
+  isActive: string; // Use 'ALL' for all statuses
 };
 
 type Props = {
@@ -41,9 +41,7 @@ export function LocationFilters({
       try {
         const res = await fetch("/api/locations");
         const json = await res.json();
-        // Expect locations as array of objects { id, name }
         if (json.data && Array.isArray(json.data)) {
-          // Use 'unknown' instead of 'any' and add a type guard for ESLint compliance
           const validLocations = json.data.filter(
             (l: unknown) =>
               l &&
@@ -66,17 +64,17 @@ export function LocationFilters({
     <div className="flex flex-wrap items-center gap-4 pb-4">
       {/* Location Filter */}
       <Select
-        value={filters.location}
-        onValueChange={(value) => onFilterChange("location", value)}
+        value={filters.location || "ALL"}
+        onValueChange={(value) => onFilterChange("location", value || "ALL")}
       >
         <SelectTrigger className="w-48">
           <SelectValue placeholder="All Locations" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Locations</SelectItem>
+          <SelectItem value="ALL">All Locations</SelectItem>
           {locations.map((loc) => (
             <SelectItem key={loc.id} value={loc.id}>
-              {loc.name}
+              {loc.name.toUpperCase()}
             </SelectItem>
           ))}
         </SelectContent>
@@ -84,14 +82,14 @@ export function LocationFilters({
 
       {/* Status Filter */}
       <Select
-        value={filters.isActive}
-        onValueChange={(value) => onFilterChange("isActive", value)}
+        value={filters.isActive || "ALL"}
+        onValueChange={(value) => onFilterChange("isActive", value || "ALL")}
       >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="All Statuses" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Statuses</SelectItem>
+          <SelectItem value="ALL">All Statuses</SelectItem>
           <SelectItem value="true">Active</SelectItem>
           <SelectItem value="false">Inactive</SelectItem>
         </SelectContent>

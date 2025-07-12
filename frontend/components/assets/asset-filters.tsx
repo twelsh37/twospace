@@ -59,25 +59,22 @@ export function AssetFilters({
   onFilterChange,
   onClearFilters,
 }: AssetFiltersProps) {
-  const hasActiveFilters = Object.values(filters).some(
-    (value) => value !== "all"
-  );
-
+  // Always show the Clear Filters button for better UX
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <Select
-            value={filters.type}
+            value={filters.type || "ALL"}
             onValueChange={(value) => onFilterChange("type", value)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Asset Type" />
+              <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="ALL">All Types</SelectItem>
               {Object.entries(ASSET_TYPE_LABELS).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
+                <SelectItem key={key} value={key.toUpperCase()}>
                   {label}
                 </SelectItem>
               ))}
@@ -85,16 +82,16 @@ export function AssetFilters({
           </Select>
 
           <Select
-            value={filters.state}
+            value={filters.state || "ALL"}
             onValueChange={(value) => onFilterChange("state", value)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Asset State" />
+              <SelectValue placeholder="All States" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All States</SelectItem>
+              <SelectItem value="ALL">All States</SelectItem>
               {Object.entries(ASSET_STATE_LABELS).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
+                <SelectItem key={key} value={key.toUpperCase()}>
                   <Badge className={getStateColorClass(key as AssetState)}>
                     {label}
                   </Badge>
@@ -104,40 +101,36 @@ export function AssetFilters({
           </Select>
 
           <Select
-            value={filters.status}
+            value={filters.status || "ALL"}
             onValueChange={(value) => onFilterChange("status", value)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Asset Status" />
+              <SelectValue placeholder="All Statuses" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="stock">Stock</SelectItem>
-              <SelectItem value="recycled">Recycled</SelectItem>
-              <SelectItem value="holding">Holding (Imported)</SelectItem>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value="HOLDING">Holding (Imported)</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="STOCK">Stock</SelectItem>
+              <SelectItem value="RECYCLED">Recycled</SelectItem>
+              <SelectItem value="REPAIR">Repair</SelectItem>
             </SelectContent>
           </Select>
 
-          {hasActiveFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClearFilters}
-              className="w-full sm:w-auto"
-            >
-              <X className="mr-2 h-4 w-4" />
-              Clear Filters
-            </Button>
-          )}
+          {/* Always show the Clear Filters button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClearFilters}
+            className="w-full sm:w-auto"
+          >
+            <X className="mr-2 h-4 w-4" />
+            Clear Filters
+          </Button>
         </div>
       </div>
 
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 items-center">
-          {/* Removed active filter badges and label as per user request */}
-        </div>
-      )}
+      {/* Removed active filter badges and label as per user request */}
     </div>
   );
 }

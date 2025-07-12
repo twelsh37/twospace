@@ -16,10 +16,11 @@ export async function GET() {
     // Deduplicate by name, but keep id
     const seen = new Set<string>();
     const departments = result.filter((row) => {
-      if (!row.name || seen.has(row.name)) return false;
-      seen.add(row.name);
+      if (!row.name || seen.has(row.name.toUpperCase())) return false;
+      seen.add(row.name.toUpperCase());
       return true;
-    });
+    }).map((row) => ({ ...row, name: row.name.toUpperCase() }));
+    // All department names are now uppercase for consistency.
 
     // Return array of { id, name }
     return NextResponse.json({ departments });
