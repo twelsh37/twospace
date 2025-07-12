@@ -1,5 +1,5 @@
 CREATE TYPE "public"."asset_state" AS ENUM('AVAILABLE', 'SIGNED_OUT', 'BUILDING', 'READY_TO_GO', 'ISSUED', 'holding');--> statement-breakpoint
-CREATE TYPE "public"."asset_status" AS ENUM('holding', 'active', 'recycled', 'stock');--> statement-breakpoint
+CREATE TYPE "public"."asset_status" AS ENUM('HOLDING', 'ACTIVE', 'RECYCLED', 'STOCK', 'REPAIR');-- Added REPAIR for assets in repair condition
 CREATE TYPE "public"."asset_type" AS ENUM('MOBILE_PHONE', 'TABLET', 'DESKTOP', 'LAPTOP', 'MONITOR');--> statement-breakpoint
 CREATE TYPE "public"."assignment_type" AS ENUM('INDIVIDUAL', 'SHARED');--> statement-breakpoint
 CREATE TYPE "public"."holding_asset_status" AS ENUM('pending', 'processed', 'error');--> statement-breakpoint

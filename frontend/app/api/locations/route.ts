@@ -25,12 +25,16 @@ export async function GET(req: Request) {
     const offset = (page - 1) * limit;
 
     const conditions = [];
-    if (isActive === "true") {
-      conditions.push(eq(locationsTable.isActive, true));
-    } else if (isActive === "false") {
-      conditions.push(eq(locationsTable.isActive, false));
+    // Only add isActive filter if not 'ALL'
+    if (isActive && isActive.toUpperCase() !== "ALL") {
+      if (isActive === "true") {
+        conditions.push(eq(locationsTable.isActive, true));
+      } else if (isActive === "false") {
+        conditions.push(eq(locationsTable.isActive, false));
+      }
     }
-    if (locationId && locationId !== "all") {
+    // Only add locationId filter if not 'ALL'
+    if (locationId && locationId.toUpperCase() !== "ALL") {
       conditions.push(eq(locationsTable.id, locationId));
     } else if (name) {
       conditions.push(ilike(locationsTable.name, `%${name}%`));
@@ -69,10 +73,15 @@ export async function GET(req: Request) {
         .offset(offset);
     }
 
+    // When returning locations, ensure all names are uppercase for consistency.
+    const locationsUpper = locations.map((loc) => ({
+      ...loc,
+      name: loc.name.toUpperCase(),
+    }));
     return NextResponse.json(
       {
         success: true,
-        data: locations,
+        data: locationsUpper,
         pagination: {
           page,
           limit,
@@ -128,11 +137,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // Insert new location
+    // Insert new location, always store name as uppercase for consistency.
     const [newLocation] = await db
       .insert(locationsTable)
       .values({
-        name,
+        name: name.toUpperCase(),
         description: description || null,
         isActive: isActive !== undefined ? !!isActive : true,
       })

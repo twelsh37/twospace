@@ -17,8 +17,8 @@ import { ExportModal } from "@/components/ui/export-modal";
 export default function LocationsPage() {
   // Filter and pagination state
   const [filters, setFilters] = useState<LocationFilterState>({
-    location: "all",
-    isActive: "all",
+    location: "ALL",
+    isActive: "ALL",
   });
   const [page, setPage] = useState(1);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function LocationsPage() {
   };
 
   const handleClearFilters = () => {
-    setFilters({ location: "all", isActive: "all" });
+    setFilters({ location: "ALL", isActive: "ALL" });
     setPage(1);
   };
 
