@@ -62,7 +62,7 @@ export function LocationTable({
     try {
       const params = new URLSearchParams();
       if (filters.location && filters.location !== "all") {
-        params.set("name", filters.location);
+        params.set("locationId", filters.location);
       }
       if (filters.isActive && filters.isActive !== "all") {
         params.set("isActive", filters.isActive);

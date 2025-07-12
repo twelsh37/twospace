@@ -28,7 +28,8 @@
     "update:asset-descriptions": "tsx scripts/update-asset-descriptions.ts",
     "db:clear-test-data": "tsx scripts/clear-test-data.ts",
     "db:drop-tables": "tsx scripts/drop-all-tables.ts",
-    "db:seed-settings": "tsx scripts/seed-settings.ts"
+    "db:seed-settings": "tsx scripts/seed-settings.ts",
+    "db:fix-departments": "tsx ./scripts/fix-it-department-ids.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",

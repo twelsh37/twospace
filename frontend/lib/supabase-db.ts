@@ -33,6 +33,9 @@ type AssetHistoryRow = Tables["asset_history"]["Row"];
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type SettingsRow = Tables["settings"]["Row"];
 
+// Add a type alias for Department
+type Department = { id: string; name: string };
+
 // =============================================================================
 // USERS
 // =============================================================================
@@ -55,44 +58,74 @@ export async function getUsers(
       role,
       is_active,
       employee_id,
-      departments!inner(name)
+      departments!inner(id, name)
     `,
-      { count: "exact" } // Ensure we get the total count for pagination
+      { count: "exact" }
     )
     .eq("is_active", true)
     .range((page - 1) * limit, page * limit - 1)
     .order("name");
 
-  if (filters?.department && filters.department !== "all") {
-    query = query.eq("departments.name", filters.department);
-  }
-
-  if (filters?.role && filters.role !== "all") {
-    query = query.eq("role", filters.role.toUpperCase());
+  // Combine filters using .filter() for explicit AND logic if both are present
+  if (
+    filters?.department &&
+    filters.department !== "all" &&
+    filters?.role &&
+    filters.role !== "all"
+  ) {
+    // Log filters for debugging
+    console.log("getUsers filters:", filters);
+    query = query
+      .filter("departments.id", "eq", filters.department)
+      .filter("role", "eq", filters.role.toUpperCase());
+  } else {
+    if (filters?.department && filters.department !== "all") {
+      query = query.eq("departments.id", filters.department);
+    }
+    if (filters?.role && filters.role !== "all") {
+      query = query.eq("role", filters.role.toUpperCase());
+    }
   }
 
   const { data, error, count } = await query;
+
+  // Log raw data for debugging
+  if (
+    filters?.department &&
+    filters.department !== "all" &&
+    filters?.role &&
+    filters.role !== "all"
+  ) {
+    console.log("getUsers raw data:", data);
+  }
 
   if (error) throw error;
 
   return {
     data:
-      data?.map((user) => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        department: Array.isArray(
-          user.departments as
-            | { name?: string }[]
-            | { name?: string }
-            | undefined
-        )
-          ? (user.departments as { name?: string }[])[0]?.name || ""
-          : (user.departments as { name?: string } | undefined)?.name || "",
-        isActive: user.is_active,
-        employeeId: user.employee_id,
-      })) || [],
+      data?.map((user) => {
+        let departmentId = "";
+        let departmentName = "";
+        if (Array.isArray(user.departments)) {
+          departmentId = user.departments[0]?.id || "";
+          departmentName = user.departments[0]?.name || "";
+        } else if (user.departments && typeof user.departments === "object") {
+          // Explicitly type user.departments as Department
+          const dept = user.departments as Department;
+          departmentId = dept.id || "";
+          departmentName = dept.name || "";
+        }
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          departmentId,
+          department: departmentName,
+          isActive: user.is_active,
+          employeeId: user.employee_id,
+        };
+      }) || [],
     pagination: {
       page,
       limit,

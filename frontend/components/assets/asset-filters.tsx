@@ -30,6 +30,12 @@ interface AssetFiltersProps {
   onClearFilters: () => void;
 }
 
+// Removed unused LocationOption interface to resolve ESLint error
+// interface LocationOption {
+//   id: string;
+//   name: string;
+// }
+
 // Utility function to map asset state to solid background color classes
 const getStateColorClass = (state: AssetState) => {
   switch (state) {

@@ -22,12 +22,18 @@ type Props = {
   onClearFilters: () => void;
 };
 
+// Define a type for location objects
+interface LocationOption {
+  id: string;
+  name: string;
+}
+
 export function LocationFilters({
   filters,
   onFilterChange,
   onClearFilters,
 }: Props) {
-  const [locations, setLocations] = useState<string[]>([]);
+  const [locations, setLocations] = useState<LocationOption[]>([]);
 
   useEffect(() => {
     // Fetch unique locations from the API
@@ -35,14 +41,22 @@ export function LocationFilters({
       try {
         const res = await fetch("/api/locations");
         const json = await res.json();
-        type Location = { name: string };
+        // Expect locations as array of objects { id, name }
         if (json.data && Array.isArray(json.data)) {
-          setLocations(["all", ...json.data.map((l: Location) => l.name)]);
+          // Use 'unknown' instead of 'any' and add a type guard for ESLint compliance
+          const validLocations = json.data.filter(
+            (l: unknown) =>
+              l &&
+              typeof l === "object" &&
+              typeof (l as { id?: unknown }).id === "string" &&
+              typeof (l as { name?: unknown }).name === "string"
+          );
+          setLocations(validLocations);
         } else {
-          setLocations(["all"]);
+          setLocations([]);
         }
       } catch {
-        setLocations(["all"]);
+        setLocations([]);
       }
     }
     fetchLocations();
@@ -60,13 +74,11 @@ export function LocationFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Locations</SelectItem>
-          {locations
-            .filter((l) => l !== "all")
-            .map((loc) => (
-              <SelectItem key={loc} value={loc}>
-                {loc}
-              </SelectItem>
-            ))}
+          {locations.map((loc) => (
+            <SelectItem key={loc.id} value={loc.id}>
+              {loc.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

@@ -3,14 +3,19 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
-import { UserFilterState } from "./user-filters";
 import { UserDetailModal } from "./user-detail-modal";
 import { UserEditModal } from "./user-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Define a type for the filters prop that expects string values
+export interface UserTableFilters {
+  department: string;
+  role: string;
+}
+
 interface UserTableProps {
-  filters: UserFilterState;
+  filters: UserTableFilters;
   page: number;
   onPageChange: (pageNumber: number) => void;
 }
@@ -49,6 +54,8 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
       setIsLoading(true);
       try {
         const params = new URLSearchParams();
+        // Debug log to see what is being sent for filters
+        console.log("UserTable API call filters:", filters);
         if (filters.department && filters.department !== "all") {
           params.set("department", filters.department);
         }

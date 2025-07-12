@@ -19,6 +19,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const name = searchParams.get("name");
     const isActive = searchParams.get("isActive");
+    const locationId = searchParams.get("locationId");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const offset = (page - 1) * limit;
@@ -29,7 +30,9 @@ export async function GET(req: Request) {
     } else if (isActive === "false") {
       conditions.push(eq(locationsTable.isActive, false));
     }
-    if (name) {
+    if (locationId && locationId !== "all") {
+      conditions.push(eq(locationsTable.id, locationId));
+    } else if (name) {
       conditions.push(ilike(locationsTable.name, `%${name}%`));
     }
 
