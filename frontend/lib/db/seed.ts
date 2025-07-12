@@ -640,7 +640,7 @@ async function seedDatabase() {
             assignedTo: user.email,
             employeeId: user.employeeId,
             locationId: user.locationId,
-            status: "active",
+            status: "ACTIVE",
             createdAt, // <-- Set createdAt
           };
         } else {
@@ -653,7 +653,7 @@ async function seedDatabase() {
             purchasePrice: blueprint.price?.toFixed(2) || "0.00",
             assignmentType: "INDIVIDUAL",
             locationId: itStoreRoom.id,
-            status: normalizedState === "AVAILABLE" ? "stock" : "holding",
+            status: normalizedState === "AVAILABLE" ? "STOCK" : "HOLDING",
             createdAt, // <-- Set createdAt
           };
         }

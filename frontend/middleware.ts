@@ -12,6 +12,7 @@ const ALLOWED_ASSET_PARAMS = [
   "type",
   "state",
   "assignmentType",
+  "status", // Add this line to allow status param
 ];
 
 /**

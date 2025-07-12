@@ -2,7 +2,7 @@
 // Users Management Page
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { UserTable } from "@/components/users/user-table";
 import { Button } from "@/components/ui/button";
@@ -33,54 +33,20 @@ function UsersPageContent() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
 
-  // Departments and roles state
-  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
-  const ROLE_OPTIONS = [
-    { value: "all", label: "All Roles" },
-    { value: "ADMIN", label: "Admin" },
-    { value: "USER", label: "User" },
-  ];
-
-  // Fetch departments on mount
-  useEffect(() => {
-    async function fetchDepartments() {
-      try {
-        const res = await fetch("/api/departments");
-        const json = await res.json();
-        if (json.departments && Array.isArray(json.departments)) {
-          setDepartments(json.departments);
-        } else {
-          setDepartments([]);
-        }
-      } catch {
-        setDepartments([]);
-      }
-    }
-    fetchDepartments();
-  }, []);
-
   // Parse filter values from URL and map to objects
   const departmentParam = searchParams?.get("department") || "all";
   const roleParam = searchParams?.get("role") || "all";
-  const selectedDepartment =
-    departmentParam === "all"
-      ? null
-      : departments.find((d) => d.id === departmentParam) || null;
-  const selectedRole =
-    roleParam === "all"
-      ? null
-      : ROLE_OPTIONS.find((r) => r.value === roleParam) || null;
 
-  // filters object now only uses DepartmentOption | null and RoleOption | null
+  // filters object now only uses department and role as string values (not objects)
   const filters: UserFilterState = {
-    department: selectedDepartment,
-    role: selectedRole,
+    department: departmentParam,
+    role: roleParam,
   };
   const page = parseInt(searchParams?.get("page") || "1", 10);
 
   const handleFilterChange = (
     key: keyof UserFilterState,
-    value: DepartmentOption | RoleOption | null
+    value: string | DepartmentOption | RoleOption | null
   ) => {
     const params = new URLSearchParams(searchParams?.toString() ?? "");
     // Debug log to see what is being passed as value
@@ -142,8 +108,8 @@ function UsersPageContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          department: filters.department?.id || "all",
-          role: filters.role?.value || "all",
+          department: filters.department || "all",
+          role: filters.role || "all",
           format,
         }),
       });
@@ -226,12 +192,7 @@ function UsersPageContent() {
           <div className="mt-4">
             <Suspense fallback={<UsersLoadingSkeleton />}>
               <UserTable
-                filters={{
-                  department: filters.department
-                    ? filters.department.id
-                    : "all",
-                  role: filters.role ? filters.role.value : "all",
-                }}
+                filters={filters}
                 page={page}
                 onPageChange={handlePageChange}
               />

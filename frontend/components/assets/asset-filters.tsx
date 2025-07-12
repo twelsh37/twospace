@@ -109,7 +109,7 @@ export function AssetFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Statuses</SelectItem>
-              <SelectItem value="HOLDING">Holding (Imported)</SelectItem>
+              <SelectItem value="HOLDING">Holding</SelectItem>
               <SelectItem value="ACTIVE">Active</SelectItem>
               <SelectItem value="STOCK">Stock</SelectItem>
               <SelectItem value="RECYCLED">Recycled</SelectItem>

@@ -30,7 +30,7 @@ export interface UserFiltersProps {
   filters: UserFilterState;
   onFilterChange: (
     key: keyof UserFilterState,
-    value: DepartmentOption | RoleOption | null
+    value: DepartmentOption | RoleOption | string | null
   ) => void;
   onClearFilters: () => void;
 }
@@ -82,7 +82,7 @@ export function UserFilters({
         value={filters.department || "ALL"}
         onValueChange={(value) => {
           if (value === "ALL") {
-            onFilterChange("department", "ALL");
+            onFilterChange("department", value);
           } else if (typeof value === "string") {
             onFilterChange("department", value);
           } else {
@@ -108,7 +108,7 @@ export function UserFilters({
         value={filters.role || "ALL"}
         onValueChange={(value) => {
           if (value === "ALL") {
-            onFilterChange("role", "ALL");
+            onFilterChange("role", value);
           } else if (typeof value === "string") {
             onFilterChange("role", value);
           } else {

@@ -15,9 +15,13 @@ type StatCard = {
 type DashboardStatsProps = {
   totalAssets: number;
   assetsByState: { state: string; count: number }[];
+  pendingHoldingCount: number; // Add this prop
 };
 
-export function DashboardStats({ assetsByState }: DashboardStatsProps) {
+export function DashboardStats({
+  assetsByState,
+  pendingHoldingCount,
+}: DashboardStatsProps) {
   // const availableCount = getCountByState("AVAILABLE"); // No longer used
   // Helper function to find count by possible state variants
   function getCountByStateVariants(variants: string[]) {
@@ -49,13 +53,15 @@ export function DashboardStats({ assetsByState }: DashboardStatsProps) {
     "issued",
     "ISSUED",
   ]);
-  // Get count for assets in 'holding' status
-  const holdingCount = getCountByStateVariants([
-    "holding",
-    "HOLDING",
-    "imported",
-    "IMPORTED",
-  ]);
+  // Get count for assets in 'holding' status (from holding_assets table)
+  // const holdingCount = getCountByStateVariants([
+  //   "holding",
+  //   "HOLDING",
+  //   "imported",
+  //   "IMPORTED",
+  // ]);
+  // Use pendingHoldingCount instead
+  const holdingCount = pendingHoldingCount;
   // Get count for assets in 'BUILDING' state (handle possible variants)
   const buildingCount = getCountByStateVariants([
     "BUILDING",
