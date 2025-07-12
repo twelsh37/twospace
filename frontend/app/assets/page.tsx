@@ -17,6 +17,7 @@ import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 
 export default function AssetsPage() {
   return (
@@ -34,17 +35,17 @@ function AssetsPageContent() {
   // Controlled filter state
   // Use optional chaining to avoid errors if searchParams is null
   const [filters, setFilters] = useState<FilterState>(() => ({
-    type: "ALL",
-    state: "ALL",
-    status: "ALL",
+    type: "all",
+    state: "all",
+    status: "all",
   }));
 
   // Keep filters in sync with URL query params
   useEffect(() => {
     setFilters({
-      type: (searchParams?.get("type")?.toUpperCase() as AssetType) || "ALL",
-      state: (searchParams?.get("state")?.toUpperCase() as AssetState) || "ALL",
-      status: searchParams?.get("status")?.toUpperCase() || "ALL",
+      type: (searchParams?.get("type") as AssetType) || "all",
+      state: (searchParams?.get("state") as AssetState) || "all",
+      status: searchParams?.get("status") || "all",
     });
   }, [searchParams]);
 
@@ -53,20 +54,20 @@ function AssetsPageContent() {
 
   // Update both state and URL when a filter changes
   const handleFilterChange = (key: FilterKey, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value.toUpperCase() }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
     const params = new URLSearchParams(searchParams?.toString() ?? "");
-    if (value.toUpperCase() === "ALL") {
+    if (value === "all") {
       params.delete(key);
     } else {
-      params.set(key, value.toUpperCase());
+      params.set(key, value);
     }
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleClearFilters = () => {
-    setFilters({ type: "ALL", state: "ALL", status: "ALL" });
+    setFilters({ type: "all", state: "all", status: "all" });
     // Ensure pathname is a string; fallback to root if null
     router.push(pathname ?? "/assets");
   };
@@ -142,13 +143,15 @@ function AssetsPageContent() {
               <Download className="mr-2 h-4 w-4" />
               <span className="hidden sm:inline">Export</span>
             </Button>
-            <Link href="/assets/new" className="flex-1 md:flex-none">
-              <Button size="sm" className="w-full md:w-auto">
-                <Plus className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Add Asset</span>
-                <span className="sm:hidden">Add</span>
-              </Button>
-            </Link>
+            {filters.status !== "HOLDING" && (
+              <Link href="/assets/new" className="flex-1 md:flex-none">
+                <Button size="sm" className="w-full md:w-auto">
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Add Asset</span>
+                  <span className="sm:hidden">Add</span>
+                </Button>
+              </Link>
+            )}
           </div>
         </CardHeader>
         <CardContent className="pt-0">
@@ -160,32 +163,41 @@ function AssetsPageContent() {
           />
           <div className="mt-4">
             <Suspense fallback={<AssetsLoadingSkeleton />}>
-              <AssetTable
-                queryString={(() => {
-                  // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
-                  const params = new URLSearchParams(
-                    searchParams?.toString() ?? ""
-                  );
-                  // Remove status from query string if 'ALL' is selected
-                  if (filters.status === "ALL") {
-                    params.delete("status");
-                  } else if (filters.status) {
-                    params.set("status", filters.status);
-                  }
-                  if (filters.type === "ALL") {
-                    params.delete("type");
-                  } else if (filters.type) {
-                    params.set("type", filters.type);
-                  }
-                  if (filters.state === "ALL") {
-                    params.delete("state");
-                  } else if (filters.state) {
-                    params.set("state", filters.state);
-                  }
-                  return params.toString();
-                })()}
-                onPageChange={handlePageChange}
-              />
+              {filters.status === "HOLDING" ? (
+                <div>
+                  <div className="mb-2 text-blue-700 font-semibold text-center">
+                    Showing assets in{" "}
+                    <span className="underline">pending (holding)</span> status,
+                    awaiting asseting.
+                  </div>
+                  <HoldingAssetsTable />
+                </div>
+              ) : (
+                <AssetTable
+                  queryString={(() => {
+                    const params = new URLSearchParams(
+                      searchParams?.toString() ?? ""
+                    );
+                    if (filters.status === "all") {
+                      params.delete("status");
+                    } else if (filters.status) {
+                      params.set("status", filters.status);
+                    }
+                    if (filters.type === "all") {
+                      params.delete("type");
+                    } else if (filters.type) {
+                      params.set("type", filters.type);
+                    }
+                    if (filters.state === "all") {
+                      params.delete("state");
+                    } else if (filters.state) {
+                      params.set("state", filters.state);
+                    }
+                    return params.toString();
+                  })()}
+                  onPageChange={handlePageChange}
+                />
+              )}
             </Suspense>
           </div>
         </CardContent>

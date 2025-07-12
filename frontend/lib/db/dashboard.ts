@@ -7,6 +7,7 @@ import {
   assetHistoryTable,
   usersTable,
   locationsTable,
+  holdingAssetsTable, // Add this import
 } from "./schema";
 import { desc, count, eq, sum } from "drizzle-orm";
 
@@ -63,6 +64,13 @@ export async function getDashboardData() {
       .leftJoin(assetsTable, eq(assetHistoryTable.assetId, assetsTable.id))
       .orderBy(desc(assetHistoryTable.timestamp))
       .limit(5);
+
+    // Add query for pending holding assets
+    const pendingHoldingResult = await tx
+      .select({ count: count() })
+      .from(holdingAssetsTable)
+      .where(eq(holdingAssetsTable.status, "pending"));
+    const pendingHoldingCount = pendingHoldingResult[0]?.count || 0;
 
     // --- Canonical state mapping for dashboard cards ---
     // Map all possible state variants (case, spelling) to canonical dashboard states
@@ -133,6 +141,7 @@ export async function getDashboardData() {
           : "",
         assetNumber: activity.assetNumber ?? undefined,
       })),
+      pendingHoldingCount, // Add this field
     };
 
     return dashboardData;

@@ -118,7 +118,7 @@ export const assetsTable = pgTable("assets", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   deletedAt: timestamp("deleted_at", { withTimezone: true }), // Soft delete
-  status: assetStatusEnum("status").notNull().default("holding"),
+  status: assetStatusEnum("status").notNull().default("HOLDING"),
 });
 
 // Asset history for audit trail

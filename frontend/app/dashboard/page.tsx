@@ -6,9 +6,10 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { AssetsByType } from "@/components/dashboard/assets-by-type";
 import { AssetsByState } from "@/components/dashboard/assets-by-state";
 import { QuickActions } from "@/components/dashboard/quick-actions";
-//import type { DashboardData } from "@/lib/types";
+import { ReadyToGoAssetsCard } from "@/components/dashboard/building-assets-card";
 import { getDashboardData } from "@/lib/db/dashboard";
 import { headers } from "next/headers";
+import { Card } from "@/components/ui/card";
 
 export default async function DashboardPage() {
   // Directly call the shared dashboard data function
@@ -26,6 +27,13 @@ export default async function DashboardPage() {
   const buildingByType = buildingByTypeRes.ok
     ? await buildingByTypeRes.json()
     : [];
+  const readyToGoByTypeRes = await fetch(
+    `${protocol}://${host}/api/assets/ready-to-go-by-type`,
+    { cache: "no-store" }
+  );
+  const readyToGoByType = readyToGoByTypeRes.ok
+    ? await readyToGoByTypeRes.json()
+    : [];
 
   // Handle case where data fetching fails
   if (!data) {
@@ -41,42 +49,48 @@ export default async function DashboardPage() {
 
   return (
     // Mobile-first responsive dashboard layout
-    <div className="flex-1 space-y-4 pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8 bg-gray-50">
-      {/* Page Header */}
-      <div className="flex items-center justify-center md:justify-end">
-        <QuickActions />
-      </div>
-
-      {/* Dashboard Stats Grid - Mobile stacked, desktop grid */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-        <DashboardStats
-          totalAssets={data.totalAssets}
-          assetsByState={data.assetsByState}
-        />
-      </div>
-
-      {/* Main Content Grid - Mobile stacked, desktop two columns */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 lg:items-end items-stretch">
-        {/* Left Column: Stack Assets by Type and Building Assets */}
-        <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">
-          <div className="flex-1">
-            <AssetsByType data={data} />
-          </div>
-          <div className="flex-1">
-            <AssetsByState
-              data={data.assetsByState}
-              buildingByType={buildingByType}
-            />
-          </div>
+    <Card className="m-2 md:m-4 p-0 bg-white shadow-lg">
+      <div className="flex-1 space-y-4 pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
+        {/* Page Header */}
+        <div className="flex items-center justify-center md:justify-end">
+          <QuickActions />
         </div>
 
-        {/* Right Column: Recent Activity fills height of both left cards */}
-        <div className="col-span-1 lg:col-span-3 h-full flex flex-col">
-          <div className="flex-1 h-full">
-            <RecentActivity data={data.recentActivity} />
+        {/* Dashboard Stats Grid - Mobile stacked, desktop grid */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+          <DashboardStats
+            totalAssets={data.totalAssets}
+            assetsByState={data.assetsByState}
+            pendingHoldingCount={data.pendingHoldingCount} // Pass the new prop
+          />
+        </div>
+
+        {/* Main Content Grid - Mobile stacked, desktop two columns */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 lg:items-end items-stretch">
+          {/* Left Column: Stack Assets by Type and Building Assets */}
+          <div className="col-span-1 space-y-4 lg:col-span-4 h-full flex flex-col">
+            <div className="flex-1">
+              <AssetsByType data={data} />
+            </div>
+            <div className="flex-1">
+              <AssetsByState
+                data={data.assetsByState}
+                buildingByType={buildingByType}
+              />
+            </div>
+            <div className="flex-1">
+              <ReadyToGoAssetsCard readyToGoByType={readyToGoByType} />
+            </div>
+          </div>
+
+          {/* Right Column: Recent Activity fills height of both left cards */}
+          <div className="col-span-1 lg:col-span-3 h-full flex flex-col">
+            <div className="flex-1 h-full">
+              <RecentActivity data={data.recentActivity} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
