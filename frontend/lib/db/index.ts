@@ -17,12 +17,15 @@ if (!process.env.POSTGRES_URL) {
   throw new Error("POSTGRES_URL is not set in environment variables");
 }
 
+// Declare queryClient for use in drizzle and closeConnection
+let queryClient: ReturnType<typeof postgres>;
+
 // Create the connection
 try {
   // Log DB connection attempt
   systemLogger.info("Attempting to connect to Postgres database...");
   // Note: For Supabase with Transaction pooling, disable prepare
-  var queryClient = postgres(process.env.POSTGRES_URL, {
+  queryClient = postgres(process.env.POSTGRES_URL, {
     prepare: false, // Required for Supabase Transaction pooling
     max: isProduction ? 10 : 5, // Allow more connections in development
   });

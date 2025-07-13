@@ -66,3 +66,85 @@
 [2025-07-13T13:20:58.402Z] [APP] info: Aggregated building-by-type asset counts
 [2025-07-13T13:20:58.455Z] [APP] info: GET /api/assets/ready-to-go-by-type called
 [2025-07-13T13:20:58.513Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:01.230Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:01.233Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?state=READY_TO_GO
+[2025-07-13T13:29:01.235Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:01.278Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:01.292Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:01.299Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:29:05.900Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:06.303Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:06.463Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:06.529Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:06.575Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:06.636Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:08.336Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:08.339Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:08.350Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=holding
+[2025-07-13T13:29:08.391Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:08.399Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:29:08.401Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:13.420Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:13.473Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:14.577Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:15.004Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:15.081Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:15.146Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:15.192Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:15.253Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:17.202Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:17.203Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:17.210Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?state=AVAILABLE
+[2025-07-13T13:29:17.258Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:17.262Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:29:17.268Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:19.250Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:20.428Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:20.522Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:20.586Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:20.633Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:20.694Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:22.294Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:22.298Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?state=BUILDING
+[2025-07-13T13:29:22.305Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:22.343Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:22.354Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:22.360Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:29:24.240Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:24.663Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:24.741Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:24.806Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:24.853Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:24.920Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:26.665Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:26.667Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:26.676Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?state=READY_TO_GO
+[2025-07-13T13:29:26.722Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:26.726Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:26.740Z] [APP] info: Cache hit for GET /api/assets with key: state=READY_TO_GO
+[2025-07-13T13:29:28.433Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:28.846Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:28.915Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:28.971Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:29.018Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:29.082Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:31.658Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:31.662Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?state=ISSUED
+[2025-07-13T13:29:31.663Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:29:31.708Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:31.716Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:29:31.723Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:29:35.800Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:36.211Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:36.288Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:36.356Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:36.435Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:36.497Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:29:51.735Z] [APP] info: getDashboardData called
+[2025-07-13T13:29:52.157Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:29:52.237Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:29:52.296Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:29:52.339Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:29:52.401Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:50:27.155Z] [APP] info: getDashboardData called
+[2025-07-13T13:50:27.978Z] [APP] info: Dashboard data fetched
