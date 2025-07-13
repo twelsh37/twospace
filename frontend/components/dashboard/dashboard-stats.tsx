@@ -131,15 +131,18 @@ export function DashboardStats({
           style={{ textDecoration: "none" }}
         >
           <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-medium text-center w-full">
                 {stat.title}
               </CardTitle>
               <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="pt-0 pb-1">
+              {/* Remove extra margin above the number for tighter vertical spacing */}
+              <div className="w-full flex justify-center mt-0 mb-0">
+                <div className="text-3xl font-bold m-0 p-0">{stat.value}</div>
+              </div>
+              <p className="text-xs text-muted-foreground text-center mt-1">
                 {stat.description}
               </p>
             </CardContent>
