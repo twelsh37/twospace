@@ -3,9 +3,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getUsers, createUser } from "@/lib/supabase-db";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // GET /api/users - returns paginated users
 export async function GET(request: NextRequest) {
+  // Log the start of the GET request
+  appLogger.info(`GET /api/users called. URL: ${request.url}`);
   const start = Date.now(); // Start timing
   try {
     // Parse query params for pagination and filters
@@ -14,6 +17,14 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const department = searchParams.get("department") || "ALL";
     const role = searchParams.get("role") || "ALL";
+
+    // Log the filters being used
+    appLogger.info("GET /api/users - Filters:", {
+      page,
+      limit,
+      department,
+      role,
+    });
 
     // Only include filters if not 'ALL'
     const filters: { department?: string; role?: string } = {};
@@ -27,12 +38,17 @@ export async function GET(request: NextRequest) {
     const result = await getUsers(page, limit, filters);
     const responseTime = Date.now() - start;
 
+    appLogger.info(`Fetched users successfully in ${responseTime}ms`);
     return NextResponse.json({
       ...result,
       responseTime,
     });
   } catch (error) {
-    console.error("Error fetching users:", error);
+    systemLogger.error(
+      `Error fetching users: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to fetch users" },
       { status: 500 }
@@ -42,6 +58,8 @@ export async function GET(request: NextRequest) {
 
 // POST /api/users - create a new user
 export async function POST(request: NextRequest) {
+  // Log the start of the POST request
+  appLogger.info("POST /api/users called");
   try {
     const body = await request.json();
     const {
@@ -54,6 +72,17 @@ export async function POST(request: NextRequest) {
       employeeId,
     } = body;
 
+    // Log the user creation attempt
+    appLogger.info("Attempting to create user", {
+      name,
+      email,
+      departmentId,
+      locationId,
+      role,
+      isActive,
+      employeeId,
+    });
+
     if (
       !name ||
       !email ||
@@ -62,6 +91,7 @@ export async function POST(request: NextRequest) {
       !role ||
       !employeeId
     ) {
+      appLogger.warn("Missing required fields in user creation");
       return NextResponse.json(
         { error: "Missing required fields." },
         { status: 400 }
@@ -80,9 +110,16 @@ export async function POST(request: NextRequest) {
     };
 
     const result = await createUser(userData);
+    appLogger.info(
+      `User created successfully: ${result.user?.id || "unknown id"}`
+    );
     return NextResponse.json({ user: result.user }, { status: 201 });
   } catch (error) {
-    console.error("Error creating user:", error);
+    systemLogger.error(
+      `Error creating user: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to create user." },
       { status: 500 }

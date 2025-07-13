@@ -9,6 +9,7 @@ import {
   assetHistoryTable,
   type NewAssetHistory,
 } from "./schema";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Asset number prefixes mapping
 const ASSET_NUMBER_PREFIXES = {
@@ -27,6 +28,8 @@ const ASSET_NUMBER_PREFIXES = {
 export async function generateAssetNumber(
   assetType: keyof typeof ASSET_NUMBER_PREFIXES
 ): Promise<string> {
+  // Log function entry
+  appLogger.info("generateAssetNumber called", { assetType });
   try {
     // Get the prefix for the asset type
     const prefix = ASSET_NUMBER_PREFIXES[assetType];
@@ -48,9 +51,17 @@ export async function generateAssetNumber(
 
     // Format as XX-YYYYY
     const formattedSequence = sequenceNumber.toString().padStart(5, "0");
+    appLogger.info("Generated asset number", {
+      assetType,
+      assetNumber: `${prefix}-${formattedSequence}`,
+    });
     return `${prefix}-${formattedSequence}`;
   } catch (error) {
-    console.error("Error generating asset number:", error);
+    systemLogger.error(
+      `Error generating asset number: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     throw new Error("Failed to generate asset number");
   }
 }
@@ -72,6 +83,14 @@ export async function createAssetHistory(
   previousState?: string,
   details?: Record<string, unknown>
 ): Promise<void> {
+  // Log function entry
+  appLogger.info("createAssetHistory called", {
+    assetId,
+    newState,
+    changedBy,
+    changeReason,
+    previousState,
+  });
   try {
     const historyEntry: NewAssetHistory = {
       assetId,
@@ -94,8 +113,13 @@ export async function createAssetHistory(
     };
 
     await db.insert(assetHistoryTable).values(historyEntry);
+    appLogger.info("Asset history entry created", { assetId, newState });
   } catch (error) {
-    console.error("Error creating asset history:", error);
+    systemLogger.error(
+      `Error creating asset history: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     throw new Error("Failed to create asset history");
   }
 }
@@ -113,6 +137,8 @@ export async function getActiveAssets(filters?: {
   limit?: number;
   offset?: number;
 }) {
+  // Log function entry
+  appLogger.info("getActiveAssets called", { filters });
   try {
     const conditions = [isNull(assetsTable.deletedAt)];
 
@@ -170,17 +196,21 @@ export async function getActiveAssets(filters?: {
       .where(and(...conditions));
 
     // Apply pagination if specified
-    if (filters?.limit && filters?.offset) {
-      return await baseQuery.limit(filters.limit).offset(filters.offset);
-    } else if (filters?.limit) {
-      return await baseQuery.limit(filters.limit);
-    } else if (filters?.offset) {
-      return await baseQuery.offset(filters.offset);
-    } else {
-      return await baseQuery;
-    }
+    const result = await (filters?.limit && filters?.offset
+      ? baseQuery.limit(filters.limit).offset(filters.offset)
+      : filters?.limit
+      ? baseQuery.limit(filters.limit)
+      : filters?.offset
+      ? baseQuery.offset(filters.offset)
+      : baseQuery);
+    appLogger.info("Active assets fetched", { count: result.length });
+    return result;
   } catch (error) {
-    console.error("Error getting active assets:", error);
+    systemLogger.error(
+      `Error getting active assets: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     throw new Error("Failed to retrieve assets");
   }
 }
@@ -190,6 +220,8 @@ export async function getActiveAssets(filters?: {
  * @returns Promise<object> - Asset statistics
  */
 export async function getAssetStatistics() {
+  // Log function entry
+  appLogger.info("getAssetStatistics called");
   try {
     const totalAssets = await db
       .select({ count: sql<number>`count(*)` })
@@ -214,6 +246,7 @@ export async function getAssetStatistics() {
       .where(isNull(assetsTable.deletedAt))
       .groupBy(assetsTable.state);
 
+    appLogger.info("Asset statistics fetched");
     return {
       totalAssets: totalAssets[0]?.count || 0,
       assetsByType: assetsByType.reduce((acc, item) => {
@@ -226,8 +259,12 @@ export async function getAssetStatistics() {
       }, {} as Record<string, number>),
     };
   } catch (error) {
-    console.error("Error getting asset statistics:", error);
-    throw new Error("Failed to retrieve asset statistics");
+    systemLogger.error(
+      `Error getting asset statistics: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
+    throw new Error("Failed to get asset statistics");
   }
 }
 
@@ -240,6 +277,8 @@ export async function softDeleteAsset(
   assetId: string,
   deletedBy: string
 ): Promise<void> {
+  // Log function entry
+  appLogger.info("softDeleteAsset called", { assetId, deletedBy });
   try {
     const now = new Date();
 
@@ -258,8 +297,13 @@ export async function softDeleteAsset(
       undefined,
       { deletedAt: now.toISOString() }
     );
+    appLogger.info("Asset soft deleted", { assetId });
   } catch (error) {
-    console.error("Error soft deleting asset:", error);
-    throw new Error("Failed to delete asset");
+    systemLogger.error(
+      `Error soft deleting asset: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
+    throw new Error("Failed to soft delete asset");
   }
 }

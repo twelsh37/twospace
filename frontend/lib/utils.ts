@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Asset } from "./types";
+// NOTE: Do NOT import server-side loggers here. This file is used by both client and server code.
+// If you need to log from the client, use console.log or send logs to an API route.
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

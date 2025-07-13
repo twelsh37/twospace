@@ -4,8 +4,11 @@
 import { NextResponse } from "next/server";
 import { db, assetsTable } from "@/lib/db";
 import { isNull, sql } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET() {
+  // Log the start of the GET request
+  appLogger.info("GET /api/reports/asset-inventory/summary called");
   try {
     // Group by type
     const byTypeRows = await db
@@ -69,6 +72,13 @@ export async function GET() {
     for (const row of byYearRows) {
       byYear[row.year] = Number(row.count);
     }
+    appLogger.info("Aggregated asset-inventory summary", {
+      byType,
+      byState,
+      byTypeInBuilding,
+      byTypeInReadyToGo,
+      byYear,
+    });
     return NextResponse.json({
       byType,
       byState,
@@ -76,7 +86,12 @@ export async function GET() {
       byTypeInReadyToGo,
       byYear,
     });
-  } catch {
+  } catch (error) {
+    systemLogger.error(
+      `Error in GET /api/reports/asset-inventory/summary: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to fetch summary" },
       { status: 500 }

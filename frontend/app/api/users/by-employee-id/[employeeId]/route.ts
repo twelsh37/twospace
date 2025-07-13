@@ -10,14 +10,21 @@ import {
   assetsTable,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ employeeId: string }> }
 ) {
+  // Log the start of the GET request
+  appLogger.info("GET /api/users/by-employee-id/[employeeId] called");
   try {
     const { employeeId } = await context.params;
+    appLogger.info("Fetching user by employee ID", { employeeId });
     if (!employeeId) {
+      appLogger.warn(
+        "Employee ID is required in GET /api/users/by-employee-id/[employeeId]"
+      );
       return NextResponse.json(
         { error: "Employee ID is required" },
         { status: 400 }
@@ -45,6 +52,10 @@ export async function GET(
       .where(eq(usersTable.employeeId, employeeId));
 
     if (!users.length) {
+      appLogger.warn(
+        "User not found in GET /api/users/by-employee-id/[employeeId]",
+        { employeeId }
+      );
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -62,9 +73,16 @@ export async function GET(
       .from(assetsTable)
       .where(eq(assetsTable.employeeId, employeeId));
 
+    appLogger.info("Fetched user and assets successfully by employee ID", {
+      employeeId,
+    });
     return NextResponse.json({ data: user, assets });
   } catch (error) {
-    console.error("Error fetching user by employee ID:", error);
+    systemLogger.error(
+      `Error fetching user by employee ID: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to fetch user" },
       { status: 500 }

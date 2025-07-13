@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { assetsTable, settingsTable } from "@/lib/db/schema";
 import { isNull } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Define a type for depreciation settings
 interface DepreciationSettings {
@@ -43,6 +44,8 @@ function calculateDepreciatedValue(
 }
 
 export async function GET() {
+  // Log the start of the GET request
+  appLogger.info("GET /api/reports/financial/summary called");
   try {
     // Fetch all assets (not deleted)
     const assets = await db
@@ -148,9 +151,14 @@ export async function GET() {
       }
       byYear[year] = total;
     }
+    appLogger.info("Aggregated financial summary", { byType, byYear });
     return NextResponse.json({ byType, byYear });
   } catch (err: unknown) {
-    console.error("Error in financial summary API:", err);
+    systemLogger.error(
+      `Error in GET /api/reports/financial/summary: ${
+        err instanceof Error ? err.stack : String(err)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to generate financial summary" },
       { status: 500 }

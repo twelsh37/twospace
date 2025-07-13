@@ -12,17 +12,25 @@ import {
 } from "@/lib/db/schema";
 import { ilike, or, eq, desc, sql } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 /**
  * GET /api/search?q={query}
  * Searches for assets, users, and locations based on the query.
  */
 export async function GET(request: Request) {
+  // Log the start of the GET request
+  appLogger.info("GET /api/search called");
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
 
+    appLogger.info("Search query received", { query });
+
     if (!query || typeof query !== "string" || query.trim().length === 0) {
+      appLogger.warn(
+        "Query parameter is required and cannot be empty in search"
+      );
       return NextResponse.json(
         { error: "Query parameter is required and cannot be empty" },
         { status: 400 }
@@ -103,9 +111,19 @@ export async function GET(request: Request) {
       locations: locationResults,
     };
 
+    appLogger.info("Search completed", {
+      assetCount: results.assets.length,
+      userCount: results.users.length,
+      locationCount: results.locations.length,
+    });
+
     return NextResponse.json({ success: true, data: results });
   } catch (error) {
-    console.error("Error during search:", error);
+    systemLogger.error(
+      `Error during search: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       {
         success: false,

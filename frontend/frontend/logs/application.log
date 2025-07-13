@@ -1,0 +1,16 @@
+[2025-07-13T02:49:11.890Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets
+[2025-07-13T02:49:11.894Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets
+[2025-07-13T02:49:11.950Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T02:49:12.210Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T02:49:16.043Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets?type=MOBILE_PHONE
+[2025-07-13T02:49:16.067Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets?type=MOBILE_PHONE&page=1
+[2025-07-13T02:49:16.120Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T02:49:16.126Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T02:49:18.112Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets?type=MOBILE_PHONE&page=1&state=SIGNED_OUT
+[2025-07-13T02:49:18.160Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T02:49:21.955Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets?type=MOBILE_PHONE&page=1&state=ISSUED
+[2025-07-13T02:49:22.010Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T08:01:55.681Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets
+[2025-07-13T08:01:55.685Z] [APP] info: GET /api/assets called. URL: http://localhost:3001/api/assets
+[2025-07-13T08:01:55.741Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T08:01:56.067Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__

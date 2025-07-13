@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "E:\\data\\Projects\\twospace\\frontend\\frontend\\logs\\.9be557fa57be45c80404c551721f563f7f15be7b-audit.json",
+    "files": [
+        {
+            "date": 1752412805964,
+            "name": "E:\\data\\Projects\\twospace\\frontend\\frontend\\logs\\system-rejections_20250713.log",
+            "hash": "38dbf18621d69e7b1a154addd843081c3f7c060d613b6e1edcee22fadf42e9ce"
+        }
+    ],
+    "hashType": "sha256"
+}

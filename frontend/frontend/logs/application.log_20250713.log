@@ -1,0 +1,68 @@
+[2025-07-13T13:20:05.998Z] [APP] info: getDashboardData called
+[2025-07-13T13:20:06.813Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:20:07.374Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:20:07.711Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:20:08.034Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:20:08.097Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:20:22.273Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=holding
+[2025-07-13T13:20:22.279Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:20:22.285Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:20:22.329Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:20:22.664Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:20:22.674Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:20:26.689Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:20:26.746Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:20:29.089Z] [APP] info: getDashboardData called
+[2025-07-13T13:20:29.512Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:20:30.631Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:20:30.691Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:20:30.737Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:20:30.803Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T13:20:32.627Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:20:32.632Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=holding
+[2025-07-13T13:20:32.635Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:20:32.679Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:20:32.682Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T13:20:32.703Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:20:35.830Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T13:20:35.882Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T13:20:38.920Z] [APP] info: GET /api/locations called
+[2025-07-13T13:20:38.921Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T13:20:38.924Z] [APP] info: GET /api/locations called
+[2025-07-13T13:20:38.924Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T13:20:39.000Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T13:20:39.009Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T13:20:39.063Z] [APP] info: GET /api/locations called
+[2025-07-13T13:20:39.064Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T13:20:39.068Z] [APP] info: GET /api/locations called
+[2025-07-13T13:20:39.068Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T13:20:39.145Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T13:20:39.147Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T13:20:42.511Z] [APP] info: GET /api/departments called
+[2025-07-13T13:20:42.541Z] [APP] info: Fetched 9 unique departments
+[2025-07-13T13:20:42.641Z] [APP] info: GET /api/users called. URL: http://localhost:3000/api/users?page=1&limit=10
+[2025-07-13T13:20:42.642Z] [APP] info: GET /api/users - Filters:
+[2025-07-13T13:20:42.658Z] [APP] info: GET /api/users called. URL: http://localhost:3000/api/users?page=1&limit=10
+[2025-07-13T13:20:42.658Z] [APP] info: GET /api/users - Filters:
+[2025-07-13T13:20:42.686Z] [APP] info: GET /api/departments called
+[2025-07-13T13:20:42.718Z] [APP] info: Fetched 9 unique departments
+[2025-07-13T13:20:43.239Z] [APP] info: Fetched users successfully in 581ms
+[2025-07-13T13:20:43.257Z] [APP] info: Fetched users successfully in 615ms
+[2025-07-13T13:20:47.497Z] [APP] info: GET /api/reports/asset-inventory/summary called
+[2025-07-13T13:20:47.731Z] [APP] info: Aggregated asset-inventory summary
+[2025-07-13T13:20:47.781Z] [APP] info: GET /api/reports/asset-inventory/summary called
+[2025-07-13T13:20:48.009Z] [APP] info: Aggregated asset-inventory summary
+[2025-07-13T13:20:50.745Z] [APP] info: GET /api/holding-assets called
+[2025-07-13T13:20:50.781Z] [APP] info: Fetched 4 holding assets successfully
+[2025-07-13T13:20:50.827Z] [APP] info: GET /api/holding-assets called
+[2025-07-13T13:20:50.860Z] [APP] info: Fetched 4 holding assets successfully
+[2025-07-13T13:20:53.080Z] [APP] info: GET /api/settings called
+[2025-07-13T13:20:53.134Z] [APP] info: Fetched settings successfully
+[2025-07-13T13:20:53.184Z] [APP] info: GET /api/settings called
+[2025-07-13T13:20:53.250Z] [APP] info: Fetched settings successfully
+[2025-07-13T13:20:57.854Z] [APP] info: getDashboardData called
+[2025-07-13T13:20:58.263Z] [APP] info: Dashboard data fetched
+[2025-07-13T13:20:58.336Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T13:20:58.402Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T13:20:58.455Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T13:20:58.513Z] [APP] info: Aggregated ready-to-go-by-type asset counts

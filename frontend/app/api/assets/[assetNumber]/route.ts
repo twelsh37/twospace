@@ -14,6 +14,7 @@ import { getTableColumns } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { archivedAssetsTable } from "@/lib/db/schema";
 import { assetCache } from "../route";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 /**
  * GET /api/assets/{assetNumber}
@@ -23,10 +24,16 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ assetNumber: string }> }
 ) {
+  // Log the start of the GET request
+  appLogger.info("GET /api/assets/[assetNumber] called");
   try {
     const { assetNumber } = await context.params;
+    appLogger.info("Fetching asset by assetNumber", { assetNumber });
 
     if (!assetNumber) {
+      appLogger.warn(
+        "Asset number is required in GET /api/assets/[assetNumber]"
+      );
       return NextResponse.json(
         { error: "Asset number is required" },
         { status: 400 }
@@ -64,6 +71,7 @@ export async function GET(
         updatedByName: lastHistory[0]?.updatedBy || "System",
         isArchived: false,
       };
+      appLogger.info("Fetched asset from active assets table", { assetNumber });
       return NextResponse.json({ success: true, data: assetWithHistory });
     }
 
@@ -82,13 +90,23 @@ export async function GET(
         archivedAt: archivedAsset.archivedAt,
         archivedBy: archivedAsset.archivedBy,
       };
+      appLogger.info("Fetched asset from archived assets table", {
+        assetNumber,
+      });
       return NextResponse.json({ success: true, data: assetWithArchiveInfo });
     }
 
     // Not found in either table
+    appLogger.warn("Asset not found in GET /api/assets/[assetNumber]", {
+      assetNumber,
+    });
     return NextResponse.json({ error: "Asset not found" }, { status: 404 });
   } catch (error) {
-    console.error("Error fetching asset details:", error);
+    systemLogger.error(
+      `Error fetching asset details: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       {
         success: false,
@@ -104,9 +122,15 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ assetNumber: string }> }
 ) {
+  // Log the start of the PATCH request
+  appLogger.info("PATCH /api/assets/[assetNumber] called");
   try {
     const { assetNumber } = await context.params;
+    appLogger.info("Updating asset by assetNumber", { assetNumber });
     if (!assetNumber) {
+      appLogger.warn(
+        "Asset number is required in PATCH /api/assets/[assetNumber]"
+      );
       return NextResponse.json(
         { error: "Asset number is required" },
         { status: 400 }
@@ -133,6 +157,10 @@ export async function PATCH(
       }
     }
     if (Object.keys(updateData).length === 0) {
+      appLogger.warn(
+        "No valid fields to update in PATCH /api/assets/[assetNumber]",
+        { assetNumber }
+      );
       return NextResponse.json(
         { error: "No valid fields to update" },
         { status: 400 }
@@ -144,11 +172,19 @@ export async function PATCH(
       .where(eq(assetsTable.assetNumber, assetNumber))
       .returning();
     if (!updated.length) {
+      appLogger.warn("Asset not found in PATCH /api/assets/[assetNumber]", {
+        assetNumber,
+      });
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
     }
+    appLogger.info("Asset updated successfully", { assetNumber });
     return NextResponse.json({ data: updated[0] });
   } catch (error) {
-    console.error("Error updating asset:", error);
+    systemLogger.error(
+      `Error updating asset: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to update asset" },
       { status: 500 }
@@ -160,10 +196,16 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ assetNumber: string }> }
 ) {
+  // Log the start of the DELETE request
+  appLogger.info("DELETE /api/assets/[assetNumber] called");
   try {
     // Parse assetNumber from route params
     const { assetNumber } = await context.params;
+    appLogger.info("Deleting asset by assetNumber", { assetNumber });
     if (!assetNumber) {
+      appLogger.warn(
+        "Asset number is required in DELETE /api/assets/[assetNumber]"
+      );
       return NextResponse.json(
         { error: "Asset number is required" },
         { status: 400 }
@@ -190,6 +232,10 @@ export async function DELETE(
       );
     }
     if (!userId) {
+      appLogger.warn(
+        "'userId' is required in DELETE /api/assets/[assetNumber]",
+        { assetNumber }
+      );
       return NextResponse.json(
         { error: "'userId' is required in request body" },
         { status: 400 }
@@ -250,12 +296,20 @@ export async function DELETE(
     // Invalidate asset list cache so deleted asset disappears from /assets page
     assetCache.clear();
 
-    // Success: asset soft-deleted and archived
+    // After successful deletion (archive), log the event
+    appLogger.info("Asset deleted (archived) successfully", {
+      assetNumber,
+      userId,
+    });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error("Error deleting (archiving) asset:", error);
+    systemLogger.error(
+      `Error deleting asset: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
-      { error: "Failed to delete (archive) asset" },
+      { error: "Failed to delete asset" },
       { status: 500 }
     );
   }
