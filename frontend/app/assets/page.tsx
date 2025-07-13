@@ -35,17 +35,17 @@ function AssetsPageContent() {
   // Controlled filter state
   // Use optional chaining to avoid errors if searchParams is null
   const [filters, setFilters] = useState<FilterState>(() => ({
-    type: "all",
-    state: "all",
-    status: "all",
+    type: "ALL", // Use uppercase 'ALL' for consistency
+    state: "ALL",
+    status: "ALL",
   }));
 
   // Keep filters in sync with URL query params
   useEffect(() => {
     setFilters({
-      type: (searchParams?.get("type") as AssetType) || "all",
-      state: (searchParams?.get("state") as AssetState) || "all",
-      status: searchParams?.get("status") || "all",
+      type: (searchParams?.get("type")?.toUpperCase() as AssetType) || "ALL",
+      state: (searchParams?.get("state")?.toUpperCase() as AssetState) || "ALL",
+      status: searchParams?.get("status")?.toUpperCase() || "ALL",
     });
   }, [searchParams]);
 
@@ -54,20 +54,20 @@ function AssetsPageContent() {
 
   // Update both state and URL when a filter changes
   const handleFilterChange = (key: FilterKey, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value.toUpperCase() })); // Always store as uppercase
     // Use optional chaining and nullish coalescing to avoid errors if searchParams is null
     const params = new URLSearchParams(searchParams?.toString() ?? "");
-    if (value === "all") {
+    if (value.toUpperCase() === "ALL") {
       params.delete(key);
     } else {
-      params.set(key, value);
+      params.set(key, value.toUpperCase());
     }
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleClearFilters = () => {
-    setFilters({ type: "all", state: "all", status: "all" });
+    setFilters({ type: "ALL", state: "ALL", status: "ALL" }); // Reset to uppercase 'ALL'
     // Ensure pathname is a string; fallback to root if null
     router.push(pathname ?? "/assets");
   };
@@ -178,17 +178,17 @@ function AssetsPageContent() {
                     const params = new URLSearchParams(
                       searchParams?.toString() ?? ""
                     );
-                    if (filters.status === "all") {
+                    if (filters.status === "ALL") {
                       params.delete("status");
                     } else if (filters.status) {
                       params.set("status", filters.status);
                     }
-                    if (filters.type === "all") {
+                    if (filters.type === "ALL") {
                       params.delete("type");
                     } else if (filters.type) {
                       params.set("type", filters.type);
                     }
-                    if (filters.state === "all") {
+                    if (filters.state === "ALL") {
                       params.delete("state");
                     } else if (filters.state) {
                       params.set("state", filters.state);

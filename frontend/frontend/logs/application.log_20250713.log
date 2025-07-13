@@ -148,3 +148,91 @@
 [2025-07-13T13:29:52.401Z] [APP] info: Aggregated ready-to-go-by-type asset counts
 [2025-07-13T13:50:27.155Z] [APP] info: getDashboardData called
 [2025-07-13T13:50:27.978Z] [APP] info: Dashboard data fetched
+[2025-07-13T14:01:42.122Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T14:01:42.140Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?state=AVAILABLE
+[2025-07-13T14:01:42.143Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T14:01:42.479Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:01:42.498Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:01:42.499Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:01:51.894Z] [APP] info: getDashboardData called
+[2025-07-13T14:01:52.532Z] [APP] info: Dashboard data fetched
+[2025-07-13T14:01:52.882Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T14:01:52.938Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T14:01:53.169Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T14:01:53.216Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T14:01:53.272Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T14:01:53.324Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T14:01:55.455Z] [APP] info: GET /api/locations called
+[2025-07-13T14:01:55.455Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:01:55.458Z] [APP] info: GET /api/locations called
+[2025-07-13T14:01:55.458Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:01:55.531Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:01:55.535Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:01:55.591Z] [APP] info: GET /api/locations called
+[2025-07-13T14:01:55.591Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:01:55.595Z] [APP] info: GET /api/locations called
+[2025-07-13T14:01:55.595Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:01:55.658Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:01:55.662Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:01:58.926Z] [APP] info: GET /api/departments called
+[2025-07-13T14:01:58.956Z] [APP] info: Fetched 9 unique departments
+[2025-07-13T14:02:00.077Z] [APP] info: GET /api/users called. URL: http://localhost:3000/api/users?page=1&limit=10
+[2025-07-13T14:02:00.078Z] [APP] info: GET /api/users - Filters:
+[2025-07-13T14:02:00.096Z] [APP] info: GET /api/users called. URL: http://localhost:3000/api/users?page=1&limit=10
+[2025-07-13T14:02:00.096Z] [APP] info: GET /api/users - Filters:
+[2025-07-13T14:02:00.120Z] [APP] info: GET /api/departments called
+[2025-07-13T14:02:00.149Z] [APP] info: Fetched 9 unique departments
+[2025-07-13T14:02:00.275Z] [APP] info: Fetched users successfully in 179ms
+[2025-07-13T14:02:00.310Z] [APP] info: Fetched users successfully in 233ms
+[2025-07-13T14:03:58.994Z] [APP] info: GET /api/users called. URL: http://localhost:3000/api/users?department=ALL&role=ALL&page=1&limit=10
+[2025-07-13T14:03:58.995Z] [APP] info: GET /api/users - Filters:
+[2025-07-13T14:03:59.292Z] [APP] info: Fetched users successfully in 297ms
+[2025-07-13T14:03:59.327Z] [APP] info: GET /api/users called. URL: http://localhost:3000/api/users?department=ALL&role=ALL&page=1&limit=10
+[2025-07-13T14:03:59.327Z] [APP] info: GET /api/users - Filters:
+[2025-07-13T14:03:59.437Z] [APP] info: Fetched users successfully in 110ms
+[2025-07-13T14:04:17.863Z] [APP] info: GET /api/locations called
+[2025-07-13T14:04:17.863Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:04:17.865Z] [APP] info: GET /api/locations called
+[2025-07-13T14:04:17.865Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:04:17.943Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:04:17.946Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:04:18.034Z] [APP] info: GET /api/locations called
+[2025-07-13T14:04:18.034Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:04:18.036Z] [APP] info: GET /api/locations called
+[2025-07-13T14:04:18.036Z] [APP] info: GET /api/locations - Filters:
+[2025-07-13T14:04:18.103Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:04:18.106Z] [APP] info: Fetched 7 locations successfully
+[2025-07-13T14:04:19.568Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T14:04:19.573Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets
+[2025-07-13T14:04:19.615Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T14:04:19.620Z] [APP] info: Cache hit for GET /api/assets with key: __no_query__
+[2025-07-13T14:04:23.678Z] [APP] info: GET /api/holding-assets called
+[2025-07-13T14:04:23.705Z] [APP] info: Fetched 4 holding assets successfully
+[2025-07-13T14:04:23.751Z] [APP] info: GET /api/holding-assets called
+[2025-07-13T14:04:23.776Z] [APP] info: Fetched 4 holding assets successfully
+[2025-07-13T14:04:26.465Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=ACTIVE&page=1
+[2025-07-13T14:04:26.468Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=ACTIVE&page=1
+[2025-07-13T14:04:26.517Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:26.521Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:28.443Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=STOCK&page=1
+[2025-07-13T14:04:28.492Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:36.256Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=RECYCLED&page=1
+[2025-07-13T14:04:36.309Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:38.245Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=REPAIR&page=1
+[2025-07-13T14:04:38.297Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:40.560Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?status=REPAIR&page=1&state=AVAILABLE
+[2025-07-13T14:04:40.609Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:44.915Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?page=1&state=AVAILABLE
+[2025-07-13T14:04:44.962Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:47.641Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?page=1&state=SIGNED_OUT
+[2025-07-13T14:04:47.693Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:49.269Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?page=1&state=BUILDING
+[2025-07-13T14:04:49.317Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:04:53.150Z] [APP] info: GET /api/assets called. URL: http://localhost:3000/api/assets?page=1&state=ISSUED
+[2025-07-13T14:04:53.212Z] [APP] info: GET /api/assets - Filters:
+[2025-07-13T14:05:00.484Z] [APP] info: GET /api/holding-assets called
+[2025-07-13T14:05:00.510Z] [APP] info: Fetched 4 holding assets successfully
+[2025-07-13T14:05:00.556Z] [APP] info: GET /api/holding-assets called
+[2025-07-13T14:05:00.581Z] [APP] info: Fetched 4 holding assets successfully
+[2025-07-13T14:05:56.663Z] [APP] info: getDashboardData called
+[2025-07-13T14:05:57.332Z] [APP] info: Dashboard data fetched

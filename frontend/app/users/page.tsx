@@ -34,8 +34,10 @@ function UsersPageContent() {
   const [exportLoading, setExportLoading] = useState(false);
 
   // Parse filter values from URL and map to objects
-  const departmentParam = searchParams?.get("department") || "all";
-  const roleParam = searchParams?.get("role") || "all";
+  // Always use uppercase 'ALL' for consistency
+  const departmentParam =
+    searchParams?.get("department")?.toUpperCase() || "ALL";
+  const roleParam = searchParams?.get("role")?.toUpperCase() || "ALL";
 
   // filters object now only uses department and role as string values (not objects)
   const filters: UserFilterState = {
@@ -51,15 +53,22 @@ function UsersPageContent() {
     const params = new URLSearchParams(searchParams?.toString() ?? "");
     // Debug log to see what is being passed as value
     console.log("handleFilterChange", key, value);
+    // Always use uppercase 'ALL' for consistency
     if (
       !value ||
-      (key === "role" && (value as RoleOption).value === "all") ||
-      (key === "department" && (value as DepartmentOption).id === "all")
+      (key === "role" &&
+        (typeof value === "string"
+          ? value.toUpperCase() === "ALL"
+          : (value as RoleOption).value === "ALL")) ||
+      (key === "department" &&
+        (typeof value === "string"
+          ? value.toUpperCase() === "ALL"
+          : (value as DepartmentOption).id === "ALL"))
     ) {
       params.delete(key);
     } else {
       if (key === "department") {
-        // Type guard: ensure value is DepartmentOption
+        // Type guard: ensure value is DepartmentOption or string
         if (
           typeof value === "object" &&
           value !== null &&
@@ -67,6 +76,8 @@ function UsersPageContent() {
           typeof (value as DepartmentOption).id === "string"
         ) {
           params.set("department", (value as DepartmentOption).id);
+        } else if (typeof value === "string") {
+          params.set("department", value);
         } else {
           console.warn(
             "Department value is not an object with string id:",
@@ -74,7 +85,7 @@ function UsersPageContent() {
           );
         }
       } else if (key === "role") {
-        // Type guard: ensure value is RoleOption
+        // Type guard: ensure value is RoleOption or string
         if (
           typeof value === "object" &&
           value !== null &&
@@ -82,6 +93,8 @@ function UsersPageContent() {
           typeof (value as RoleOption).value === "string"
         ) {
           params.set("role", (value as RoleOption).value);
+        } else if (typeof value === "string") {
+          params.set("role", value);
         } else {
           console.warn("Role value is not an object with string value:", value);
         }
