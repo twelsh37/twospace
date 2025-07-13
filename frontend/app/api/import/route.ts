@@ -13,6 +13,7 @@ import {
 import type { NewHoldingAsset } from "@/lib/db/schema";
 import { inArray } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
 
 // Helper to parse CSV buffer
 function parseCsvBuffer(buffer: Buffer) {
@@ -32,6 +33,9 @@ function parseXlsxBuffer(buffer: Buffer) {
 }
 
 export async function POST(req: NextRequest) {
+  // Require server-side Supabase ADMIN authentication
+  const user = await requireAdmin(req);
+  if (user instanceof NextResponse) return user; // Not authorized
   // Log the start of the import POST request
   appLogger.info("POST /api/import called");
   try {

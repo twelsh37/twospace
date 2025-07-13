@@ -14,6 +14,9 @@ import {
   // CardFooter, // Remove unused import
 } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { createClientComponentClient } from "@/lib/supabase";
 
 export default function SettingsPage() {
   const [cacheDuration, setCacheDuration] = useState(30);
@@ -31,6 +34,13 @@ export default function SettingsPage() {
   const [decliningPercents, setDecliningPercents] = useState<number[]>([
     50, 25, 12.5, 12.5,
   ]);
+
+  // User password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // Calculate straight line percentage
   const straightLinePercent =
@@ -60,6 +70,32 @@ export default function SettingsPage() {
   // Calculate total for validation
   const decliningTotal = decliningPercents.reduce((a, b) => a + b, 0);
   const decliningWarning = Math.abs(decliningTotal - 100) > 0.01;
+
+  // Handler for password change
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordLoading(true);
+    setPasswordSuccess(null);
+    setPasswordError(null);
+    try {
+      const supabase = createClientComponentClient();
+      // Supabase only requires new password, but you may want to verify current password client-side
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) {
+        setPasswordError(error.message || "Failed to change password.");
+      } else {
+        setPasswordSuccess("Password updated successfully.");
+        setCurrentPassword("");
+        setNewPassword("");
+      }
+    } catch (err) {
+      setPasswordError("Failed to change password.");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   // Fetch current setting on mount (including depreciationSettings)
   useEffect(() => {
@@ -149,6 +185,46 @@ export default function SettingsPage() {
   return (
     <ErrorBoundary>
       <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8 min-h-[80vh] bg-gray-50">
+        {/* User Account Section */}
+        <Card className="w-full max-w-2xl mx-auto mb-8 shadow-lg border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-xl md:text-2xl">
+              Account Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handlePasswordChange}>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  New Password
+                </label>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={6}
+                  required
+                  placeholder="Enter new password"
+                  disabled={passwordLoading}
+                />
+              </div>
+              {passwordError && (
+                <div className="text-red-600 text-sm">{passwordError}</div>
+              )}
+              {passwordSuccess && (
+                <div className="text-green-600 text-sm">{passwordSuccess}</div>
+              )}
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={passwordLoading || newPassword.length < 6}
+                >
+                  {passwordLoading ? "Updating..." : "Change Password"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
         {/* Large background card to group all settings */}
         <Card className="w-full max-w-4xl p-0 shadow-2xl border border-gray-300 bg-white">
           <CardHeader className="pt-6">
@@ -160,7 +236,9 @@ export default function SettingsPage() {
               {/* --- Reporting Section Card --- */}
               <Card className="shadow-lg border border-gray-200">
                 <CardHeader>
-                  <CardTitle className="text-xl md:text-2xl">Reporting</CardTitle>
+                  <CardTitle className="text-xl md:text-2xl">
+                    Reporting
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form
@@ -182,7 +260,9 @@ export default function SettingsPage() {
                         min={1}
                         max={1440}
                         value={cacheDuration}
-                        onChange={(e) => setCacheDuration(Number(e.target.value))}
+                        onChange={(e) =>
+                          setCacheDuration(Number(e.target.value))
+                        }
                         className="w-full md:w-32 px-3 py-2 md:py-1.5 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                         disabled={saving}
                       />

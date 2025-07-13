@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import { db, locationsTable } from "@/lib/db";
 import { eq, ilike, and } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
+import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   // Log the start of the GET request
   appLogger.info("GET /api/locations called");
   try {
@@ -128,7 +130,10 @@ export async function OPTIONS() {
 }
 
 // Add POST handler for creating a new location
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Require ADMIN for creating locations
+  const user = await requireAdmin(req);
+  if (user instanceof NextResponse) return user; // Not authorized
   // Log the start of the POST request
   appLogger.info("POST /api/locations called");
   try {

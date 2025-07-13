@@ -19,6 +19,7 @@ import { createAssetHistory, generateAssetNumber } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 import { settingsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
 
 // Define standard CORS headers for reusability
 const corsHeaders = {
@@ -271,6 +272,9 @@ export async function GET(request: NextRequest) {
  * Create a new asset
  */
 export async function POST(request: NextRequest) {
+  // Require ADMIN for creating assets
+  const user = await requireAdmin(request);
+  if (user instanceof NextResponse) return user; // Not authorized
   try {
     const body = await request.json();
 
@@ -401,6 +405,9 @@ export async function POST(request: NextRequest) {
  * Bulk update assets (e.g., state transitions, bulk operations)
  */
 export async function PUT(request: NextRequest) {
+  // Require ADMIN for bulk asset updates
+  const user = await requireAdmin(request);
+  if (user instanceof NextResponse) return user; // Not authorized
   try {
     const body = await request.json();
 

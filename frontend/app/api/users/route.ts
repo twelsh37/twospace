@@ -4,9 +4,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUsers, createUser } from "@/lib/supabase-db";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
 
 // GET /api/users - returns paginated users
 export async function GET(request: NextRequest) {
+  // Require authentication for listing users
+  const user = await requireAuth(request);
+  if (user instanceof NextResponse) return user; // Not authenticated
   // Log the start of the GET request
   appLogger.info(`GET /api/users called. URL: ${request.url}`);
   const start = Date.now(); // Start timing
@@ -58,6 +62,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/users - create a new user
 export async function POST(request: NextRequest) {
+  // Require ADMIN for creating users
+  const user = await requireAdmin(request);
+  if (user instanceof NextResponse) return user; // Not authorized
   // Log the start of the POST request
   appLogger.info("POST /api/users called");
   try {

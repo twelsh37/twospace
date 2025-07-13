@@ -18,6 +18,8 @@ import { ExportModal } from "@/components/ui/export-modal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 import { AssetAddModal } from "@/components/assets/asset-add-modal";
+import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
+import { createClientComponentClient } from "@/lib/supabase";
 
 export default function AssetsPage() {
   return (
@@ -56,6 +58,8 @@ function AssetsPageContent() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   // State to trigger asset table refresh after adding
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const [showUnauthorizedToast, unauthorizedToast] = useUnauthorizedToast();
 
   // Update both state and URL when a filter changes
   const handleFilterChange = (key: FilterKey, value: string) => {
@@ -123,8 +127,23 @@ function AssetsPageContent() {
     }
   };
 
+  // Handler for Add Asset button
+  const handleAddAssetClick = async () => {
+    const supabase = createClientComponentClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const role = session?.user?.user_metadata?.role;
+    if (role !== "ADMIN") {
+      showUnauthorizedToast();
+      return;
+    }
+    setAddModalOpen(true);
+  };
+
   return (
     <div className="flex-1 space-y-4 pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
+      {unauthorizedToast}
       {/* Assets Table */}
       <Card className="shadow-lg border rounded-xl">
         <CardHeader className="pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -153,7 +172,7 @@ function AssetsPageContent() {
               <Button
                 size="sm"
                 className="w-full md:w-auto"
-                onClick={() => setAddModalOpen(true)}
+                onClick={handleAddAssetClick}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Add Asset</span>

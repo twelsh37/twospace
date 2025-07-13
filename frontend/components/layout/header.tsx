@@ -22,6 +22,7 @@ import {
   type SearchResults,
 } from "@/components/search/search-results-modal";
 import { useAuth } from "@/lib/auth-context";
+import Link from "next/link";
 
 interface HeaderProps {
   onMobileMenuToggle?: () => void;
@@ -174,14 +175,18 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="text-sm md:text-base">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+              <DropdownMenuItem asChild className="text-sm md:text-base">
+                <Link href="/profile" className="flex items-center w-full">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="text-sm md:text-base">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+              <DropdownMenuItem asChild className="text-sm md:text-base">
+                <Link href="/settings" className="flex items-center w-full">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />

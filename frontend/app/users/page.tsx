@@ -16,6 +16,8 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserAddModal } from "@/components/users/user-add-modal";
 import { ExportModal } from "@/components/ui/export-modal";
+import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
+import { createClientComponentClient } from "@/lib/supabase";
 
 export default function UsersPage() {
   return (
@@ -32,6 +34,7 @@ function UsersPageContent() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [showUnauthorizedToast, unauthorizedToast] = useUnauthorizedToast();
 
   // Parse filter values from URL and map to objects
   // Always use uppercase 'ALL' for consistency
@@ -173,8 +176,23 @@ function UsersPageContent() {
     }
   };
 
+  // Handler for Add User button
+  const handleAddUserClick = async () => {
+    const supabase = createClientComponentClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const role = session?.user?.user_metadata?.role;
+    if (role !== "ADMIN") {
+      showUnauthorizedToast();
+      return;
+    }
+    setAddModalOpen(true);
+  };
+
   return (
     <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
+      {unauthorizedToast}
       <Card
         style={{
           maxWidth: 1200,
@@ -213,7 +231,7 @@ function UsersPageContent() {
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
-              <Button size="sm" onClick={() => setAddModalOpen(true)}>
+              <Button size="sm" onClick={handleAddUserClick}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add User
               </Button>
