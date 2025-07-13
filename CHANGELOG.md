@@ -2,9 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2025-06-12
+
+### Fixed
+
+- Fixed all build and type errors related to filter state and enum usage in assets and users pages.
+- Enforced consistent use of uppercase enum values (e.g., 'HOLDING', 'ACTIVE', 'STOCK') throughout schema and seed files.
+- Resolved all linter errors and removed unused variables/imports.
+- Ensured filter logic uses 'all' (lowercase) for UI, but always sends correct enum values to backend.
+- Project now builds and passes type checks cleanly.
+
 ## [Unreleased]
 
-## [0.2.0] - 2024-06-11
+## [0.0.3] - 2025-06-11
 
 ### Added
 
@@ -25,7 +35,7 @@ All notable changes to this project will be documented in this file.
 - Fixed issues where selecting 'ALL' would cause enum errors in the backend.
 - Ensured clear filters resets all dropdowns to 'ALL' and shows all assets.
 
-## [1.1.0] - 2024-06-10
+## [0.0.2] - 2025-06-10
 
 ### Added
 
@@ -46,7 +56,7 @@ All notable changes to this project will be documented in this file.
 - Type errors and linter issues in filters, user management, and Supabase integration.
 - Ensured all code builds and lints cleanly (`yarn build`).
 
-## [1.0.0] - 2024-06-01
+## [0.0.1] - 2025-06-01
 
 ### Added
 
