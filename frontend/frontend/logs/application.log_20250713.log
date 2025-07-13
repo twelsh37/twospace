@@ -236,3 +236,13 @@
 [2025-07-13T14:05:00.581Z] [APP] info: Fetched 4 holding assets successfully
 [2025-07-13T14:05:56.663Z] [APP] info: getDashboardData called
 [2025-07-13T14:05:57.332Z] [APP] info: Dashboard data fetched
+[2025-07-13T14:09:06.423Z] [APP] info: getDashboardData called
+[2025-07-13T14:09:07.250Z] [APP] info: Dashboard data fetched
+[2025-07-13T14:09:07.747Z] [APP] info: GET /api/assets/building-by-type called
+[2025-07-13T14:09:08.037Z] [APP] info: Aggregated building-by-type asset counts
+[2025-07-13T14:09:08.359Z] [APP] info: GET /api/assets/ready-to-go-by-type called
+[2025-07-13T14:09:08.410Z] [APP] info: Aggregated ready-to-go-by-type asset counts
+[2025-07-13T14:16:27.275Z] [APP] info: getDashboardData called
+[2025-07-13T14:16:28.031Z] [APP] info: Dashboard data fetched
+[2025-07-13T14:18:05.263Z] [APP] info: getDashboardData called
+[2025-07-13T14:18:05.967Z] [APP] info: Dashboard data fetched
