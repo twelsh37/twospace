@@ -13,11 +13,11 @@ import {
 import { AssetActions } from "@/components/assets/asset-actions";
 import { Button } from "@/components/ui/button";
 import { Plus, Download } from "lucide-react";
-import Link from "next/link";
 import { AssetType, AssetState } from "@/lib/types";
 import { ExportModal } from "@/components/ui/export-modal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
+import { AssetAddModal } from "@/components/assets/asset-add-modal";
 
 export default function AssetsPage() {
   return (
@@ -51,6 +51,11 @@ function AssetsPageContent() {
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+
+  // State for controlling the Add Asset modal
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  // State to trigger asset table refresh after adding
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Update both state and URL when a filter changes
   const handleFilterChange = (key: FilterKey, value: string) => {
@@ -144,13 +149,16 @@ function AssetsPageContent() {
               <span className="hidden sm:inline">Export</span>
             </Button>
             {filters.status !== "HOLDING" && (
-              <Link href="/assets/new" className="flex-1 md:flex-none">
-                <Button size="sm" className="w-full md:w-auto">
-                  <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Add Asset</span>
-                  <span className="sm:hidden">Add</span>
-                </Button>
-              </Link>
+              // Replaced Link with modal trigger button
+              <Button
+                size="sm"
+                className="w-full md:w-auto"
+                onClick={() => setAddModalOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">Add Asset</span>
+                <span className="sm:hidden">Add</span>
+              </Button>
             )}
           </div>
         </CardHeader>
@@ -173,7 +181,9 @@ function AssetsPageContent() {
                   <HoldingAssetsTable />
                 </div>
               ) : (
+                // Pass refreshKey as a prop to force AssetTable to reload after add
                 <AssetTable
+                  key={refreshKey}
                   queryString={(() => {
                     const params = new URLSearchParams(
                       searchParams?.toString() ?? ""
@@ -212,6 +222,16 @@ function AssetsPageContent() {
         onOpenChange={setExportModalOpen}
         onExport={handleExport}
         loading={exportLoading}
+      />
+
+      {/* Add Asset Modal */}
+      <AssetAddModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        onAdded={() => {
+          // Refresh asset table after successful add
+          setRefreshKey((k) => k + 1);
+        }}
       />
     </div>
   );

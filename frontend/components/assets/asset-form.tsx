@@ -25,9 +25,10 @@ type AssetFormProps = {
   mode: "create" | "edit";
   asset?: Partial<Asset>;
   onSubmit?: (asset: Partial<Asset>) => Promise<void>;
+  onCancel?: () => void; // Optional cancel handler
 };
 
-export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
+export function AssetForm({ mode, asset, onSubmit, onCancel }: AssetFormProps) {
   const [formData, setFormData] = useState<Partial<Asset>>({
     type: AssetType.MOBILE_PHONE,
     state: AssetState.AVAILABLE, // Set default state to Available Stock
@@ -269,7 +270,7 @@ export function AssetForm({ mode, asset, onSubmit }: AssetFormProps) {
           <Button
             type="button"
             variant="outline"
-            onClick={() => window.history.back()}
+            onClick={onCancel ? onCancel : undefined} // Use onCancel if provided
           >
             Cancel
           </Button>
