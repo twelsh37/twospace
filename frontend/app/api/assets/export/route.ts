@@ -7,8 +7,8 @@ import { db, assetsTable, locationsTable } from "@/lib/db";
 import { eq, and, or, ilike, isNull, SQL, Column } from "drizzle-orm";
 import {
   generateTableReportHTML,
-  generateTableCSV,
   generatePDFViaBrowserless,
+  generateTableCSVStream, // <-- import the new streaming function
 } from "@/lib/server/exportUtils";
 import { systemLogger, appLogger } from "@/lib/logger";
 
@@ -56,20 +56,27 @@ export async function POST(request: NextRequest) {
 
     // Build where conditions (reuse logic from GET handler)
     const whereConditions = [isNull(assetsTable.deletedAt)];
-    if (type !== "all") {
+    // Normalize filters to lowercase for comparison
+    const typeFilter = String(type).toLowerCase();
+    const stateFilter = String(state).toLowerCase();
+    const statusFilter = String(status).toLowerCase();
+    const locationIdFilter = String(locationId).toLowerCase();
+    const assignedToFilter = String(assignedTo).toLowerCase();
+
+    if (typeFilter !== "all") {
       whereConditions.push(eq(assetsTable.type, type));
     }
-    if (state !== "all") {
+    if (stateFilter !== "all") {
       whereConditions.push(eq(assetsTable.state, state));
     }
-    if (status !== "all") {
+    if (statusFilter !== "all") {
       whereConditions.push(eq(assetsTable.status, status));
     }
-    if (locationId !== "all") {
+    if (locationIdFilter !== "all") {
       whereConditions.push(eq(assetsTable.locationId, locationId));
     }
-    if (assignedTo !== "all") {
-      if (assignedTo === "unassigned") {
+    if (assignedToFilter !== "all") {
+      if (assignedToFilter === "unassigned") {
         whereConditions.push(isNull(assetsTable.assignedTo));
       } else {
         whereConditions.push(eq(assetsTable.assignedTo, assignedTo));
@@ -120,16 +127,22 @@ export async function POST(request: NextRequest) {
       appLogger.info(
         `Generating CSV export for assets (${exportRows.length} rows)`
       );
-      // Generate CSV string
-      const csv = generateTableCSV({ columns: assetColumns, rows: exportRows });
-      // Return as downloadable CSV file
-      return new NextResponse(csv, {
-        status: 200,
-        headers: {
-          "Content-Type": "text/csv",
-          "Content-Disposition": `attachment; filename=assets-report.csv`,
-        },
+      // Stream CSV using fast-csv for large datasets
+      const csvStream = generateTableCSVStream({
+        columns: assetColumns,
+        rows: exportRows,
       });
+      // Return as downloadable CSV file (streamed)
+      return new NextResponse(
+        csvStream as unknown as ReadableStream<Uint8Array>,
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "text/csv",
+            "Content-Disposition": `attachment; filename=assets-report.csv`,
+          },
+        }
+      );
     } else {
       // Log PDF export
       appLogger.info(

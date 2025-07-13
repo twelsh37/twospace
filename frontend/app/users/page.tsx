@@ -117,27 +117,52 @@ function UsersPageContent() {
   const handleExport = async (format: "pdf" | "csv") => {
     setExportLoading(true);
     try {
-      const res = await fetch("/api/users/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          department: filters.department || "all",
-          role: filters.role || "all",
-          format,
-        }),
-      });
-      if (!res.ok) throw new Error(`Failed to export ${format.toUpperCase()}`);
-      const blob = await res.blob();
-      const filename =
-        format === "csv" ? "users-report.csv" : "users-report.pdf";
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+      if (format === "csv") {
+        // Use GET for CSV export with filters as query params
+        const params = new URLSearchParams();
+        if (filters.department && filters.department !== "ALL") {
+          params.set("department", filters.department);
+        }
+        if (filters.role && filters.role !== "ALL") {
+          params.set("role", filters.role);
+        }
+        const res = await fetch(`/api/users/export?${params.toString()}`, {
+          method: "GET",
+        });
+        if (!res.ok) throw new Error(`Failed to export CSV`);
+        const blob = await res.blob();
+        const filename = "users-report.csv";
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        // Use POST for PDF export
+        const res = await fetch("/api/users/export", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            department: filters.department || "all",
+            role: filters.role || "all",
+            format,
+          }),
+        });
+        if (!res.ok) throw new Error(`Failed to export PDF`);
+        const blob = await res.blob();
+        const filename = "users-report.pdf";
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }
     } catch {
       alert(
         `Failed to export users ${format.toUpperCase()}. Please try again.`
