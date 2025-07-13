@@ -22,6 +22,9 @@ import {
 } from "chart.js";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ReportCard } from "@/components/ui/report-card";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { ExportModal } from "@/components/ui/export-modal";
 
 // Register Chart.js components
 ChartJS.register(
@@ -49,21 +52,32 @@ const REPORTS = [
   "Audit",
 ];
 
-// Placeholder component for each report type
-function ReportPlaceholder({ title }: { title: string }) {
-  return (
-    <div style={{ padding: "2rem" }}>
-      <h2 style={{ fontWeight: "bold", fontSize: "1.5rem" }}>{title} Report</h2>
-      <p>
-        Coming soon: Detailed {title.toLowerCase()} report with tables, charts,
-        and export options.
-      </p>
-    </div>
-  );
+// 1. Add types for chart refs and data
+interface AssetInventoryExportData {
+  chart1?: string; // Assets by Type
+  chart2?: string; // Assets by State
+  chart3?: string; // Assets in Building State
+  chart4?: string; // Assets Ready to Go
+  assetTypes: string[];
+  assetCounts: Record<string, number>;
+  stateTypes: string[];
+  stateCounts: Record<string, number>;
+  buildingTypes: string[];
+  byTypeInBuilding: Record<string, number>;
+  readyTypes: string[];
+  byTypeInReadyToGo: Record<string, number>;
 }
 
-// Asset Inventory Report with summary API and smooth chart animation
-function AssetInventoryReport() {
+// 2. In ReportsPageContent, add state to hold export data
+// const [assetInventoryExportData, setAssetInventoryExportData] =
+//   useState<AssetInventoryExportData | null>(null);
+
+// 3. Update AssetInventoryReport to accept a setExportData prop
+function AssetInventoryReport({
+  onExport,
+}: {
+  onExport: (data: AssetInventoryExportData) => void;
+}) {
   // State for summary data
   const [assetCounts, setAssetCounts] = useState<{ [type: string]: number }>(
     {}
@@ -224,6 +238,32 @@ function AssetInventoryReport() {
     ],
   };
 
+  // Function to gather export data on demand
+  function getExportData(): AssetInventoryExportData {
+    const chart1 =
+      (chartTypeRef.current as any)?.toBase64Image?.() || undefined;
+    const chart2 =
+      (chartStateRef.current as any)?.toBase64Image?.() || undefined;
+    const chart3 =
+      (chartBuildingRef.current as any)?.toBase64Image?.() || undefined;
+    const chart4 =
+      (chartReadyRef.current as any)?.toBase64Image?.() || undefined;
+    return {
+      chart1,
+      chart2,
+      chart3,
+      chart4,
+      assetTypes: labels,
+      assetCounts,
+      stateTypes: stateLabels,
+      stateCounts,
+      buildingTypes: buildingLabels,
+      byTypeInBuilding,
+      readyTypes: Object.keys(byTypeInReadyToGo).sort(),
+      byTypeInReadyToGo,
+    };
+  }
+
   // Render loading, error, or charts
   return (
     <div className="flex-1 flex flex-col pt-4 md:pt-6 pb-2 md:pb-4 px-4 md:px-8">
@@ -237,15 +277,28 @@ function AssetInventoryReport() {
         }}
         className="shadow-lg border"
       >
-        <CardHeader className="pb-2">
-          <CardTitle
-            style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+        <CardHeader className="pb-2 flex flex-row items-center">
+          <div className="flex-1">
+            <CardTitle
+              style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+            >
+              Asset Inventory Report
+            </CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">
+              Prepared on: {printTime || "—"}
+            </p>
+          </div>
+          {/* Export button for Asset Inventory */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto flex items-center gap-1"
+            onClick={() => onExport(getExportData())}
+            title={`Export Asset Inventory report`}
+            style={{ marginLeft: "auto" }}
           >
-            Asset Inventory Report
-          </CardTitle>
-          <p className="text-muted-foreground text-sm mt-1">
-            Prepared on: {printTime || "—"}
-          </p>
+            <Download className="w-4 h-4 mr-1" /> Export
+          </Button>
         </CardHeader>
         <CardContent>
           {/* Responsive grid for chart+table cards */}
@@ -694,7 +747,7 @@ function AssetInventoryReport() {
 }
 
 // --- Lifecycle Management Report: Distribution of Assets by Year ---
-function LifecycleManagementReport() {
+function LifecycleManagementReport({ onExport }: { onExport: () => void }) {
   // State for year data
   const [yearCounts, setYearCounts] = React.useState<{
     [year: string]: number;
@@ -783,15 +836,28 @@ function LifecycleManagementReport() {
         }}
         className="shadow-lg border"
       >
-        <CardHeader className="pb-2">
-          <CardTitle
-            style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+        <CardHeader className="pb-2 flex flex-row items-center">
+          <div className="flex-1">
+            <CardTitle
+              style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+            >
+              Lifecycle Management Report
+            </CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">
+              Prepared on: {printTime || "—"}
+            </p>
+          </div>
+          {/* Export button for Lifecycle Management */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto flex items-center gap-1"
+            onClick={onExport}
+            title={`Export Lifecycle Management report`}
+            style={{ marginLeft: "auto" }}
           >
-            Lifecycle Management Report
-          </CardTitle>
-          <p className="text-muted-foreground text-sm mt-1">
-            Prepared on: {printTime || "—"}
-          </p>
+            <Download className="w-4 h-4 mr-1" /> Export
+          </Button>
         </CardHeader>
         <CardContent>
           {/* Responsive grid for chart+table cards */}
@@ -901,7 +967,7 @@ function LifecycleManagementReport() {
 }
 
 // --- Financial Report: Asset Value by Type and Over Years ---
-function FinancialReport() {
+function FinancialReport({ onExport }: { onExport: () => void }) {
   // State for API data
   const [byType, setByType] = useState<{ [type: string]: number }>({});
   const [byYear, setByYear] = useState<{ [year: string]: number }>({});
@@ -1034,15 +1100,28 @@ function FinancialReport() {
         }}
         className="shadow-lg border"
       >
-        <CardHeader className="pb-2">
-          <CardTitle
-            style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+        <CardHeader className="pb-2 flex flex-row items-center">
+          <div className="flex-1">
+            <CardTitle
+              style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
+            >
+              Financial Report
+            </CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">
+              Prepared on: {printTime || "—"}
+            </p>
+          </div>
+          {/* Export button for Financial */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto flex items-center gap-1"
+            onClick={onExport}
+            title={`Export Financial report`}
+            style={{ marginLeft: "auto" }}
           >
-            Financial Report
-          </CardTitle>
-          <p className="text-muted-foreground text-sm mt-1">
-            Prepared on: {printTime || "—"}
-          </p>
+            <Download className="w-4 h-4 mr-1" /> Export
+          </Button>
         </CardHeader>
         <CardContent>
           {/* Responsive grid for chart+table cards */}
@@ -1255,6 +1334,42 @@ function FinancialReport() {
   );
 }
 
+// Placeholder component for each report type
+function ReportPlaceholder({
+  title,
+  onExport,
+}: {
+  title: string;
+  onExport: () => void;
+}) {
+  return (
+    <div style={{ padding: "2rem" }}>
+      <div
+        style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}
+      >
+        <h2 style={{ fontWeight: "bold", fontSize: "1.5rem", flex: 1 }}>
+          {title} Report
+        </h2>
+        {/* Export button for placeholder reports */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto flex items-center gap-1"
+          onClick={onExport}
+          title={`Export ${title} report`}
+          style={{ marginLeft: "auto" }}
+        >
+          <Download className="w-4 h-4 mr-1" /> Export
+        </Button>
+      </div>
+      <p>
+        Coming soon: Detailed {title.toLowerCase()} report with tables, charts,
+        and export options.
+      </p>
+    </div>
+  );
+}
+
 // Main Reports Page
 function ReportsPageContent() {
   // Read the selected report from the query string (?report=CategoryName)
@@ -1264,19 +1379,117 @@ function ReportsPageContent() {
   // Default to 'Asset Inventory' if not specified or invalid
   const selected = REPORTS.includes(reportParam) ? reportParam : REPORTS[0];
 
-  // Render the selected report
+  // State for export modal
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportReport, setExportReport] = useState<string>(selected);
+
+  // Move useState inside the component
+  const [assetInventoryExportData, setAssetInventoryExportData] =
+    useState<AssetInventoryExportData | null>(null);
+
+  // Handler to open export modal for a report
+  function handleOpenExport(reportName: string) {
+    setExportReport(reportName);
+    setExportModalOpen(true);
+  }
+
+  // Handler to actually export the report as PDF
+  async function handleExport(format: "pdf") {
+    setExportLoading(true);
+    try {
+      let apiUrl = "";
+      let body: Record<string, unknown> = { format };
+      let filename = "report.pdf";
+      if (exportReport === "Asset Inventory") {
+        apiUrl = "/api/reports/pdf";
+        filename = "asset-inventory-report.pdf";
+        // Attach chart images and table data
+        if (assetInventoryExportData) {
+          body = { ...assetInventoryExportData, format };
+        }
+      } else if (exportReport === "Lifecycle Management") {
+        alert("PDF export for Lifecycle Management is not yet implemented.");
+        setExportLoading(false);
+        setExportModalOpen(false);
+        return;
+      } else if (exportReport === "Financial") {
+        alert("PDF export for Financial is not yet implemented.");
+        setExportLoading(false);
+        setExportModalOpen(false);
+        return;
+      } else {
+        alert(`PDF export for ${exportReport} is not yet implemented.`);
+        setExportLoading(false);
+        setExportModalOpen(false);
+        return;
+      }
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Failed to export PDF");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(
+        `Failed to export ${exportReport} as PDF. Please try again.\n` +
+          (err instanceof Error ? err.message : String(err))
+      );
+    } finally {
+      setExportLoading(false);
+      setExportModalOpen(false);
+    }
+  }
+
+  // Render the selected report, passing export handler
   function renderReport() {
-    if (selected === "Asset Inventory") return <AssetInventoryReport />;
+    // Pass export handler to each report for the export button
+    if (selected === "Asset Inventory")
+      return (
+        <AssetInventoryReport
+          onExport={(data) => {
+            setAssetInventoryExportData(data);
+            handleOpenExport("Asset Inventory");
+          }}
+        />
+      );
     if (selected === "Lifecycle Management")
-      return <LifecycleManagementReport />;
-    if (selected === "Financial") return <FinancialReport />;
-    return <ReportPlaceholder title={selected} />;
+      return (
+        <LifecycleManagementReport
+          onExport={() => handleOpenExport("Lifecycle Management")}
+        />
+      );
+    if (selected === "Financial")
+      return <FinancialReport onExport={() => handleOpenExport("Financial")} />;
+    return (
+      <ReportPlaceholder
+        title={selected}
+        onExport={() => handleOpenExport(selected)}
+      />
+    );
   }
 
   return (
     <div style={{ padding: "1rem" }}>
       {/* Render selected report */}
       {renderReport()}
+      {/* Export Modal for all reports */}
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        onExport={handleExport}
+        loading={exportLoading}
+        title={`Export ${exportReport} Report`}
+      />
     </div>
   );
 }
