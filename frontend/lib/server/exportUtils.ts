@@ -2,6 +2,9 @@
 
 // Utility for modular CSV and PDF export using browserless.io for PDF
 
+import { format as csvFormat } from "@fast-csv/format";
+import { Readable } from "stream";
+
 interface ExportColumn {
   header: string;
   key: string;
@@ -123,6 +126,28 @@ export function generateTableCSV({ columns, rows }: GenerateTableCSVParams) {
     columns.map((col) => escapeCSV(row[col.key])).join(",")
   );
   return [header, ...dataRows].join("\r\n");
+}
+
+/**
+ * Stream CSV for a tabular report using fast-csv
+ * @param {Object} params
+ * @param {Array<{header: string, key: string}>} params.columns - Table columns
+ * @param {Array<Object>} params.rows - Table data
+ * @returns {Readable} Node.js Readable stream
+ */
+export function generateTableCSVStream({
+  columns,
+  rows,
+}: GenerateTableCSVParams): Readable {
+  // Use an array of strings for headers (the keys)
+  const headers = columns.map((col) => col.key);
+  const csvStream = csvFormat({ headers, writeHeaders: true });
+  // Write each row to the stream
+  for (const row of rows) {
+    csvStream.write(row);
+  }
+  csvStream.end();
+  return csvStream;
 }
 
 // Helper: Generate PDF via browserless.io
