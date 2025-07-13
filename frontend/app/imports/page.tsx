@@ -12,6 +12,7 @@ import { AssetState } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 // Main Imports Page component
 const ImportsPage: React.FC = () => {
@@ -131,109 +132,114 @@ const ImportsPage: React.FC = () => {
   });
 
   return (
-    // Only ADMIN users can access this page
-    <ProtectedRoute requireAdmin={true}>
-      <div className="flex min-h-[80vh] items-center justify-center p-4">
-        <Card className="w-full max-w-md md:max-w-2xl shadow-lg border rounded-xl">
-          <CardContent className="py-8 flex flex-col items-center">
-            {/* Page title - match assets page style */}
-            <h1 className="text-3xl font-bold tracking-tight mb-2 text-center">
-              Bulk Import Data
-            </h1>
-            {/* Explanatory text - match assets page style */}
-            <p className="text-muted-foreground mb-6 text-center">
-              System Administrators can bulk import Assets, Users, or Locations
-              using CSV or XLSX files. Imported assets will appear in the
-              holding area until they are signed out and tagged.
-            </p>
-            {/* Import Data button */}
-            <Button onClick={handleOpenModal} className="mb-4 w-full max-w-xs">
-              Import Data
-            </Button>
-            {/* Persistent error area for easier copying */}
-            {errorDetails && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-xs whitespace-pre-wrap break-all w-full">
-                <strong>Error Details:</strong>
-                <pre className="overflow-x-auto">{errorDetails}</pre>
-              </div>
-            )}
-            {/* View Holding Assets button */}
-            <Button
-              onClick={() => setHoldingModalOpen(true)}
-              className={`mb-4 w-full max-w-xs ${
-                hasUnassignedAssets
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : ""
-              }`}
-              variant={hasUnassignedAssets ? undefined : "secondary"}
-            >
-              View Holding Assets
-            </Button>
-            {/* Import Modal (conditionally rendered) */}
-            {modalOpen && (
-              <ImportModal
-                open={modalOpen}
-                onClose={handleCloseModal}
-                onSuccess={async () => {
-                  handleCloseModal();
-                  await handleImportSuccess();
-                }}
-                setErrorDetails={setErrorDetails}
-              />
-            )}
-            {/* Holding Assets Modal (flyout) */}
-            {holdingModalOpen && (
-              <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded shadow-lg max-w-2xl w-full">
-                  <HoldingAssetsTable />
-                  <div className="flex justify-end mt-4">
-                    <Button
-                      onClick={() => setHoldingModalOpen(false)}
-                      variant="secondary"
-                    >
-                      Close
-                    </Button>
+    <ErrorBoundary>
+      {/* Only ADMIN users can access this page */}
+      <ProtectedRoute requireAdmin={true}>
+        <div className="flex min-h-[80vh] items-center justify-center p-4">
+          <Card className="w-full max-w-md md:max-w-2xl shadow-lg border rounded-xl">
+            <CardContent className="py-8 flex flex-col items-center">
+              {/* Page title - match assets page style */}
+              <h1 className="text-3xl font-bold tracking-tight mb-2 text-center">
+                Bulk Import Data
+              </h1>
+              {/* Explanatory text - match assets page style */}
+              <p className="text-muted-foreground mb-6 text-center">
+                System Administrators can bulk import Assets, Users, or
+                Locations using CSV or XLSX files. Imported assets will appear
+                in the holding area until they are signed out and tagged.
+              </p>
+              {/* Import Data button */}
+              <Button
+                onClick={handleOpenModal}
+                className="mb-4 w-full max-w-xs"
+              >
+                Import Data
+              </Button>
+              {/* Persistent error area for easier copying */}
+              {errorDetails && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-xs whitespace-pre-wrap break-all w-full">
+                  <strong>Error Details:</strong>
+                  <pre className="overflow-x-auto">{errorDetails}</pre>
+                </div>
+              )}
+              {/* View Holding Assets button */}
+              <Button
+                onClick={() => setHoldingModalOpen(true)}
+                className={`mb-4 w-full max-w-xs ${
+                  hasUnassignedAssets
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : ""
+                }`}
+                variant={hasUnassignedAssets ? undefined : "secondary"}
+              >
+                View Holding Assets
+              </Button>
+              {/* Import Modal (conditionally rendered) */}
+              {modalOpen && (
+                <ImportModal
+                  open={modalOpen}
+                  onClose={handleCloseModal}
+                  onSuccess={async () => {
+                    handleCloseModal();
+                    await handleImportSuccess();
+                  }}
+                  setErrorDetails={setErrorDetails}
+                />
+              )}
+              {/* Holding Assets Modal (flyout) */}
+              {holdingModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                  <div className="bg-white p-6 rounded shadow-lg max-w-2xl w-full">
+                    <HoldingAssetsTable />
+                    <div className="flex justify-end mt-4">
+                      <Button
+                        onClick={() => setHoldingModalOpen(false)}
+                        variant="secondary"
+                      >
+                        Close
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {/* Display imported data in a table if available */}
-            {displayData.length > 0 && (
-              <div className="mt-8 w-full overflow-x-auto rounded-md border bg-white">
-                <h2 className="text-lg font-semibold mb-2 text-center">
-                  Recently Imported Data
-                </h2>
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr>
-                      {columns.map((col) => (
-                        <th
-                          key={col.key}
-                          className="border-b px-4 py-2 text-left font-medium bg-gray-50"
-                        >
-                          {col.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayData.map((row, idx) => (
-                      <tr key={idx} className="even:bg-gray-50">
+              )}
+              {/* Display imported data in a table if available */}
+              {displayData.length > 0 && (
+                <div className="mt-8 w-full overflow-x-auto rounded-md border bg-white">
+                  <h2 className="text-lg font-semibold mb-2 text-center">
+                    Recently Imported Data
+                  </h2>
+                  <table className="min-w-full text-sm">
+                    <thead>
+                      <tr>
                         {columns.map((col) => (
-                          <td key={col.key} className="px-4 py-2 border-b">
-                            {row[col.key]}
-                          </td>
+                          <th
+                            key={col.key}
+                            className="border-b px-4 py-2 text-left font-medium bg-gray-50"
+                          >
+                            {col.label}
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </ProtectedRoute>
+                    </thead>
+                    <tbody>
+                      {displayData.map((row, idx) => (
+                        <tr key={idx} className="even:bg-gray-50">
+                          {columns.map((col) => (
+                            <td key={col.key} className="px-4 py-2 border-b">
+                              {row[col.key]}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </ProtectedRoute>
+    </ErrorBoundary>
   );
 };
 

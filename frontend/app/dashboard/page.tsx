@@ -47,6 +47,10 @@ export default async function DashboardPage() {
     );
   }
 
+  // Fallback UI for buildingByType and readyToGoByType fetch errors
+  const buildingByTypeError = !buildingByTypeRes.ok;
+  const readyToGoByTypeError = !readyToGoByTypeRes.ok;
+
   return (
     // Mobile-first responsive dashboard layout
     <Card className="m-2 md:m-4 p-0 bg-white shadow-lg">
@@ -61,7 +65,7 @@ export default async function DashboardPage() {
           <DashboardStats
             totalAssets={data.totalAssets}
             assetsByState={data.assetsByState}
-            pendingHoldingCount={data.pendingHoldingCount} // Pass the new prop
+            pendingHoldingCount={data.pendingHoldingCount}
           />
         </div>
 
@@ -73,13 +77,35 @@ export default async function DashboardPage() {
               <AssetsByType data={data} />
             </div>
             <div className="flex-1">
-              <AssetsByState
-                data={data.assetsByState}
-                buildingByType={buildingByType}
-              />
+              {buildingByTypeError ? (
+                <div className="p-4 bg-red-100 border border-red-400 rounded text-red-800 text-center">
+                  <h3 className="font-bold">
+                    Error loading building-by-type data.
+                  </h3>
+                  <p>
+                    Some dashboard data may be missing. Please try again later.
+                  </p>
+                </div>
+              ) : (
+                <AssetsByState
+                  data={data.assetsByState}
+                  buildingByType={buildingByType}
+                />
+              )}
             </div>
             <div className="flex-1">
-              <ReadyToGoAssetsCard readyToGoByType={readyToGoByType} />
+              {readyToGoByTypeError ? (
+                <div className="p-4 bg-red-100 border border-red-400 rounded text-red-800 text-center">
+                  <h3 className="font-bold">
+                    Error loading ready-to-go-by-type data.
+                  </h3>
+                  <p>
+                    Some dashboard data may be missing. Please try again later.
+                  </p>
+                </div>
+              ) : (
+                <ReadyToGoAssetsCard readyToGoByType={readyToGoByType} />
+              )}
             </div>
           </div>
 

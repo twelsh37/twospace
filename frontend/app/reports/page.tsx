@@ -25,6 +25,7 @@ import { ReportCard } from "@/components/ui/report-card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { ExportModal } from "@/components/ui/export-modal";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 // Register Chart.js components
 ChartJS.register(
@@ -1479,18 +1480,20 @@ function ReportsPageContent() {
   }
 
   return (
-    <div style={{ padding: "1rem" }}>
-      {/* Render selected report */}
-      {renderReport()}
-      {/* Export Modal for all reports */}
-      <ExportModal
-        open={exportModalOpen}
-        onOpenChange={setExportModalOpen}
-        onExport={handleExport}
-        loading={exportLoading}
-        title={`Export ${exportReport} Report`}
-      />
-    </div>
+    <ErrorBoundary>
+      <div style={{ padding: "1rem" }}>
+        {/* Render selected report */}
+        {renderReport()}
+        {/* Export Modal for all reports */}
+        <ExportModal
+          open={exportModalOpen}
+          onOpenChange={setExportModalOpen}
+          onExport={handleExport}
+          loading={exportLoading}
+          title={`Export ${exportReport} Report`}
+        />
+      </div>
+    </ErrorBoundary>
   );
 }
 

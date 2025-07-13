@@ -26,6 +26,7 @@ import Link from "next/link";
 import { AssetEditModal } from "./asset-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { UserAssetsModal } from "@/components/users/user-assets-modal";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 // Utility function to map asset state to solid background color classes
 const getStateColorClass = (state: AssetState) => {
@@ -175,432 +176,442 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
   const { page, totalPages, totalAssets } = pagination;
 
   return (
-    <div className="w-full">
-      <AssetEditModal
-        assetNumber={editAssetNumber}
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        onUpdated={handleAssetUpdated}
-      />
-      <ConfirmDeleteModal
-        open={deleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
-        onConfirm={handleDeleteConfirmed}
-        loading={deleting}
-        title="Delete Asset"
-        description={
-          "This action cannot be undone. Please select a reason for deletion."
-        }
-      />
-      <UserAssetsModal
-        employeeId={selectedEmployeeId}
-        open={userAssetsModalOpen}
-        onOpenChange={setUserAssetsModalOpen}
-      />
-      <div>
-        {/* Mobile-first responsive table - hidden on mobile, shown on desktop */}
-        <div className="hidden md:block">
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "separate",
-              borderSpacing: 0,
-              borderRadius: "12px",
-              overflow: "hidden",
-              boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-              fontSize: "12px",
-            }}
-          >
-            <thead>
-              <tr
-                style={{
-                  background: "#1d4ed8",
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                }}
-              >
-                <th
-                  style={{
-                    padding: "0.5rem 8px 0.5rem 0.5rem",
-                    border: "none",
-                    borderTopLeftRadius: "12px",
-                    textAlign: "left",
-                  }}
-                >
-                  Asset Number
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  Type
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  Description
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  State
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  Location
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  Assigned To
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  Purchase Price
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    textAlign: "left",
-                  }}
-                >
-                  Updated
-                </th>
-                <th
-                  style={{
-                    padding: "0.5rem",
-                    border: "none",
-                    borderTopRightRadius: "12px",
-                    textAlign: "left",
-                  }}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {assets.map((asset: Asset, idx: number) => (
+    <ErrorBoundary>
+      <div className="w-full">
+        <AssetEditModal
+          assetNumber={editAssetNumber}
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          onUpdated={handleAssetUpdated}
+        />
+        <ConfirmDeleteModal
+          open={deleteModalOpen}
+          onOpenChange={setDeleteModalOpen}
+          onConfirm={handleDeleteConfirmed}
+          loading={deleting}
+          title="Delete Asset"
+          description={
+            "This action cannot be undone. Please select a reason for deletion."
+          }
+        />
+        <UserAssetsModal
+          employeeId={selectedEmployeeId}
+          open={userAssetsModalOpen}
+          onOpenChange={setUserAssetsModalOpen}
+        />
+        <div>
+          {/* Mobile-first responsive table - hidden on mobile, shown on desktop */}
+          <div className="hidden md:block">
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "separate",
+                borderSpacing: 0,
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+                fontSize: "12px",
+              }}
+            >
+              <thead>
                 <tr
-                  key={asset.assetNumber || asset.serialNumber || `row-${idx}`}
                   style={{
-                    background: idx % 2 === 0 ? "#f8fafc" : "#fff",
-                    transition: "background 0.2s",
-                    cursor: "pointer",
+                    background: "#1d4ed8",
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: "1rem",
                   }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.background = "#e0e7ff")
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background =
-                      idx % 2 === 0 ? "#f8fafc" : "#fff")
-                  }
                 >
-                  <td
+                  <th
                     style={{
                       padding: "0.5rem 8px 0.5rem 0.5rem",
-                      fontWeight: 500,
+                      border: "none",
+                      borderTopLeftRadius: "12px",
                       textAlign: "left",
                     }}
                   >
+                    Asset Number
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    Type
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    Description
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    State
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    Location
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    Assigned To
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    Purchase Price
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      textAlign: "left",
+                    }}
+                  >
+                    Updated
+                  </th>
+                  <th
+                    style={{
+                      padding: "0.5rem",
+                      border: "none",
+                      borderTopRightRadius: "12px",
+                      textAlign: "left",
+                    }}
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {assets.map((asset: Asset, idx: number) => (
+                  <tr
+                    key={
+                      asset.assetNumber || asset.serialNumber || `row-${idx}`
+                    }
+                    style={{
+                      background: idx % 2 === 0 ? "#f8fafc" : "#fff",
+                      transition: "background 0.2s",
+                      cursor: "pointer",
+                    }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.background = "#e0e7ff")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.background =
+                        idx % 2 === 0 ? "#f8fafc" : "#fff")
+                    }
+                  >
+                    <td
+                      style={{
+                        padding: "0.5rem 8px 0.5rem 0.5rem",
+                        fontWeight: 500,
+                        textAlign: "left",
+                      }}
+                    >
+                      <Link
+                        href={`/assets/${asset.assetNumber}`}
+                        className="hover:underline"
+                      >
+                        {asset.assetNumber}
+                      </Link>
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>
+                      {ASSET_TYPE_LABELS[asset.type as AssetType]}
+                    </td>
+                    <td
+                      style={{
+                        padding: "0.5rem",
+                        maxWidth: "200px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {asset.description}
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>
+                      <Badge
+                        className={getStateColorClass(
+                          asset.state as AssetState
+                        )}
+                      >
+                        {ASSET_STATE_LABELS[asset.state as AssetState]}
+                      </Badge>
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>{asset.location}</td>
+                    <td style={{ padding: "0.5rem" }}>
+                      {asset.assignedTo ? (
+                        <div>
+                          <div className="font-medium">{asset.assignedTo}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {asset.employeeId ? (
+                              <button
+                                onClick={() =>
+                                  handleAssignedToClick(asset.employeeId!)
+                                }
+                                className="hover:underline hover:text-blue-600 cursor-pointer transition-colors"
+                                title="Click to view user details and assigned assets"
+                              >
+                                {asset.employeeId}
+                              </button>
+                            ) : (
+                              asset.employeeId
+                            )}{" "}
+                            • {asset.department}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Unassigned
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>
+                      {formatCurrency(parseFloat(asset.purchasePrice))}
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>
+                      {new Date(asset.updatedAt).toLocaleString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/assets/${asset.assetNumber}`}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleEditClick(asset.assetNumber)}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Asset
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDeleteClick(asset.assetNumber)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Asset
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View - shown on mobile, hidden on desktop */}
+          <div className="md:hidden space-y-3">
+            {assets.map((asset: Asset, idx: number) => (
+              <div
+                key={asset.assetNumber || asset.serialNumber || `card-${idx}`}
+                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+              >
+                {/* Asset Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
                     <Link
                       href={`/assets/${asset.assetNumber}`}
-                      className="hover:underline"
+                      className="text-lg font-semibold text-blue-600 hover:underline"
                     >
                       {asset.assetNumber}
                     </Link>
-                  </td>
-                  <td style={{ padding: "0.5rem" }}>
-                    {ASSET_TYPE_LABELS[asset.type as AssetType]}
-                  </td>
-                  <td
-                    style={{
-                      padding: "0.5rem",
-                      maxWidth: "200px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {asset.description}
-                  </td>
-                  <td style={{ padding: "0.5rem" }}>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {ASSET_TYPE_LABELS[asset.type as AssetType]}
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/assets/${asset.assetNumber}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleEditClick(asset.assetNumber)}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit Asset
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDeleteClick(asset.assetNumber)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Asset
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Asset Details */}
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-700">
+                      Description:
+                    </span>
+                    <span className="ml-2 text-gray-600">
+                      {asset.description}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-700">State:</span>
                     <Badge
                       className={getStateColorClass(asset.state as AssetState)}
                     >
                       {ASSET_STATE_LABELS[asset.state as AssetState]}
                     </Badge>
-                  </td>
-                  <td style={{ padding: "0.5rem" }}>{asset.location}</td>
-                  <td style={{ padding: "0.5rem" }}>
-                    {asset.assignedTo ? (
-                      <div>
-                        <div className="font-medium">{asset.assignedTo}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {asset.employeeId ? (
-                            <button
-                              onClick={() =>
-                                handleAssignedToClick(asset.employeeId!)
-                              }
-                              className="hover:underline hover:text-blue-600 cursor-pointer transition-colors"
-                              title="Click to view user details and assigned assets"
-                            >
-                              {asset.employeeId}
-                            </button>
-                          ) : (
-                            asset.employeeId
-                          )}{" "}
-                          • {asset.department}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">Unassigned</span>
-                    )}
-                  </td>
-                  <td style={{ padding: "0.5rem" }}>
-                    {formatCurrency(parseFloat(asset.purchasePrice))}
-                  </td>
-                  <td style={{ padding: "0.5rem" }}>
-                    {new Date(asset.updatedAt).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })}
-                  </td>
-                  <td style={{ padding: "0.5rem" }}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/assets/${asset.assetNumber}`}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleEditClick(asset.assetNumber)}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit Asset
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => handleDeleteClick(asset.assetNumber)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Asset
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
 
-        {/* Mobile Card View - shown on mobile, hidden on desktop */}
-        <div className="md:hidden space-y-3">
-          {assets.map((asset: Asset, idx: number) => (
-            <div
-              key={asset.assetNumber || asset.serialNumber || `card-${idx}`}
-              className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
-            >
-              {/* Asset Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <Link
-                    href={`/assets/${asset.assetNumber}`}
-                    className="text-lg font-semibold text-blue-600 hover:underline"
-                  >
-                    {asset.assetNumber}
-                  </Link>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {ASSET_TYPE_LABELS[asset.type as AssetType]}
+                  <div>
+                    <span className="font-medium text-gray-700">Location:</span>
+                    <span className="ml-2 text-gray-600">{asset.location}</span>
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-gray-700">
+                      Assigned To:
+                    </span>
+                    <span className="ml-2 text-gray-600">
+                      {asset.assignedTo ? (
+                        <div>
+                          <div className="font-medium">{asset.assignedTo}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {asset.employeeId ? (
+                              <button
+                                onClick={() =>
+                                  handleAssignedToClick(asset.employeeId!)
+                                }
+                                className="hover:underline hover:text-blue-600 cursor-pointer transition-colors"
+                                title="Click to view user details and assigned assets"
+                              >
+                                {asset.employeeId}
+                              </button>
+                            ) : (
+                              asset.employeeId
+                            )}{" "}
+                            • {asset.department}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Unassigned
+                        </span>
+                      )}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-gray-700">
+                      Purchase Price:
+                    </span>
+                    <span className="ml-2 text-gray-600">
+                      {formatCurrency(parseFloat(asset.purchasePrice))}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-gray-700">Updated:</span>
+                    <span className="ml-2 text-gray-600">
+                      {new Date(asset.updatedAt).toLocaleString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                    </span>
                   </div>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={`/assets/${asset.assetNumber}`}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Details
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleEditClick(asset.assetNumber)}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Asset
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => handleDeleteClick(asset.assetNumber)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Asset
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
-
-              {/* Asset Details */}
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Description:
-                  </span>
-                  <span className="ml-2 text-gray-600">
-                    {asset.description}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-700">State:</span>
-                  <Badge
-                    className={getStateColorClass(asset.state as AssetState)}
-                  >
-                    {ASSET_STATE_LABELS[asset.state as AssetState]}
-                  </Badge>
-                </div>
-
-                <div>
-                  <span className="font-medium text-gray-700">Location:</span>
-                  <span className="ml-2 text-gray-600">{asset.location}</span>
-                </div>
-
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Assigned To:
-                  </span>
-                  <span className="ml-2 text-gray-600">
-                    {asset.assignedTo ? (
-                      <div>
-                        <div className="font-medium">{asset.assignedTo}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {asset.employeeId ? (
-                            <button
-                              onClick={() =>
-                                handleAssignedToClick(asset.employeeId!)
-                              }
-                              className="hover:underline hover:text-blue-600 cursor-pointer transition-colors"
-                              title="Click to view user details and assigned assets"
-                            >
-                              {asset.employeeId}
-                            </button>
-                          ) : (
-                            asset.employeeId
-                          )}{" "}
-                          • {asset.department}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">Unassigned</span>
-                    )}
-                  </span>
-                </div>
-
-                <div>
-                  <span className="font-medium text-gray-700">
-                    Purchase Price:
-                  </span>
-                  <span className="ml-2 text-gray-600">
-                    {formatCurrency(parseFloat(asset.purchasePrice))}
-                  </span>
-                </div>
-
-                <div>
-                  <span className="font-medium text-gray-700">Updated:</span>
-                  <span className="ml-2 text-gray-600">
-                    {new Date(asset.updatedAt).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Pagination - Mobile responsive */}
-        <div className="flex flex-col sm:flex-row items-center justify-between p-4 mt-3 gap-4">
-          <div className="text-sm text-muted-foreground text-center sm:text-left">
-            Showing {assets.length} of {totalAssets} assets
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(page - 1)}
-              disabled={page <= 1}
-              className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 disabled:bg-gray-400 disabled:border-gray-400"
-              aria-label="Previous page"
-              title="Previous page"
-            >
-              Previous
-            </Button>
-            <span className="text-sm font-medium">
-              Page {page} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(page + 1)}
-              disabled={page >= totalPages}
-              className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 disabled:bg-gray-400 disabled:border-gray-400"
-              aria-label="Next page"
-              title="Next page"
-            >
-              Next
-            </Button>
+
+          {/* Pagination - Mobile responsive */}
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 mt-3 gap-4">
+            <div className="text-sm text-muted-foreground text-center sm:text-left">
+              Showing {assets.length} of {totalAssets} assets
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(page - 1)}
+                disabled={page <= 1}
+                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 disabled:bg-gray-400 disabled:border-gray-400"
+                aria-label="Previous page"
+                title="Previous page"
+              >
+                Previous
+              </Button>
+              <span className="text-sm font-medium">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(page + 1)}
+                disabled={page >= totalPages}
+                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 disabled:bg-gray-400 disabled:border-gray-400"
+                aria-label="Next page"
+                title="Next page"
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
