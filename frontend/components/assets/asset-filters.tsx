@@ -19,9 +19,9 @@ import { Badge } from "@/components/ui/badge";
 export type FilterKey = "type" | "state" | "status";
 
 export interface FilterState {
-  type: AssetType | "all";
-  state: AssetState | "all";
-  status: string | "all";
+  type: AssetType | "ALL";
+  state: AssetState | "ALL";
+  status: string | "ALL";
 }
 
 interface AssetFiltersProps {
