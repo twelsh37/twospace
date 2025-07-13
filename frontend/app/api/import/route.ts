@@ -12,6 +12,7 @@ import {
 } from "@/lib/db";
 import type { NewHoldingAsset } from "@/lib/db/schema";
 import { inArray } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Helper to parse CSV buffer
 function parseCsvBuffer(buffer: Buffer) {
@@ -31,6 +32,8 @@ function parseXlsxBuffer(buffer: Buffer) {
 }
 
 export async function POST(req: NextRequest) {
+  // Log the start of the import POST request
+  appLogger.info("POST /api/import called");
   try {
     // Use Fetch API's formData to handle file uploads in App Router
     const formData = await req.formData();
@@ -38,7 +41,15 @@ export async function POST(req: NextRequest) {
     const type = formData.get("type");
     const format = formData.get("format");
 
+    // Log file and import parameters
+    appLogger.info("Import parameters received", {
+      type,
+      format,
+      fileType: file && typeof file,
+    });
+
     if (!file || !(file instanceof Blob)) {
+      appLogger.warn("File not received or invalid in import");
       return NextResponse.json(
         { error: "File not received or invalid." },
         { status: 400 }
@@ -50,6 +61,7 @@ export async function POST(req: NextRequest) {
       typeof type !== "string" ||
       typeof format !== "string"
     ) {
+      appLogger.warn("Missing type or format in import");
       return NextResponse.json(
         { error: "Missing type or format." },
         { status: 400 }
@@ -61,10 +73,13 @@ export async function POST(req: NextRequest) {
     const fileBuffer = Buffer.from(arrayBuffer);
     let parsedData;
     if (format === "csv") {
+      appLogger.info("Parsing CSV file for import");
       parsedData = parseCsvBuffer(fileBuffer);
     } else if (format === "xlsx") {
+      appLogger.info("Parsing XLSX file for import");
       parsedData = parseXlsxBuffer(fileBuffer);
     } else {
+      appLogger.warn("Unsupported file format in import", { format });
       return NextResponse.json(
         { error: "Unsupported file format." },
         { status: 400 }
@@ -76,7 +91,6 @@ export async function POST(req: NextRequest) {
       // Use the correct type for insert
       const holdingAssetsToInsert: NewHoldingAsset[] = [];
       const allSerialNumbers: string[] = [];
-      console.log("Parsed data:", parsedData);
       let firstRowKeys: string[] = [];
       let firstNormalizedKeys: string[] = [];
       for (const [i, row] of (
@@ -116,8 +130,8 @@ export async function POST(req: NextRequest) {
       }
       // Log normalized keys for debugging
       if (firstRowKeys.length > 0) {
-        console.log("First row original keys:", firstRowKeys);
-        console.log("First row normalized keys:", firstNormalizedKeys);
+        appLogger.info("First row original keys", { firstRowKeys });
+        appLogger.info("First row normalized keys", { firstNormalizedKeys });
       }
       // Check for existing serial numbers in the DB
       let existingSerials: string[] = [];
@@ -136,9 +150,14 @@ export async function POST(req: NextRequest) {
         .filter((asset) => existingSerials.includes(asset.serialNumber))
         .map((asset) => asset.serialNumber);
       if (skippedSerials.length > 0) {
-        console.log("Skipped duplicate serial numbers:", skippedSerials);
+        appLogger.warn("Skipped duplicate serial numbers in import", {
+          skippedSerials,
+        });
       }
       if (uniqueAssetsToInsert.length === 0) {
+        appLogger.warn(
+          "All serial numbers in import already exist in holding assets table"
+        );
         return NextResponse.json(
           {
             warning:
@@ -153,6 +172,9 @@ export async function POST(req: NextRequest) {
       }
       // Insert only unique assets
       await db.insert(holdingAssetsTable).values(uniqueAssetsToInsert);
+      appLogger.info(
+        `Inserted ${uniqueAssetsToInsert.length} new holding assets via import`
+      );
       // Return a warning if some were skipped, otherwise success
       if (skippedSerials.length > 0) {
         return NextResponse.json(
@@ -165,12 +187,15 @@ export async function POST(req: NextRequest) {
         );
       }
     }
+    appLogger.info("Import successful");
     return NextResponse.json({
       message: "Import successful.",
       data: parsedData,
     });
   } catch (err) {
-    console.error("Import error:", err);
+    systemLogger.error(
+      `Import error: ${err instanceof Error ? err.stack : String(err)}`
+    );
     return NextResponse.json({ error: "Import failed." }, { status: 500 });
   }
 }

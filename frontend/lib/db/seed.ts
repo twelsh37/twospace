@@ -9,6 +9,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { eq, ne } from "drizzle-orm";
 import * as schema from "./schema";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 const {
   usersTable,
@@ -257,9 +258,8 @@ function randomDateInRange(start: Date, end: Date, biasRecent = false): Date {
 }
 
 async function seedDatabase() {
-  console.log("🌱 Starting database seed for a large company...");
-  console.log(`   - Users to create: ${TOTAL_USERS}`);
-
+  // Log the start of the seed process
+  appLogger.info("Seeding database started");
   try {
     // --- Stage 1: Clean Slate ---
     console.log("\n--- Stage 1: Cleaning Database ---");
@@ -686,8 +686,23 @@ async function seedDatabase() {
     }
 
     console.log("\n✅ Database seeded successfully with large dataset!");
+    // Log after seeding locations
+    appLogger.info("Locations seeded", { count: LOCATIONS_CONFIG.length });
+    // Example: Log after seeding departments
+    appLogger.info("Departments seeded", {
+      count: Object.values(DEPARTMENTS_CONFIG).flat().length,
+    });
+    // Example: Log after seeding users
+    appLogger.info("Users seeded", { count: TOTAL_USERS });
+    // Example: Log after seeding assets
+    appLogger.info("Assets seeded");
+    appLogger.info("Database seeding completed successfully");
   } catch (error) {
-    console.error("❌ A critical error occurred during seeding:", error);
+    systemLogger.error(
+      `Error during database seeding: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     throw error;
   } finally {
     console.log("   - Closing database connection...");

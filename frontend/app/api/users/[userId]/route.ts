@@ -10,14 +10,19 @@ import {
   assetsTable,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ userId: string }> }
 ) {
+  // Log the start of the GET request
+  appLogger.info("GET /api/users/[userId] called");
   try {
     const { userId } = await context.params;
+    appLogger.info("Fetching user by ID", { userId });
     if (!userId) {
+      appLogger.warn("User ID is required in GET /api/users/[userId]");
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
@@ -43,6 +48,7 @@ export async function GET(
       .innerJoin(locationsTable, eq(usersTable.locationId, locationsTable.id))
       .where(eq(usersTable.id, userId));
     if (!users.length) {
+      appLogger.warn("User not found in GET /api/users/[userId]", { userId });
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
     const user = users[0];
@@ -57,9 +63,14 @@ export async function GET(
       })
       .from(assetsTable)
       .where(eq(assetsTable.assignedTo, user.email));
+    appLogger.info("Fetched user and assets successfully", { userId });
     return NextResponse.json({ data: user, assets });
   } catch (error) {
-    console.error("Error fetching user by ID:", error);
+    systemLogger.error(
+      `Error fetching user by ID: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to fetch user" },
       { status: 500 }
@@ -71,9 +82,13 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ userId: string }> }
 ) {
+  // Log the start of the PATCH request
+  appLogger.info("PATCH /api/users/[userId] called");
   try {
     const { userId } = await context.params;
+    appLogger.info("Updating user by ID", { userId });
     if (!userId) {
+      appLogger.warn("User ID is required in PATCH /api/users/[userId]");
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
@@ -97,6 +112,9 @@ export async function PATCH(
       }
     }
     if (Object.keys(updateData).length === 0) {
+      appLogger.warn("No valid fields to update in PATCH /api/users/[userId]", {
+        userId,
+      });
       return NextResponse.json(
         { error: "No valid fields to update" },
         { status: 400 }
@@ -108,11 +126,17 @@ export async function PATCH(
       .where(eq(usersTable.id, userId))
       .returning();
     if (!updated.length) {
+      appLogger.warn("User not found in PATCH /api/users/[userId]", { userId });
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    appLogger.info("User updated successfully", { userId });
     return NextResponse.json({ data: updated[0] });
   } catch (error) {
-    console.error("Error updating user:", error);
+    systemLogger.error(
+      `Error updating user: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to update user" },
       { status: 500 }
@@ -124,9 +148,13 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ userId: string }> }
 ) {
+  // Log the start of the DELETE request
+  appLogger.info("DELETE /api/users/[userId] called");
   try {
     const { userId } = await context.params;
+    appLogger.info("Deleting user by ID", { userId });
     if (!userId) {
+      appLogger.warn("User ID is required in DELETE /api/users/[userId]");
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
@@ -137,11 +165,19 @@ export async function DELETE(
       .where(eq(usersTable.id, userId))
       .returning();
     if (!deleted.length) {
+      appLogger.warn("User not found in DELETE /api/users/[userId]", {
+        userId,
+      });
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    appLogger.info("User deleted successfully", { userId });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error("Error deleting user:", error);
+    systemLogger.error(
+      `Error deleting user: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to delete user" },
       { status: 500 }

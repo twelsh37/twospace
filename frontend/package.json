@@ -55,6 +55,7 @@
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.44.2",
     "formidable": "^3.5.4",
+    "fs": "^0.0.1-security",
     "init": "^0.1.2",
     "lucide-react": "^0.522.0",
     "next": "15.3.4",
@@ -69,6 +70,8 @@
     "shadcn": "^2.7.0",
     "swr": "^2.3.3",
     "tailwind-merge": "^3.3.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -82,6 +85,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/winston": "^2.4.4",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",

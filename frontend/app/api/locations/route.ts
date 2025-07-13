@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { db, locationsTable } from "@/lib/db";
 import { eq, ilike, and } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,8 @@ const corsHeaders = {
 };
 
 export async function GET(req: Request) {
+  // Log the start of the GET request
+  appLogger.info("GET /api/locations called");
   try {
     const { searchParams } = new URL(req.url);
     const name = searchParams.get("name");
@@ -22,6 +25,14 @@ export async function GET(req: Request) {
     const locationId = searchParams.get("locationId");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
+    // Log filters being used
+    appLogger.info("GET /api/locations - Filters:", {
+      name,
+      isActive,
+      locationId,
+      page,
+      limit,
+    });
     const offset = (page - 1) * limit;
 
     const conditions = [];
@@ -78,6 +89,7 @@ export async function GET(req: Request) {
       ...loc,
       name: loc.name.toUpperCase(),
     }));
+    appLogger.info(`Fetched ${locationsUpper.length} locations successfully`);
     return NextResponse.json(
       {
         success: true,
@@ -94,7 +106,11 @@ export async function GET(req: Request) {
       { headers: corsHeaders }
     );
   } catch (error) {
-    console.error("Error fetching locations:", error);
+    systemLogger.error(
+      `Error fetching locations: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       {
         success: false,
@@ -113,12 +129,18 @@ export async function OPTIONS() {
 
 // Add POST handler for creating a new location
 export async function POST(req: Request) {
+  // Log the start of the POST request
+  appLogger.info("POST /api/locations called");
   try {
     const body = await req.json();
     const { name, description, isActive } = body;
+    appLogger.info("Creating new location", { name, description, isActive });
 
     // Validate required fields
     if (!name || typeof name !== "string") {
+      appLogger.warn(
+        "Name is required and must be a string in POST /api/locations"
+      );
       return NextResponse.json(
         { success: false, error: "Name is required and must be a string." },
         { status: 400, headers: corsHeaders }
@@ -131,6 +153,9 @@ export async function POST(req: Request) {
       .from(locationsTable)
       .where(eq(locationsTable.name, name));
     if (existing.length > 0) {
+      appLogger.warn("Location name must be unique in POST /api/locations", {
+        name,
+      });
       return NextResponse.json(
         { success: false, error: "Location name must be unique." },
         { status: 409, headers: corsHeaders }
@@ -147,12 +172,17 @@ export async function POST(req: Request) {
       })
       .returning();
 
+    appLogger.info("Location created successfully", { name: newLocation.name });
     return NextResponse.json(
       { success: true, data: newLocation },
       { status: 201, headers: corsHeaders }
     );
   } catch (error) {
-    console.error("Error creating location:", error);
+    systemLogger.error(
+      `Error creating location: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       {
         success: false,

@@ -14,6 +14,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Comprehensive server-side logging using Winston for all API routes and utilities.
+- Daily log rotation with 30-day retention using winston-daily-rotate-file.
+- Separate logs for system events (`system.log_YYYYMMDD.log`) and application events (`app.log_YYYYMMDD.log`).
+- Extensive explanatory comments and documentation for logging usage, audit, and troubleshooting.
+- Logging is server-side only (no Winston on client).
+
 ## [0.0.3] - 2025-06-11
 
 ### Added

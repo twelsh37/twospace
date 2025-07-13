@@ -11,6 +11,7 @@ import {
   generateTableCSV,
   generatePDFViaBrowserless,
 } from "@/lib/server/exportUtils";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Define columns for the users export (match table columns)
 const userColumns = [
@@ -23,6 +24,8 @@ const userColumns = [
 ];
 
 export async function POST(request: NextRequest) {
+  // Log the start of the POST request
+  appLogger.info("POST /api/users/export called");
   try {
     // Accept 'format' in request body (default to 'pdf' for backward compatibility)
     const {
@@ -30,6 +33,12 @@ export async function POST(request: NextRequest) {
       role = "all",
       format = "pdf",
     } = await request.json();
+    // Log the filters and format being used
+    appLogger.info("Exporting users with filters", {
+      department,
+      role,
+      format,
+    });
     // Build where conditions for filters (reuse logic from users/route.ts)
     const whereConditions = [];
     let joinDepartment = false;
@@ -97,6 +106,10 @@ export async function POST(request: NextRequest) {
     }));
     const filters = { department, role };
     if (format === "csv") {
+      // Log CSV export
+      appLogger.info(
+        `Generating CSV export for users (${exportRows.length} rows)`
+      );
       // Generate CSV string
       const csv = generateTableCSV({ columns: userColumns, rows: exportRows });
       // Return as downloadable CSV file
@@ -108,6 +121,10 @@ export async function POST(request: NextRequest) {
         },
       });
     } else {
+      // Log PDF export
+      appLogger.info(
+        `Generating PDF export for users (${exportRows.length} rows)`
+      );
       // Generate HTML
       const html = generateTableReportHTML({
         title: "User Report",
@@ -126,7 +143,11 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("User export error:", error);
+    systemLogger.error(
+      `User export error: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to generate user export" },
       { status: 500 }

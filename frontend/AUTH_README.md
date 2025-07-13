@@ -56,6 +56,7 @@ This document explains how authentication works in this project, how to set up S
 If you're having trouble logging in with the demo user (`demo@example.com`), it's likely because the user exists in the application database but not in Supabase Auth. To fix this:
 
 1. **Quick Fix (Recommended):**
+
    ```bash
    # Add your Supabase service role key to .env.local first
    cd frontend
@@ -63,6 +64,7 @@ If you're having trouble logging in with the demo user (`demo@example.com`), it'
    ```
 
 2. **Manual Setup:**
+
    - Go to Supabase Dashboard > Authentication > Users
    - Create user: `demo@example.com` / `password01`
    - Check "Auto-confirm email"
@@ -74,6 +76,7 @@ If you're having trouble logging in with the demo user (`demo@example.com`), it'
    ```
 
 See `scripts/fix-auth-issue.md` for detailed troubleshooting.
+
 - **Via API:**
   - Use the Supabase Admin API to programmatically create users (see Supabase docs).
 
@@ -141,6 +144,17 @@ See `scripts/fix-auth-issue.md` for detailed troubleshooting.
 - All sensitive operations are handled outside the codebase for security.
 - The app is ready for production with minimal changes needed for scaling and compliance.
 - For any questions, see the code comments in `lib/auth-context.tsx` and `components/auth/protected-route.tsx`.
+
+---
+
+## 9. Authentication Event Logging
+
+- All authentication-related events (login, logout, sign-up, password reset, errors) are logged to the system log (`frontend/logs/system.log_YYYYMMDD.log`).
+- Logs include timestamp, user email (where available), event type, and error details (if any).
+- **Admins**: Review these logs regularly to audit authentication activity and investigate issues.
+- **Log Location**: `frontend/logs/`
+- **Log Review**: Open the relevant log file and search for auth-related events (e.g., `login`, `signUp`, `resetPassword`).
+- **Security**: Never share log files publicly, as they may contain sensitive information.
 
 ---
 

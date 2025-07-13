@@ -7,12 +7,21 @@ import {
   assetHistoryTable,
 } from "@/lib/db";
 import { eq } from "drizzle-orm";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Remove unused: IT_STORE_ROOM_ID, getAssetTypeFromNumber, toIsoStringSafe
 
 export async function POST(req: NextRequest) {
+  // Log the start of the POST request
+  appLogger.info("POST /api/holding-assets/assign called");
   try {
     const { holdingAssetId, assetNumber, userId, type } = await req.json();
+    appLogger.info("Assigning holding asset", {
+      holdingAssetId,
+      assetNumber,
+      userId,
+      type,
+    });
     // Validate type
     const validTypes = [
       "MOBILE_PHONE",
@@ -22,6 +31,7 @@ export async function POST(req: NextRequest) {
       "MONITOR",
     ];
     if (!type || !validTypes.includes(type)) {
+      appLogger.warn("Invalid or missing asset type in assign", { type });
       return NextResponse.json(
         { error: "Invalid or missing asset type." },
         { status: 400 }
@@ -34,6 +44,9 @@ export async function POST(req: NextRequest) {
       .where(eq(holdingAssetsTable.id, holdingAssetId))
       .limit(1);
     if (!holdingAsset.length) {
+      appLogger.warn("Holding asset not found or already assigned", {
+        holdingAssetId,
+      });
       return NextResponse.json(
         { error: "Holding asset not found or already assigned." },
         { status: 400 }
@@ -46,6 +59,9 @@ export async function POST(req: NextRequest) {
       .where(eq(assetsTable.assetNumber, assetNumber))
       .limit(1);
     if (existingAsset.length) {
+      appLogger.warn("Asset number already exists in assets table", {
+        assetNumber,
+      });
       return NextResponse.json(
         { error: "Asset number already exists in assets table." },
         { status: 400 }
@@ -57,6 +73,9 @@ export async function POST(req: NextRequest) {
       .where(eq(assetsTable.serialNumber, holdingAsset[0].serialNumber))
       .limit(1);
     if (existingSerial.length) {
+      appLogger.warn("Serial number already exists in assets table", {
+        serialNumber: holdingAsset[0].serialNumber,
+      });
       return NextResponse.json(
         { error: "Serial number already exists in assets table." },
         { status: 400 }
@@ -81,7 +100,7 @@ export async function POST(req: NextRequest) {
         status: "stock" as (typeof assetsTable.$inferInsert)["status"],
         // Do NOT include rawData or notes here
       };
-      console.log("[assign] Inserting asset:", assetInsert);
+      appLogger.info("Inserting asset in assign transaction", { assetInsert });
       await trx.insert(assetsTable).values(assetInsert);
       // Prepare asset history insert object
       const assetHistoryInsert = {
@@ -99,14 +118,18 @@ export async function POST(req: NextRequest) {
           type,
         }), // Use correct type
       };
-      console.log("[assign] Inserting asset history:", assetHistoryInsert);
+      appLogger.info("Inserting asset history in assign transaction", {
+        assetHistoryInsert,
+      });
       await trx.insert(assetHistoryTable).values(assetHistoryInsert);
       // Remove from holding_assets (ensure correct id and log result)
       const deleteResult = await trx
         .delete(holdingAssetsTable)
         .where(eq(holdingAssetsTable.id, holdingAssetId));
-      // Optionally log the result for debugging
-      console.log("[assign] Delete result:", deleteResult);
+      appLogger.info("Deleted holding asset in assign transaction", {
+        holdingAssetId,
+        deleteResult,
+      });
     });
     // Optionally, confirm removal after transaction
     const stillExists = await db
@@ -115,16 +138,22 @@ export async function POST(req: NextRequest) {
       .where(eq(holdingAssetsTable.id, holdingAssetId))
       .limit(1);
     if (stillExists.length > 0) {
-      console.warn(
+      systemLogger.warn(
         `Warning: Asset ${holdingAssetId} still exists in holding_assets after assignment.`
       );
     }
+    appLogger.info("Asset assigned and moved successfully", {
+      holdingAssetId,
+      assetNumber,
+    });
     return NextResponse.json(
       { message: "Asset assigned and moved successfully." },
       { status: 200 }
     );
   } catch (err) {
-    console.error("Error in assign asset:", err);
+    systemLogger.error(
+      `Error in assign asset: ${err instanceof Error ? err.stack : String(err)}`
+    );
     return NextResponse.json(
       {
         error:

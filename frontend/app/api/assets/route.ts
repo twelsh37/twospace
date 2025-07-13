@@ -18,6 +18,7 @@ import { db, assetsTable, locationsTable } from "@/lib/db";
 import { createAssetHistory, generateAssetNumber } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 import { settingsTable } from "@/lib/db/schema";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Define standard CORS headers for reusability
 const corsHeaders = {
@@ -50,11 +51,14 @@ async function getCacheDurationFromSettings(): Promise<number> {
  * Retrieve assets with optional filtering, searching, and pagination
  */
 export async function GET(request: NextRequest) {
+  // Log the start of the GET request
+  appLogger.info(`GET /api/assets called. URL: ${request.url}`);
   // Support /api/assets/next-asset-number?type=TYPE
   const { pathname, searchParams } = new URL(request.url);
   if (pathname.endsWith("/next-asset-number")) {
     const type = searchParams.get("type");
     if (!type) {
+      appLogger.warn("Missing 'type' parameter for next-asset-number endpoint");
       return NextResponse.json(
         { success: false, error: "Missing type" },
         { status: 400, headers: corsHeaders }
@@ -65,11 +69,17 @@ export async function GET(request: NextRequest) {
       const assetNumber = await generateAssetNumber(
         type as "MOBILE_PHONE" | "TABLET" | "DESKTOP" | "LAPTOP" | "MONITOR"
       );
+      appLogger.info(`Generated asset number for type ${type}: ${assetNumber}`);
       return NextResponse.json(
         { success: true, assetNumber },
         { headers: corsHeaders }
       );
-    } catch {
+    } catch (err) {
+      systemLogger.error(
+        `Failed to generate asset number for type ${type}: ${
+          err instanceof Error ? err.stack : String(err)
+        }`
+      );
       return NextResponse.json(
         { success: false, error: "Failed to generate asset number" },
         { status: 500, headers: corsHeaders }
@@ -85,6 +95,7 @@ export async function GET(request: NextRequest) {
     const now = Date.now();
     const cached = assetCache.get(cacheKey);
     if (cached && now - cached.timestamp < cacheDuration) {
+      appLogger.info(`Cache hit for GET /api/assets with key: ${cacheKey}`);
       // Return cached data
       return NextResponse.json(cached.data, { headers: corsHeaders });
     }
@@ -101,7 +112,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get("sortOrder") || "desc";
     const status = searchParams.get("status") || "all";
 
-    console.log("GET /api/assets - Filters:", {
+    appLogger.info("GET /api/assets - Filters:", {
       type,
       state,
       locationId,
@@ -237,15 +248,18 @@ export async function GET(request: NextRequest) {
       duration: cacheDuration,
     });
     return NextResponse.json(response, { headers: corsHeaders });
-  } catch (error) {
-    const durationMs = Date.now() - start;
-    console.error("Error fetching assets:", error, `Timing: ${durationMs}ms`);
+  } catch (err) {
+    systemLogger.error(
+      `Error in GET /api/assets: ${
+        err instanceof Error ? err.stack : String(err)
+      }`
+    );
     return NextResponse.json(
       {
         success: false,
         error: "Failed to fetch assets",
-        details: error instanceof Error ? error.message : "Unknown error",
-        timingMs: durationMs, // Add timing info
+        details: err instanceof Error ? err.message : "Unknown error",
+        timingMs: Date.now() - start, // Add timing info
       },
       { status: 500, headers: corsHeaders }
     );

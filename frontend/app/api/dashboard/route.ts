@@ -3,17 +3,27 @@
 
 import { NextResponse } from "next/server";
 import { getDashboardData } from "@/lib/db/dashboard";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 /**
  * GET /api/dashboard
  * Retrieves all the necessary statistics for the dashboard in a single request.
  */
 export async function GET() {
+  // TEST: Write a test log entry to verify logging works
+  appLogger.info("TEST LOG: /api/dashboard GET handler invoked");
+  // Log the start of the dashboard data request
+  appLogger.info("GET /api/dashboard called");
   try {
     const dashboardData = await getDashboardData();
+    appLogger.info("Dashboard data fetched successfully");
     return NextResponse.json({ success: true, data: dashboardData });
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
+    systemLogger.error(
+      `Error fetching dashboard data: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       {
         success: false,

@@ -10,6 +10,7 @@ import {
   generateTableCSV,
   generatePDFViaBrowserless,
 } from "@/lib/server/exportUtils";
+import { systemLogger, appLogger } from "@/lib/logger";
 
 // Define columns for the assets export (match table columns)
 const assetColumns = [
@@ -29,6 +30,8 @@ function safeIlike(column: Column, value: string): SQL<unknown> | undefined {
 }
 
 export async function POST(request: NextRequest) {
+  // Log the start of the POST request
+  appLogger.info("POST /api/assets/export called");
   try {
     // Accept filters and format in request body
     const {
@@ -40,6 +43,16 @@ export async function POST(request: NextRequest) {
       search = "",
       format = "pdf",
     } = await request.json();
+    // Log the filters and format being used
+    appLogger.info("Exporting assets with filters", {
+      type,
+      state,
+      status,
+      locationId,
+      assignedTo,
+      search,
+      format,
+    });
 
     // Build where conditions (reuse logic from GET handler)
     const whereConditions = [isNull(assetsTable.deletedAt)];
@@ -103,6 +116,10 @@ export async function POST(request: NextRequest) {
     }));
     const filters = { type, state, status, locationId, assignedTo, search };
     if (format === "csv") {
+      // Log CSV export
+      appLogger.info(
+        `Generating CSV export for assets (${exportRows.length} rows)`
+      );
       // Generate CSV string
       const csv = generateTableCSV({ columns: assetColumns, rows: exportRows });
       // Return as downloadable CSV file
@@ -114,6 +131,10 @@ export async function POST(request: NextRequest) {
         },
       });
     } else {
+      // Log PDF export
+      appLogger.info(
+        `Generating PDF export for assets (${exportRows.length} rows)`
+      );
       // Generate HTML
       const html = generateTableReportHTML({
         title: "Asset Report",
@@ -132,7 +153,11 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Asset export error:", error);
+    systemLogger.error(
+      `Asset export error: ${
+        error instanceof Error ? error.stack : String(error)
+      }`
+    );
     return NextResponse.json(
       { error: "Failed to generate asset export" },
       { status: 500 }
