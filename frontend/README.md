@@ -61,3 +61,10 @@ This project uses [Winston](https://github.com/winstonjs/winston) for robust ser
 ```
 {"level":"info","message":"Asset created","timestamp":"2024-06-12T10:00:00.000Z","assetId":"01-12345"}
 ```
+
+## PDF Export and Reporting
+
+- Asset Inventory reports can be exported as PDFs with all charts and tables included, exactly as seen on the screen.
+- The export modal provides a simple, robust user experience for exporting reports.
+- Recent bugfixes ensure that React state and hooks are used correctly, preventing errors and infinite loops during export.
+- The export workflow is modular and ready for future extension to other report types.
