@@ -154,6 +154,18 @@ The transition from **Holding** to **Available Stock** is a key step in the asse
 
 ---
 
+## Logging and Workflow Troubleshooting
+
+All asset workflow actions, state transitions, and errors are logged server-side using Winston. Logs are stored in `frontend/logs/` with daily rotation and 30-day retention. There are separate logs for system and application events.
+
+- **Admins**: Use logs to audit workflow actions, investigate errors, and monitor system health.
+- **Users**: If you encounter workflow issues, provide the relevant log file to admins for troubleshooting.
+- **Log Location**: `frontend/logs/`
+
+This logging system supports workflow troubleshooting, audit trails, and compliance.
+
+---
+
 <!--
 Reasoning:
 - This document now accurately reflects the real asset states and workflows for different asset types, including the 'Available Stock' state.

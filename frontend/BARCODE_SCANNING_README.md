@@ -5,6 +5,7 @@ This document explains how to set up and use barcode scanning functionality in t
 ## Overview
 
 The barcode scanning system supports two methods:
+
 1. **USB Barcode Scanner** (Recommended for enterprise use)
 2. **Camera-based scanning** (Mobile/tablet friendly)
 
@@ -29,10 +30,12 @@ yarn add quagga
 ## USB Barcode Scanner Setup
 
 ### Hardware Requirements
+
 - USB barcode scanner (any standard HID keyboard emulation scanner)
 - Compatible with Windows, macOS, and Linux
 
 ### Configuration
+
 1. **Connect the scanner** to your computer via USB
 2. **Install drivers** if required (most are plug-and-play)
 3. **Test the scanner** by scanning a barcode into any text field
@@ -42,6 +45,7 @@ yarn add quagga
    - Configure barcode format support
 
 ### Usage
+
 1. Focus on any barcode input field
 2. Scan the barcode
 3. The scanner will automatically input the barcode and trigger the search/submit action
@@ -49,11 +53,13 @@ yarn add quagga
 ## Camera-based Scanning Setup
 
 ### Requirements
+
 - Modern web browser with camera access
 - HTTPS connection (required for camera access)
 - Camera permissions granted
 
 ### Supported Barcode Formats
+
 - Code 128
 - Code 39
 - EAN-13
@@ -62,6 +68,7 @@ yarn add quagga
 - UPC-E
 
 ### Usage
+
 1. Click the "📷 Scan" button next to any barcode input field
 2. Grant camera permissions when prompted
 3. Point camera at the barcode
@@ -126,19 +133,16 @@ function CreateAsset() {
     console.log("Creating asset:", asset);
   };
 
-  return (
-    <AssetFormWithBarcode
-      mode="create"
-      onSubmit={handleSubmit}
-    />
-  );
+  return <AssetFormWithBarcode mode="create" onSubmit={handleSubmit} />;
 }
 ```
 
 ## Barcode Format Recommendations
 
 ### Asset Numbers
+
 Use your existing format: `XX-YYYYY`
+
 - 01-XXXXX: Mobile Phones
 - 02-XXXXX: Tablets
 - 03-XXXXX: Desktops
@@ -146,9 +150,11 @@ Use your existing format: `XX-YYYYY`
 - 05-XXXXX: Monitors
 
 ### Serial Numbers
+
 Use manufacturer serial numbers as-is
 
 ### Recommended Barcode Types
+
 - **Code 128**: Best for alphanumeric data (asset numbers, serial numbers)
 - **Code 39**: Good for alphanumeric data, widely supported
 - **EAN-13**: For numeric-only data
@@ -159,12 +165,14 @@ Use manufacturer serial numbers as-is
 ### USB Scanner Issues
 
 **Scanner not working:**
+
 1. Check USB connection
 2. Test in a simple text editor
 3. Verify scanner is in keyboard emulation mode
 4. Check for driver conflicts
 
 **Wrong characters appearing:**
+
 1. Check keyboard layout settings
 2. Verify scanner is configured for your region
 3. Test scanner configuration
@@ -172,18 +180,21 @@ Use manufacturer serial numbers as-is
 ### Camera Scanner Issues
 
 **Camera not working:**
+
 1. Check browser permissions
 2. Ensure HTTPS connection
 3. Try a different browser
 4. Check camera availability
 
 **Poor scanning performance:**
+
 1. Ensure good lighting
 2. Hold camera steady
 3. Clean camera lens
 4. Try different barcode formats
 
 **Scanner not detecting barcodes:**
+
 1. Check barcode quality and size
 2. Ensure barcode is well-lit
 3. Try different angles
@@ -192,16 +203,19 @@ Use manufacturer serial numbers as-is
 ## Security Considerations
 
 ### Camera Access
+
 - Only request camera access when needed
 - Provide clear permission requests
 - Handle permission denials gracefully
 
 ### Data Validation
+
 - Always validate scanned barcodes
 - Sanitize input data
 - Implement proper error handling
 
 ### Network Security
+
 - Use HTTPS for camera access
 - Validate API endpoints
 - Implement proper authentication
@@ -209,11 +223,13 @@ Use manufacturer serial numbers as-is
 ## Performance Optimization
 
 ### USB Scanner
+
 - No performance impact (keyboard input)
 - Works offline
 - Instant response
 
 ### Camera Scanner
+
 - Optimize video resolution for scanning
 - Implement proper cleanup on component unmount
 - Consider battery usage on mobile devices
@@ -221,7 +237,9 @@ Use manufacturer serial numbers as-is
 ## Testing
 
 ### Test Scenarios
+
 1. **USB Scanner:**
+
    - Scan asset numbers
    - Scan serial numbers
    - Test with different barcode formats
@@ -234,7 +252,9 @@ Use manufacturer serial numbers as-is
    - Test permission handling
 
 ### Test Data
+
 Create test barcodes for:
+
 - Valid asset numbers (XX-YYYYY format)
 - Valid serial numbers
 - Invalid/malformed barcodes
@@ -243,12 +263,14 @@ Create test barcodes for:
 ## Deployment Considerations
 
 ### Production Setup
+
 1. Ensure HTTPS is enabled
 2. Configure proper CORS settings
 3. Set up error monitoring
 4. Test on target devices
 
 ### Mobile Optimization
+
 1. Test on various mobile devices
 2. Optimize for touch interfaces
 3. Consider battery usage
@@ -257,6 +279,7 @@ Create test barcodes for:
 ## Support
 
 For issues with barcode scanning:
+
 1. Check browser console for errors
 2. Verify hardware compatibility
 3. Test with different barcode formats
@@ -265,9 +288,18 @@ For issues with barcode scanning:
 ## Future Enhancements
 
 Potential improvements:
+
 - Support for additional barcode formats
 - Batch scanning capabilities
 - Offline barcode processing
 - Integration with inventory systems
 - Advanced error correction
 - Multi-language support
+
+## Logging of Barcode Scan Events
+
+- All barcode scan events and errors (e.g., failed scans, invalid barcodes) are logged server-side using Winston.
+- Logs are stored in `frontend/logs/app.log_YYYYMMDD.log`.
+- **Admins**: Use these logs to troubleshoot scanning issues and monitor usage.
+- **Users**: If you encounter scan problems, provide the relevant log file to admins for troubleshooting.
+- **Log Location**: `frontend/logs/`

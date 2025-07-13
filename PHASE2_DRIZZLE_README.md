@@ -338,3 +338,13 @@ yarn db:migrate
 # For development, use push instead:
 yarn db:push
 ```
+
+## Logging and Database Audit
+
+All database operations, migrations, and audit trail events are logged server-side using Winston. Logs are stored in `frontend/logs/` with daily rotation and 30-day retention. There are separate logs for system and application events.
+
+- **Admins**: Use logs to audit database changes, investigate errors, and monitor system health.
+- **Users**: If you encounter database issues, provide the relevant log file to admins for troubleshooting.
+- **Log Location**: `frontend/logs/`
+
+This logging system supports database troubleshooting, audit trails, and compliance.

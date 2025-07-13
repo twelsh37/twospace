@@ -292,6 +292,16 @@ Components are designed to be:
 - **Data Encryption**: Sensitive data protection
 - **Audit Logging**: Security event tracking
 
+## Logging, Audit, and Troubleshooting
+
+A comprehensive server-side logging system is implemented using Winston. All API routes and server-side utilities log key events, errors, and business actions to files in `frontend/logs/`, with daily rotation and 30-day retention. There are separate logs for system and application events.
+
+- **Admins**: Use logs to audit activity, investigate errors, and monitor system health.
+- **Users**: If you encounter issues, provide the relevant log file to admins for troubleshooting.
+- **Log Location**: `frontend/logs/`
+
+This logging system supports operational troubleshooting, audit trails, and compliance.
+
 ---
 
 This Phase 2 implementation provides a solid foundation for the Asset Management System. The architecture supports the full feature set outlined in the masterplan while maintaining flexibility for future enhancements.
