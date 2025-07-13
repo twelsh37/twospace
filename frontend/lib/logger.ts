@@ -9,8 +9,8 @@ import winston from "winston";
 import path from "path";
 import DailyRotateFile from "winston-daily-rotate-file";
 
-// Define log directory
-const logDir = path.join(process.cwd(), "frontend", "logs");
+// Changed log directory to /logs for simplicity and clarity
+const logDir = path.join(process.cwd(), "logs");
 
 // Helper to create a logger with daily rotating file and console transports
 function createLogger(filename: string, label: string) {

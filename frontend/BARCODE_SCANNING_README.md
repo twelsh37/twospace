@@ -299,7 +299,7 @@ Potential improvements:
 ## Logging of Barcode Scan Events
 
 - All barcode scan events and errors (e.g., failed scans, invalid barcodes) are logged server-side using Winston.
-- Logs are stored in `frontend/logs/app.log_YYYYMMDD.log`.
+- Logs are stored in `/logs/app.log_YYYYMMDD.log`.
 - **Admins**: Use these logs to troubleshoot scanning issues and monitor usage.
 - **Users**: If you encounter scan problems, provide the relevant log file to admins for troubleshooting.
-- **Log Location**: `frontend/logs/`
+- **Log Location**: `/logs/`

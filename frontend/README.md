@@ -37,7 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Logging and Audit Trail
 
-This project uses [Winston](https://github.com/winstonjs/winston) for robust server-side logging. Logs are written to the `frontend/logs/` directory and are rotated daily (30 days retained). There are two log types:
+This project uses [Winston](https://github.com/winstonjs/winston) for robust server-side logging. Logs are written to the `/logs/` directory and are rotated daily (30 days retained). There are two log types:
 
 - **System Logs**: For infrastructure, API, and error events (`system.log_YYYYMMDD.log`)
 - **Application Logs**: For business logic, user actions, and workflow events (`app.log_YYYYMMDD.log`)
@@ -53,7 +53,7 @@ This project uses [Winston](https://github.com/winstonjs/winston) for robust ser
 
 - **Admins**: Use logs to audit system activity, investigate errors, and monitor usage.
 - **Users**: If you encounter an error, provide the relevant log file to the admin for troubleshooting.
-- **Log Location**: `frontend/logs/`
+- **Log Location**: `/logs/`
 - **Log Review**: Open log files with any text editor. Search for timestamps, error messages, or user actions.
 
 ### Example Log Entry
