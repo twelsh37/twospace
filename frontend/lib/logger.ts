@@ -1,80 +1,63 @@
 // filepath: frontend/lib/logger.ts
-// Winston logger setup for Next.js/TypeScript application
+// Console-based logger for Next.js/TypeScript application
 // This file exports two loggers: systemLogger and appLogger
 // - systemLogger: logs system-level events (startup, errors, etc.)
 // - appLogger: logs application-level events (user actions, business logic, etc.)
-// Logs are written to separate files in frontend/logs/ and also to the console in development.
+//
+// Refactored for Vercel compatibility: Vercel does not support file-based logging.
+// All logs are output to the console, which Vercel captures and displays in the dashboard.
+//
+// Reasoning:
+// - File-based logging (e.g., Winston, rotating files) is not supported in serverless environments like Vercel.
+// - Console logging is the recommended approach for serverless platforms.
+// - This logger provides a consistent API for info, warn, and error logs.
 
-import winston from "winston";
-import path from "path";
-import DailyRotateFile from "winston-daily-rotate-file";
-
-// Changed log directory to /logs for simplicity and clarity
-const logDir = path.join(process.cwd(), "logs");
-
-// Helper to create a logger with daily rotating file and console transports
-function createLogger(filename: string, label: string) {
-  return winston.createLogger({
-    level: "info", // Default log level
-    format: winston.format.combine(
-      winston.format.label({ label }),
-      winston.format.timestamp(),
-      winston.format.printf(({ timestamp, level, message, label }) => {
-        // Log format: [timestamp] [label] level: message
-        return `[${timestamp}] [${label}] ${level}: ${message}`;
-      })
-    ),
-    transports: [
-      // Daily rotating file transport: logs to a file in the logs directory, rotated daily
-      new DailyRotateFile({
-        filename: path.join(logDir, `${filename}_%DATE%.log`),
-        datePattern: "YYYYMMDD",
-        zippedArchive: false,
-        maxFiles: "30d", // Keep logs for 30 days
-      }),
-      // Console transport: logs to the console (only in development)
-      ...(process.env.NODE_ENV !== "production"
-        ? [new winston.transports.Console()]
-        : []),
-    ],
-    // Handle uncaught exceptions and rejections for system logger
-    exceptionHandlers:
-      label === "SYSTEM"
-        ? [
-            new DailyRotateFile({
-              filename: path.join(logDir, `system-exceptions_%DATE%.log`),
-              datePattern: "YYYYMMDD",
-              zippedArchive: false,
-              maxFiles: "30d",
-            }),
-          ]
-        : undefined,
-    rejectionHandlers:
-      label === "SYSTEM"
-        ? [
-            new DailyRotateFile({
-              filename: path.join(logDir, `system-rejections_%DATE%.log`),
-              datePattern: "YYYYMMDD",
-              zippedArchive: false,
-              maxFiles: "30d",
-            }),
-          ]
-        : undefined,
-  });
+interface Logger {
+  info: (message: string, meta?: unknown) => void;
+  warn: (message: string, meta?: unknown) => void;
+  error: (message: string, meta?: unknown) => void;
 }
 
-// System logger: for system-level events
-export const systemLogger = createLogger("system.log", "SYSTEM");
+function formatLog(
+  level: string,
+  label: string,
+  message: string,
+  meta?: unknown
+): string {
+  const timestamp = new Date().toISOString();
+  let log = `[${timestamp}] [${label}] ${level}: ${message}`;
+  if (meta !== undefined) {
+    try {
+      log += ` | meta: ${JSON.stringify(meta)}`;
+    } catch {
+      log += ` | meta: [unserializable]`;
+    }
+  }
+  return log;
+}
 
-// Application logger: for application-level events
-export const appLogger = createLogger("application.log", "APP");
+export const systemLogger: Logger = {
+  info: (message, meta) =>
+    console.info(formatLog("info", "SYSTEM", message, meta)),
+  warn: (message, meta) =>
+    console.warn(formatLog("warn", "SYSTEM", message, meta)),
+  error: (message, meta) =>
+    console.error(formatLog("error", "SYSTEM", message, meta)),
+};
+
+export const appLogger: Logger = {
+  info: (message, meta) =>
+    console.info(formatLog("info", "APP", message, meta)),
+  warn: (message, meta) =>
+    console.warn(formatLog("warn", "APP", message, meta)),
+  error: (message, meta) =>
+    console.error(formatLog("error", "APP", message, meta)),
+};
 
 // Usage example (remove or comment out in production):
 // systemLogger.info('System logger initialized');
 // appLogger.info('Application logger initialized');
 
 // Reasoning:
-// - Separate loggers keep system and application logs organized.
-// - File and console transports help with both development and production debugging.
-// - Exception/rejection handlers on systemLogger catch unhandled errors for diagnostics.
+// - File and console transports are replaced with console-only logging for Vercel/serverless compatibility.
 // - Extensive comments provided for clarity and maintainability.

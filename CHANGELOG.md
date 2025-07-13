@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2025-06-13
+
+### Added
+
+- Asset Inventory PDF export now includes all charts and table data as seen on the screen.
+- Export modal provides a robust, user-friendly workflow for exporting reports as PDF.
+
+### Fixed
+
+- Fixed invalid React hook call in reports page by moving useState inside the component.
+- Prevented infinite render loop by gathering export data only on export action, not on every render.
+- Removed unused imports to resolve ESLint build errors.
+- Export workflow is now robust and bug-free for Asset Inventory reports.
+
 ## [0.0.4] - 2025-06-12
 
 ### Fixed
@@ -21,6 +35,10 @@ All notable changes to this project will be documented in this file.
 - Separate logs for system events (`system.log_YYYYMMDD.log`) and application events (`app.log_YYYYMMDD.log`).
 - Extensive explanatory comments and documentation for logging usage, audit, and troubleshooting.
 - Logging is server-side only (no Winston on client).
+- Migrated all server-side logging from Winston/file-based logging to console-based logging for full compatibility with Vercel and other serverless platforms.
+  - All logs are now output to the console and viewable in the Vercel dashboard (or your serverless provider's logs UI).
+  - Removed all references to Winston, file-based logs, and log file locations from the codebase and documentation.
+  - **Reason:** Vercel and similar platforms do not support persistent file storage. Console logging is the recommended and supported approach for reliability and operational visibility.
 
 ## [0.0.3] - 2025-06-11
 

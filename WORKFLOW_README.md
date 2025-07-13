@@ -156,11 +156,11 @@ The transition from **Holding** to **Available Stock** is a key step in the asse
 
 ## Logging and Workflow Troubleshooting
 
-All asset workflow actions, state transitions, and errors are logged server-side using Winston. Logs are stored in `frontend/logs/` with daily rotation and 30-day retention. There are separate logs for system and application events.
+All asset workflow actions, state transitions, and errors are logged server-side using a console-based logger. Logs are output to the console and are viewable in the Vercel dashboard (or your serverless provider's logs UI). There are separate logs for system and application events, labelled accordingly.
 
-- **Admins**: Use logs to audit workflow actions, investigate errors, and monitor system health.
-- **Users**: If you encounter workflow issues, provide the relevant log file to admins for troubleshooting.
-- **Log Location**: `frontend/logs/`
+- **Admins**: Use the Vercel dashboard to audit workflow actions, investigate errors, and monitor system health.
+- **Users**: If you encounter workflow issues, notify the admin, who can review logs in the Vercel dashboard for troubleshooting.
+- **Why?** Vercel and other serverless platforms do not support persistent file storage. Console logging is the recommended approach for compatibility and reliability.
 
 This logging system supports workflow troubleshooting, audit trails, and compliance.
 
