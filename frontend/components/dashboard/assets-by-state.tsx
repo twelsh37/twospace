@@ -84,6 +84,15 @@ export function AssetsByState({
     MONITOR: "bg-green-500 text-white",
   };
 
+  // --- Flex row for Building Assets by Type (matches ReadyToGoAssetsCard) ---
+  // Order: Desktop, Laptop, Mobile Phone, Tablet
+  const BUILDING_TYPE_ORDER = ["DESKTOP", "LAPTOP", "MOBILE_PHONE", "TABLET"];
+  // Map type to count for quick lookup
+  const typeCountMap: Record<string, number> = {};
+  buildingByType.forEach((item) => {
+    typeCountMap[item.type] = item.count;
+  });
+
   return (
     <Card>
       <CardHeader>
@@ -93,29 +102,27 @@ export function AssetsByState({
         </CardTitle>
       </CardHeader>
       <CardContent className="pb-0">
-        {/* Building by Type counters in a 2x2 grid (matrix) for compact layout */}
+        {/* Building by Type as a flex row (not grid) for even spacing and order */}
         {buildingByType.length > 0 && (
-          <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-4">
-            {/* Only show buildable asset types (exclude Monitor) */}
-            {buildingByType
-              .filter((item) => item.type !== "MONITOR")
-              .map((item) => (
+          <div className="mb-4 w-full">
+            {/* Flex row: each type is a flex-col, centered, for vertical alignment */}
+            <div className="flex flex-row w-full items-end justify-between gap-2 md:gap-4">
+              {BUILDING_TYPE_ORDER.map((type) => (
                 <div
-                  key={item.type}
-                  className="flex flex-col items-center justify-center min-w-[70px]"
+                  key={type}
+                  className="flex flex-col items-center flex-1 min-w-0"
                 >
                   <Badge
-                    className={
-                      typeColorMap[item.type] || "bg-gray-400 text-white"
-                    }
+                    className={`mb-1 text-xs px-2 py-1 whitespace-nowrap text-center ${typeColorMap[type]}`}
                   >
-                    {ASSET_TYPE_LABELS[item.type as AssetType] || item.type}
+                    {ASSET_TYPE_LABELS[type as AssetType] || type}
                   </Badge>
-                  <span className="text-2xl font-bold mt-2 text-center">
-                    {item.count}
-                  </span>
+                  <div className="text-2xl font-bold">
+                    {typeCountMap[type] || 0}
+                  </div>
                 </div>
               ))}
+            </div>
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
