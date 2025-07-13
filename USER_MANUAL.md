@@ -56,6 +56,10 @@ Step-by-step guides for frequent tasks, such as assigning assets, importing/expo
 List common issues, solutions, and how to get help.
 -->
 
+## Error Handling and User Experience
+
+The system is designed to handle errors gracefully. If something goes wrong, you will see a clear, user-friendly message explaining the issue and what you can do next. You will never see confusing technical or system error messages. If you encounter an error, follow the instructions on the screen or contact support if needed.
+
 ## 6. Glossary
 
 <!--
