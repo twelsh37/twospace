@@ -149,13 +149,8 @@ See `scripts/fix-auth-issue.md` for detailed troubleshooting.
 
 ## 9. Authentication Event Logging
 
-- All authentication-related events (login, logout, sign-up, password reset, errors) are logged to the system log (`frontend/logs/system.log_YYYYMMDD.log`).
+- All authentication-related events (login, logout, sign-up, password reset, errors) are logged to the system log (`/logs/system.log_YYYYMMDD.log`).
 - Logs include timestamp, user email (where available), event type, and error details (if any).
 - **Admins**: Review these logs regularly to audit authentication activity and investigate issues.
-- **Log Location**: `frontend/logs/`
-- **Log Review**: Open the relevant log file and search for auth-related events (e.g., `login`, `signUp`, `resetPassword`).
-- **Security**: Never share log files publicly, as they may contain sensitive information.
-
----
-
-// Reasoning: This document was created to provide clear, step-by-step guidance for developers and admins. It emphasizes security, auditability, and maintainability, following best practices for production systems.
+- **Log Location**: `/logs/`
+- **Log Review**: Open the relevant log file and search for auth-related events (e.g., `login`, `
