@@ -341,10 +341,10 @@ yarn db:push
 
 ## Logging and Database Audit
 
-All database operations, migrations, and audit trail events are logged server-side using Winston. Logs are stored in `frontend/logs/` with daily rotation and 30-day retention. There are separate logs for system and application events.
+All database operations, migrations, and audit trail events are logged server-side using a console-based logger. Logs are output to the console and are viewable in the Vercel dashboard (or your serverless provider's logs UI). There are separate logs for system and application events, labelled accordingly.
 
-- **Admins**: Use logs to audit database changes, investigate errors, and monitor system health.
-- **Users**: If you encounter database issues, provide the relevant log file to admins for troubleshooting.
-- **Log Location**: `frontend/logs/`
+- **Admins**: Use the Vercel dashboard to audit database changes, investigate errors, and monitor system health.
+- **Users**: If you encounter database issues, notify the admin, who can review logs in the Vercel dashboard for troubleshooting.
+- **Why?** Vercel and other serverless platforms do not support persistent file storage. Console logging is the recommended approach for compatibility and reliability.
 
 This logging system supports database troubleshooting, audit trails, and compliance.

@@ -97,6 +97,14 @@ twospace/
 ### PDF Export and Reporting
 
 - **PDF Generation**: Asset Inventory and other reports are exported as PDFs using [browserless.io](https://www.browserless.io/) (cloud-based headless Chrome). This approach is compatible with Vercel and other serverless platforms. The system no longer uses Puppeteer directly for PDF generation.
+- **Full Data Export**: Asset Inventory PDF exports now include all visible charts and table data, exactly as seen on the screen. Chart images are captured and embedded in the PDF, and all summary tables are included.
+- **Robust Export Workflow**: The export workflow is now robust and bug-free, with all React state and hook usage fixed to prevent errors and infinite loops.
+
+## Recent Bugfixes (June 2025)
+
+- Fixed React hook usage in reports page to prevent invalid hook call and infinite render loop errors.
+- PDF export now reliably includes all chart images and table data for Asset Inventory reports.
+- Export modal and workflow are modular and ready for future extension.
 
 ## Technology Stack
 
@@ -294,11 +302,11 @@ Components are designed to be:
 
 ## Logging, Audit, and Troubleshooting
 
-A comprehensive server-side logging system is implemented using Winston. All API routes and server-side utilities log key events, errors, and business actions to files in `frontend/logs/`, with daily rotation and 30-day retention. There are separate logs for system and application events.
+A comprehensive server-side logging system is implemented using console-based logging. All API routes and server-side utilities log key events, errors, and business actions to the console. There are separate logs for system and application events, labelled accordingly.
 
-- **Admins**: Use logs to audit activity, investigate errors, and monitor system health.
-- **Users**: If you encounter issues, provide the relevant log file to admins for troubleshooting.
-- **Log Location**: `frontend/logs/`
+- **Admins**: Use the Vercel dashboard to audit activity, investigate errors, and monitor system health.
+- **Users**: If you encounter issues, notify the admin, who can review logs in the Vercel dashboard for troubleshooting.
+- **Why?** Vercel and other serverless platforms do not support persistent file storage. Console logging is the recommended approach for compatibility and reliability.
 
 This logging system supports operational troubleshooting, audit trails, and compliance.
 

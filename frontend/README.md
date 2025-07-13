@@ -37,30 +37,26 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Logging and Audit Trail
 
-This project uses [Winston](https://github.com/winstonjs/winston) for robust server-side logging. Logs are written to the `/logs/` directory and are rotated daily (30 days retained). There are two log types:
+This project now uses console-based logging for all server-side events. Logs are output to the console, which is captured and viewable in the Vercel dashboard (or your serverless provider's logs UI). There are two log types:
 
-- **System Logs**: For infrastructure, API, and error events (`system.log_YYYYMMDD.log`)
-- **Application Logs**: For business logic, user actions, and workflow events (`app.log_YYYYMMDD.log`)
+- **System Logs**: For infrastructure, API, and error events (labelled as SYSTEM)
+- **Application Logs**: For business logic, user actions, and workflow events (labelled as APP)
 
 ### How Logging Works
 
 - All API routes and server-side utilities are instrumented with logging.
-- Logs are written to both file and console (in development).
-- Log files are rotated daily and old logs are automatically deleted after 30 days.
-- **Winston is only used server-side.** No client-side logging with Winston.
+- Logs are output to the console only (no file-based logging).
+- **Why?** Vercel and other serverless platforms do not support persistent file storage. Console logging is the recommended approach for compatibility and reliability.
 
 ### How to Use Logs
 
-- **Admins**: Use logs to audit system activity, investigate errors, and monitor usage.
-- **Users**: If you encounter an error, provide the relevant log file to the admin for troubleshooting.
-- **Log Location**: `/logs/`
-- **Log Review**: Open log files with any text editor. Search for timestamps, error messages, or user actions.
+- **Admins**: Use the Vercel dashboard to audit system activity, investigate errors, and monitor usage.
+- **Users**: If you encounter an error, notify the admin, who can review logs in the Vercel dashboard.
+- **Log Review**: Use the Vercel dashboard's "Functions" or "Logs" section to search for timestamps, error messages, or user actions.
 
 ### Example Log Entry
 
-```
-{"level":"info","message":"Asset created","timestamp":"2024-06-12T10:00:00.000Z","assetId":"01-12345"}
-```
+[2024-07-01T12:34:56.789Z] [APP] info: Asset created | meta: {"assetId":"123","userId":"456"}
 
 ## PDF Export and Reporting
 
