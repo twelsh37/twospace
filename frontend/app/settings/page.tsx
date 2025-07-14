@@ -37,9 +37,13 @@ export default function SettingsPage() {
 
   // User password change state
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // State for confirm password
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  // Ref for focusing the first password input
+  const newPasswordRef = React.useRef<HTMLInputElement>(null);
 
   // Calculate straight line percentage
   const straightLinePercent =
@@ -76,6 +80,16 @@ export default function SettingsPage() {
     setPasswordLoading(true);
     setPasswordSuccess(null);
     setPasswordError(null);
+    // Validate passwords match before submitting
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      setPasswordLoading(false);
+      // Focus the first password input for user correction
+      if (newPasswordRef.current) {
+        newPasswordRef.current.focus();
+      }
+      return;
+    }
     try {
       const supabase = createClientComponentClient();
       // Supabase only requires new password, but you may want to verify current password client-side
@@ -86,8 +100,8 @@ export default function SettingsPage() {
         setPasswordError(error.message || "Failed to change password.");
       } else {
         setPasswordSuccess("Password updated successfully.");
-        // setCurrentPassword(""); // This line was removed as per the edit hint
         setNewPassword("");
+        setConfirmPassword("");
       }
     } catch {
       setPasswordError("Failed to change password.");
@@ -197,6 +211,7 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium mb-1">
                   New Password
                 </label>
+                {/* Add ref to the first password input for focusing on error */}
                 <Input
                   type="password"
                   value={newPassword}
@@ -205,8 +220,24 @@ export default function SettingsPage() {
                   required
                   placeholder="Enter new password"
                   disabled={passwordLoading}
+                  ref={newPasswordRef}
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Confirm New Password
+                </label>
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  minLength={6}
+                  required
+                  placeholder="Re-enter new password"
+                  disabled={passwordLoading}
+                />
+              </div>
+              {/* Show error if passwords do not match or other error occurs */}
               {passwordError && (
                 <div className="text-red-600 text-sm">{passwordError}</div>
               )}
@@ -216,7 +247,11 @@ export default function SettingsPage() {
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled={passwordLoading || newPassword.length < 6}
+                  disabled={
+                    passwordLoading ||
+                    newPassword.length < 6 ||
+                    confirmPassword.length < 6
+                  }
                 >
                   {passwordLoading ? "Updating..." : "Change Password"}
                 </Button>
