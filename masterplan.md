@@ -73,8 +73,9 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 ### 4. User Management
 
 - **Role-Based Access Control**:
-  - **Admin**: Full CRUD operations, user management, system configuration
-  - **User**: All operations except record deletion
+  - **Admin**: Full CRUD operations, user management, system configuration. Only Admins can add or modify information (assets, users, locations, etc.), and only Admins can view the user list on the /users page.
+  - **User**: Can view assets and locations, but cannot add or modify information. Users cannot see the user list on the /users page.
+- **Unauthorized Access Handling**: If a standard user attempts a restricted action, they receive a clear, styled toast notification stating 'Unauthorized Access, You do not have authorisation for this feature.'
 - **User Import**: CSV/Excel import for bulk user onboarding
 - **User Properties**: Name, employee ID, department, role
 - **Authentication & Authorization**: Uses Supabase Auth for authentication and role-based authorization (ADMIN/USER). All users must log in via Supabase Auth. Role-based access is enforced in both the UI and API endpoints.
@@ -162,6 +163,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - Streamlined bulk operations
 - Real-time feedback and validation
 - Consistent design language with Shadcn/ui
+- **Unauthorized Access Feedback**: If a user without ADMIN privileges attempts a restricted action, a prominent, styled toast notification appears, informing them of the lack of authorization.
 
 ### Key Interface Components
 
@@ -178,6 +180,9 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 
 - Secure user authentication using Supabase Auth
 - Role-based access control (ADMIN/USER)
+- Only ADMIN users can add or modify information or view the user list on the /users page
+- Standard users will receive an 'Unauthorized Access' message if they attempt restricted actions
+- Unauthorized attempts are met with a clear, styled toast notification in the UI
 - Session management via Supabase
 - API route protection with server-side Supabase session and role checks
 

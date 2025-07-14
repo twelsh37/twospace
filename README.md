@@ -1,3 +1,11 @@
+# Authentication & Authorization
+
+- All API endpoints are protected by Supabase Auth.
+- Only users with the ADMIN role can add or modify information (assets, users, locations, etc.).
+- Standard users (role: USER) will receive an 'Unauthorized Access' message if they attempt restricted actions.
+- Only ADMIN users can view the user list on the /users page; standard users cannot see this information.
+- Unauthorized attempts are met with a clear, styled toast notification in the UI.
+
 ## Error Handling and Trapping Strategy
 
 This application implements robust error trapping and user-friendly error handling across all major pages and client components:
