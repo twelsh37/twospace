@@ -73,11 +73,12 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 ### 4. User Management
 
 - **Role-Based Access Control**:
-  - **Admin**: Full CRUD operations, user management, system configuration
-  - **User**: All operations except record deletion
+  - **Admin**: Full CRUD operations, user management, system configuration. Only Admins can add or modify information (assets, users, locations, etc.), and only Admins can view the user list on the /users page.
+  - **User**: Can view assets and locations, but cannot add or modify information. Users cannot see the user list on the /users page.
+- **Unauthorized Access Handling**: If a standard user attempts a restricted action, they receive a clear, styled toast notification stating 'Unauthorized Access, You do not have authorisation for this feature.'
 - **User Import**: CSV/Excel import for bulk user onboarding
 - **User Properties**: Name, employee ID, department, role
-- **Authentication & Authorization**: Not yet implemented, but Clerk is planned for authentication/authorization.
+- **Authentication & Authorization**: Uses Supabase Auth for authentication and role-based authorization (ADMIN/USER). All users must log in via Supabase Auth. Role-based access is enforced in both the UI and API endpoints.
 
 ### 5. Location Management
 
@@ -117,7 +118,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **API**: Next.js API routes (no separate backend service; all business logic and database access is handled in the Next.js frontend via API routes and server components)
 - **Database**: Neon Postgres
 - **ORM**: Drizzle ORM
-- **Authentication**: (Planned) Clerk for authentication/authorization
+- **Authentication**: Supabase Auth for authentication/authorization
 - **File Upload**: Users upload CSV/XLSX files directly for import; Vercel Blob Storage is not used
 - **Hosting**: Vercel platform
 - **Package Manager**: Yarn
@@ -125,7 +126,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - **Environment**: TypeScript throughout
 - **PDF Export**: [browserless.io](https://www.browserless.io/) REST API for cloud-based PDF generation (replaces Puppeteer)
 
-> **Note:** There is no separate backend service. All business logic, API endpoints, and database access are implemented in the Next.js frontend using API routes and server components. The project does not use Prisma, Supabase, or a traditional backend server.
+> **Note:** There is no separate backend service. All business logic, API endpoints, and database access are implemented in the Next.js frontend using API routes and server components. The project does not use Prisma or a traditional backend server. Supabase is used for authentication and user management.
 
 ## Conceptual Data Model
 
@@ -162,6 +163,7 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 - Streamlined bulk operations
 - Real-time feedback and validation
 - Consistent design language with Shadcn/ui
+- **Unauthorized Access Feedback**: If a user without ADMIN privileges attempts a restricted action, a prominent, styled toast notification appears, informing them of the lack of authorization.
 
 ### Key Interface Components
 
@@ -176,10 +178,13 @@ The Asset Management System is a comprehensive web-based solution designed to ma
 
 ### Authentication and Authorization
 
-- Secure user authentication (planned; will use Clerk)
-- Role-based access control
-- Session management
-- API route protection
+- Secure user authentication using Supabase Auth
+- Role-based access control (ADMIN/USER)
+- Only ADMIN users can add or modify information or view the user list on the /users page
+- Standard users will receive an 'Unauthorized Access' message if they attempt restricted actions
+- Unauthorized attempts are met with a clear, styled toast notification in the UI
+- Session management via Supabase
+- API route protection with server-side Supabase session and role checks
 
 ### Data Protection
 

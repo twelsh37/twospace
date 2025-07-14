@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
+import { createClientComponentClient } from "@/lib/supabase";
 
 interface LocationAddModalProps {
   open: boolean;
@@ -46,15 +47,24 @@ export function LocationAddModal({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isValid) return;
     setSaving(true);
     setError(null);
     try {
+      // Get Supabase access token for authenticated requests
+      const supabase = createClientComponentClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
       const res = await fetch("/api/locations", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           name: form.name,
           description: form.description,

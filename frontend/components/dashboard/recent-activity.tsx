@@ -11,6 +11,7 @@ import { ASSET_STATE_LABELS, getStateColorClass } from "@/lib/constants";
 import { Activity } from "lucide-react";
 import { AssetDetailModal } from "@/components/assets/asset-detail-modal";
 import { Asset as DetailedAsset } from "@/components/search/search-results-modal";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 type RecentActivityProps = {
   data: {
@@ -90,7 +91,7 @@ export function RecentActivity({ data }: RecentActivityProps) {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <Card className="flex h-full flex-col shadow-md border border-gray-200 rounded-lg justify-between">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -149,6 +150,6 @@ export function RecentActivity({ data }: RecentActivityProps) {
         asset={selectedAsset}
         isLoading={isLoading}
       />
-    </>
+    </ErrorBoundary>
   );
 }
