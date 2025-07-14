@@ -8,6 +8,7 @@ import { UserEditModal } from "./user-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { createClientComponentClient } from "@/lib/supabase";
 
 // Define a type for the filters prop that expects string values
 export interface UserTableFilters {
@@ -65,8 +66,19 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
         }
         params.set("page", page.toString());
         params.set("limit", "10");
+        // Get Supabase access token
+        const supabase = createClientComponentClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        const accessToken = session?.access_token;
+        const headers: HeadersInit = {};
+        if (accessToken) {
+          headers["Authorization"] = `Bearer ${accessToken}`;
+        }
         const response = await fetch(`/api/users?${params.toString()}`, {
           cache: "no-store",
+          headers,
         });
         if (!response.ok) throw new Error("Failed to fetch users");
         const result = await response.json();

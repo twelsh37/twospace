@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { db, locationsTable } from "@/lib/db";
 import { eq, ilike, and } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
-import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";

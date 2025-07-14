@@ -45,7 +45,6 @@ export class ErrorBoundary extends React.Component<
     // You can log the error to an error reporting service here
     // For now, just log to the console
     // In production, consider sending to Sentry or similar
-    // eslint-disable-next-line no-console
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ error, errorInfo });
   }

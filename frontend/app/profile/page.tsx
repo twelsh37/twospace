@@ -4,7 +4,7 @@
 "use client";
 import { useEffect, useState, ChangeEvent } from "react";
 import { createClientComponentClient } from "@/lib/supabase";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -70,7 +70,7 @@ export default function ProfilePage() {
         setSuccess("Avatar updated (placeholder, not actually uploaded)");
         setSaving(false);
       }, 1000);
-    } catch (err) {
+    } catch {
       setError("Failed to upload avatar.");
       setSaving(false);
     }
@@ -89,11 +89,13 @@ export default function ProfilePage() {
         <CardContent className="flex flex-col items-center gap-6 pt-2">
           {/* Avatar */}
           <div className="flex flex-col items-center gap-2">
-            <Avatar
-              src={avatarPreview || undefined}
-              alt={profile.name}
-              size={80}
-            />
+            <Avatar>
+              <AvatarImage
+                src={avatarPreview || undefined}
+                alt={profile.name}
+              />
+              <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+            </Avatar>
             <label className="block text-sm font-medium mt-2">
               Change Avatar
             </label>

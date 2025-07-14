@@ -36,7 +36,6 @@ export default function SettingsPage() {
   ]);
 
   // User password change state
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
@@ -87,10 +86,10 @@ export default function SettingsPage() {
         setPasswordError(error.message || "Failed to change password.");
       } else {
         setPasswordSuccess("Password updated successfully.");
-        setCurrentPassword("");
+        // setCurrentPassword(""); // This line was removed as per the edit hint
         setNewPassword("");
       }
-    } catch (err) {
+    } catch {
       setPasswordError("Failed to change password.");
     } finally {
       setPasswordLoading(false);
@@ -186,7 +185,7 @@ export default function SettingsPage() {
     <ErrorBoundary>
       <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8 min-h-[80vh] bg-gray-50">
         {/* User Account Section */}
-        <Card className="w-full max-w-2xl mx-auto mb-8 shadow-lg border border-gray-200">
+        <Card className="w-full max-w-2xl mb-8 shadow-lg border border-gray-200">
           <CardHeader>
             <CardTitle className="text-xl md:text-2xl">
               Account Settings

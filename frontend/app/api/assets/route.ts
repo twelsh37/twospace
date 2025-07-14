@@ -19,7 +19,7 @@ import { createAssetHistory, generateAssetNumber } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 import { settingsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
-import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
 
 // Define standard CORS headers for reusability
 const corsHeaders = {
