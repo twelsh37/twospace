@@ -6,8 +6,13 @@ import { db } from "@/lib/db";
 import { assetsTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireAuth } from "@/lib/supabase-auth-helpers";
+import { NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require authentication for accessing building-by-type data
+  const user = await requireAuth(request);
+  if (user instanceof Response) return user; // Not authenticated
   // Log the start of the GET request
   appLogger.info("GET /api/assets/building-by-type called");
   try {

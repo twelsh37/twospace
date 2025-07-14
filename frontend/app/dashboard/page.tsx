@@ -9,6 +9,7 @@ import { QuickActions } from "@/components/dashboard/quick-actions";
 import { ReadyToGoAssetsCard } from "@/components/dashboard/building-assets-card";
 import { getDashboardData } from "@/lib/db/dashboard";
 import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { Card } from "@/components/ui/card";
 
 export default async function DashboardPage() {
@@ -20,16 +21,24 @@ export default async function DashboardPage() {
   const isLocalhost =
     host?.startsWith("localhost") || host?.startsWith("127.0.0.1");
   const protocol = isLocalhost ? "http" : "https";
+
+  // Get the Supabase access token from cookies
+  const accessToken = (await cookies()).get("sb-access-token")?.value;
+  const fetchHeaders: HeadersInit = {};
+  if (accessToken) {
+    fetchHeaders["Authorization"] = `Bearer ${accessToken}`;
+  }
+
   const buildingByTypeRes = await fetch(
     `${protocol}://${host}/api/assets/building-by-type`,
-    { cache: "no-store" }
+    { cache: "no-store", headers: fetchHeaders }
   );
   const buildingByType = buildingByTypeRes.ok
     ? await buildingByTypeRes.json()
     : [];
   const readyToGoByTypeRes = await fetch(
     `${protocol}://${host}/api/assets/ready-to-go-by-type`,
-    { cache: "no-store" }
+    { cache: "no-store", headers: fetchHeaders }
   );
   const readyToGoByType = readyToGoByTypeRes.ok
     ? await readyToGoByTypeRes.json()
