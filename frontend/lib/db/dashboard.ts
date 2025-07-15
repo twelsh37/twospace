@@ -128,6 +128,43 @@ export async function getDashboardData() {
         count: stateCounts[state] || 0,
       }));
 
+      // --- Add buildingByType: count of assets in 'BUILDING' state, grouped by type ---
+      const buildingResults = await tx
+        .select({ type: assetsTable.type })
+        .from(assetsTable)
+        .where(eq(assetsTable.state, "BUILDING"));
+      const ALL_TYPES = [
+        "DESKTOP",
+        "LAPTOP",
+        "MONITOR",
+        "MOBILE_PHONE",
+        "TABLET",
+      ];
+      const buildingTypeCounts: Record<string, number> = {};
+      for (const row of buildingResults) {
+        const type = (row.type || "").toUpperCase();
+        buildingTypeCounts[type] = (buildingTypeCounts[type] || 0) + 1;
+      }
+      const buildingByType = ALL_TYPES.map((type) => ({
+        type,
+        count: buildingTypeCounts[type] || 0,
+      }));
+
+      // --- Add readyToGoByType: count of assets in 'READY_TO_GO' state, grouped by type ---
+      const readyToGoResults = await tx
+        .select({ type: assetsTable.type })
+        .from(assetsTable)
+        .where(eq(assetsTable.state, "READY_TO_GO"));
+      const readyToGoTypeCounts: Record<string, number> = {};
+      for (const row of readyToGoResults) {
+        const type = (row.type || "").toUpperCase();
+        readyToGoTypeCounts[type] = (readyToGoTypeCounts[type] || 0) + 1;
+      }
+      const readyToGoByType = ALL_TYPES.map((type) => ({
+        type,
+        count: readyToGoTypeCounts[type] || 0,
+      }));
+
       // Format the results
       const dashboardData = {
         totalAssets: totalAssetsResult[0]?.value || 0,
@@ -146,6 +183,8 @@ export async function getDashboardData() {
           assetNumber: activity.assetNumber ?? undefined,
         })),
         pendingHoldingCount, // Add this field
+        buildingByType, // Add this field for SSR
+        readyToGoByType, // Add this field for SSR
       };
 
       // After all queries, log summary counts
