@@ -6,8 +6,8 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { AssetsByType } from "@/components/dashboard/assets-by-type";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import {
-  BuildingAssetsCardClient,
-  ReadyToGoAssetsCardClient,
+  BuildingAssetsCard,
+  ReadyToGoAssetsCard,
 } from "@/components/dashboard/building-assets-card";
 import { getDashboardData } from "@/lib/db/dashboard";
 import { Card } from "@/components/ui/card";
@@ -54,10 +54,12 @@ export default async function DashboardPage() {
               <AssetsByType data={data} />
             </div>
             <div className="flex-1">
-              <BuildingAssetsCardClient />
+              {/* SSR: Pass buildingByType from server data */}
+              <BuildingAssetsCard buildingByType={data.buildingByType} />
             </div>
             <div className="flex-1">
-              <ReadyToGoAssetsCardClient />
+              {/* SSR: Pass readyToGoByType from server data */}
+              <ReadyToGoAssetsCard readyToGoByType={data.readyToGoByType} />
             </div>
           </div>
 

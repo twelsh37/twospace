@@ -1,4 +1,4 @@
-"use client";
+// No 'use client' directive: this file now supports server-side rendering for BuildingAssetsCard and ReadyToGoAssetsCard.
 // frontend/components/dashboard/building-assets-card.tsx
 // Card to display the number and types of assets currently in the 'BUILDING' state
 
@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Rocket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ASSET_TYPE_LABELS } from "@/lib/constants";
-import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@/lib/supabase";
+// Client-only variants (deprecated) are now in building-assets-card.client.tsx
 
 const TYPE_COLOR_MAP: Record<string, string> = {
   DESKTOP: "bg-orange-500 text-white",
@@ -123,110 +122,4 @@ export function ReadyToGoAssetsCard({
       </CardContent>
     </Card>
   );
-}
-
-// Client-side BuildingAssetsCard that fetches data with access token
-type BuildingByType = { type: string; count: number }[];
-
-export function BuildingAssetsCardClient() {
-  const [data, setData] = useState<BuildingByType>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const supabase = createClientComponentClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const accessToken = session?.access_token;
-        const headers: HeadersInit = {};
-        if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`;
-        }
-        const res = await fetch("/api/assets/building-by-type", { headers });
-        if (!res.ok) throw new Error("Failed to fetch building-by-type data");
-        const json = await res.json();
-        setData(json);
-      } catch {
-        setError(
-          "Error loading building-by-type data. Some dashboard data may be missing. Please try again later."
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardContent>Loading...</CardContent>
-      </Card>
-    );
-  }
-  if (error) {
-    return (
-      <div className="p-4 bg-red-100 border border-red-400 rounded text-red-800 text-center">
-        <h3 className="font-bold">{error}</h3>
-      </div>
-    );
-  }
-  return <BuildingAssetsCard buildingByType={data} />;
-}
-
-export function ReadyToGoAssetsCardClient() {
-  const [data, setData] = useState<BuildingByType>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const supabase = createClientComponentClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const accessToken = session?.access_token;
-        const headers: HeadersInit = {};
-        if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`;
-        }
-        const res = await fetch("/api/assets/ready-to-go-by-type", { headers });
-        if (!res.ok)
-          throw new Error("Failed to fetch ready-to-go-by-type data");
-        const json = await res.json();
-        setData(json);
-      } catch {
-        setError(
-          "Error loading ready-to-go-by-type data. Some dashboard data may be missing. Please try again later."
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardContent>Loading...</CardContent>
-      </Card>
-    );
-  }
-  if (error) {
-    return (
-      <div className="p-4 bg-red-100 border border-red-400 rounded text-red-800 text-center">
-        <h3 className="font-bold">{error}</h3>
-      </div>
-    );
-  }
-  return <ReadyToGoAssetsCard readyToGoByType={data} />;
 }
