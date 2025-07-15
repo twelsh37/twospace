@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
-import { getUserById } from "@/lib/supabase-db";
+// Remove: import { getUserById } from "@/lib/supabase-db";
 
 // Report types for the flyout menu
 const reportTypes = [
@@ -97,26 +97,15 @@ export function Sidebar({
   const [reportsOpen, setReportsOpen] = useState(false); // Only used for mobile
   // --- App user state for role-based sidebar entries ---
   const { user } = useAuth();
-  const [appUser, setAppUser] = useState<{ role: string } | null>(null);
-  const [roleLoading, setRoleLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setRoleLoading(true);
-      getUserById(user.id)
-        .then((result) => setAppUser(result.data))
-        .catch(() => setAppUser(null))
-        .finally(() => setRoleLoading(false));
-    } else {
-      setAppUser(null);
-    }
-  }, [user]);
+  // Use Supabase Auth role directly
+  const isAdmin = user?.user_metadata?.role?.toLowerCase() === "admin";
 
   // Filter nav items: Only show Imports for Admins
   const filteredNavItems = navItems.filter((item) => {
     if (item.title === "Imports") {
       // Only show for admins
-      return appUser?.role?.toLowerCase() === "admin";
+      return isAdmin;
     }
     return true;
   });
@@ -155,95 +144,89 @@ export function Sidebar({
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
           {/* Only render nav items after role is loaded, to avoid flicker */}
-          {roleLoading ? (
-            <div className="text-center text-xs text-muted-foreground py-4">
-              Loading menu...
-            </div>
-          ) : (
-            filteredNavItems.map((item) => {
-              const isActive = pathname === item.href;
+          {/* Remove roleLoading checks and loading menu UI */}
+          {filteredNavItems.map((item) => {
+            const isActive = pathname === item.href;
 
-              // Handle reports submenu
-              if (item.hasSubmenu) {
-                // When collapsed, just show the icon
-                if (isCollapsed) {
-                  return (
-                    <Link key={item.href} href={item.href}>
-                      <div
-                        className={cn(
-                          "flex items-center justify-center rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                          isActive &&
-                            "bg-accent text-accent-foreground font-medium"
-                        )}
-                      >
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                    </Link>
-                  );
-                }
-
-                // When expanded, show the fly-out submenu
+            // Handle reports submenu
+            if (item.hasSubmenu) {
+              // When collapsed, just show the icon
+              if (isCollapsed) {
                 return (
-                  <div key={item.href} className="relative group">
-                    <Link href={item.href}>
-                      <div
-                        className={cn(
-                          "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                          isActive &&
-                            "bg-accent text-accent-foreground font-medium"
-                        )}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
-                      </div>
-                    </Link>
-
-                    {/* Fly-out Reports Submenu */}
-                    <div className="absolute left-full top-0 ml-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      {/* Arrow pointing to parent */}
-                      <div className="absolute -left-1 top-4 w-2 h-2 bg-white border-l border-t border-gray-200 transform rotate-45"></div>
-                      <div className="py-2">
-                        {reportTypes.map((report) => (
-                          <Link key={report.href} href={report.href}>
-                            <div className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                              <span>{report.title}</span>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
+                  <Link key={item.href} href={item.href}>
+                    <div
+                      className={cn(
+                        "flex items-center justify-center rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                        isActive &&
+                          "bg-accent text-accent-foreground font-medium"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
                     </div>
-                  </div>
+                  </Link>
                 );
               }
 
-              // Regular navigation items
+              // When expanded, show the fly-out submenu
               return (
-                <Link key={item.href} href={item.href}>
-                  <div
-                    className={cn(
-                      "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                      isActive &&
-                        "bg-accent text-accent-foreground font-medium",
-                      isCollapsed && "justify-center px-2"
-                    )}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
+                <div key={item.href} className="relative group">
+                  <Link href={item.href}>
+                    <div
+                      className={cn(
+                        "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                        isActive &&
+                          "bg-accent text-accent-foreground font-medium"
+                      )}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
                     </div>
-                    {!isCollapsed && item.badge && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                        {item.badge}
-                      </span>
-                    )}
+                  </Link>
+
+                  {/* Fly-out Reports Submenu */}
+                  <div className="absolute left-full top-0 ml-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    {/* Arrow pointing to parent */}
+                    <div className="absolute -left-1 top-4 w-2 h-2 bg-white border-l border-t border-gray-200 transform rotate-45"></div>
+                    <div className="py-2">
+                      {reportTypes.map((report) => (
+                        <Link key={report.href} href={report.href}>
+                          <div className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                            <span>{report.title}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </Link>
+                </div>
               );
-            })
-          )}
+            }
+
+            // Regular navigation items
+            return (
+              <Link key={item.href} href={item.href}>
+                <div
+                  className={cn(
+                    "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                    isActive && "bg-accent text-accent-foreground font-medium",
+                    isCollapsed && "justify-center px-2"
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className="h-4 w-4" />
+                    {!isCollapsed && <span>{item.title}</span>}
+                  </div>
+                  {!isCollapsed && item.badge && (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Sticky Footer */}
@@ -289,67 +272,18 @@ export function Sidebar({
 
         {/* Mobile Navigation */}
         <nav className="flex-1 p-4 space-y-2">
-          {roleLoading ? (
-            <div className="text-center text-xs text-muted-foreground py-4">
-              Loading menu...
-            </div>
-          ) : (
-            filteredNavItems.map((item) => {
-              const isActive = pathname === item.href;
+          {/* Remove roleLoading checks and loading menu UI */}
+          {filteredNavItems.map((item) => {
+            const isActive = pathname === item.href;
 
-              // Handle reports submenu for mobile (keep as accordion since no hover on mobile)
-              if (item.hasSubmenu) {
-                return (
-                  <div key={item.href}>
-                    <button
-                      onClick={() => setReportsOpen(!reportsOpen)}
-                      className={cn(
-                        "w-full flex items-center justify-between rounded-lg px-4 py-3 text-base transition-colors hover:bg-accent hover:text-accent-foreground",
-                        isActive &&
-                          "bg-accent text-accent-foreground font-medium"
-                      )}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <item.icon className="h-5 w-5" />
-                        <span>{item.title}</span>
-                      </div>
-                      {reportsOpen ? (
-                        <ChevronDown className="h-5 w-5" />
-                      ) : (
-                        <ChevronRight className="h-5 w-5" />
-                      )}
-                    </button>
-
-                    {/* Mobile Reports Submenu */}
-                    {reportsOpen && (
-                      <div className="ml-6 mt-2 space-y-1">
-                        {reportTypes.map((report) => (
-                          <Link
-                            key={report.href}
-                            href={report.href}
-                            onClick={onMobileMenuClose}
-                          >
-                            <div className="flex items-center rounded-lg px-4 py-2 text-base transition-colors hover:bg-accent hover:text-accent-foreground">
-                              <span>{report.title}</span>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              // Regular navigation items
+            // Handle reports submenu for mobile (keep as accordion since no hover on mobile)
+            if (item.hasSubmenu) {
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onMobileMenuClose}
-                >
-                  <div
+                <div key={item.href}>
+                  <button
+                    onClick={() => setReportsOpen(!reportsOpen)}
                     className={cn(
-                      "flex items-center justify-between rounded-lg px-4 py-3 text-base transition-colors hover:bg-accent hover:text-accent-foreground",
+                      "w-full flex items-center justify-between rounded-lg px-4 py-3 text-base transition-colors hover:bg-accent hover:text-accent-foreground",
                       isActive && "bg-accent text-accent-foreground font-medium"
                     )}
                   >
@@ -357,16 +291,59 @@ export function Sidebar({
                       <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
                     </div>
-                    {item.badge && (
-                      <span className="rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
-                        {item.badge}
-                      </span>
+                    {reportsOpen ? (
+                      <ChevronDown className="h-5 w-5" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5" />
                     )}
-                  </div>
-                </Link>
+                  </button>
+
+                  {/* Mobile Reports Submenu */}
+                  {reportsOpen && (
+                    <div className="ml-6 mt-2 space-y-1">
+                      {reportTypes.map((report) => (
+                        <Link
+                          key={report.href}
+                          href={report.href}
+                          onClick={onMobileMenuClose}
+                        >
+                          <div className="flex items-center rounded-lg px-4 py-2 text-base transition-colors hover:bg-accent hover:text-accent-foreground">
+                            <span>{report.title}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
-            })
-          )}
+            }
+
+            // Regular navigation items
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onMobileMenuClose}
+              >
+                <div
+                  className={cn(
+                    "flex items-center justify-between rounded-lg px-4 py-3 text-base transition-colors hover:bg-accent hover:text-accent-foreground",
+                    isActive && "bg-accent text-accent-foreground font-medium"
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.title}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Mobile Footer */}

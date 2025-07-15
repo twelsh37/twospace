@@ -64,3 +64,10 @@ This project now uses console-based logging for all server-side events. Logs are
 - The export modal provides a simple, robust user experience for exporting reports.
 - Recent bugfixes ensure that React state and hooks are used correctly, preventing errors and infinite loops during export.
 - The export workflow is modular and ready for future extension to other report types.
+
+## Role-Based Access Control (RBAC)
+
+- The application now determines admin access for sidebar menu items (such as Imports) and protected routes using the Supabase Auth role (`user.user_metadata.role`).
+- The app no longer relies on the `role` field in the app's `users` table for these checks.
+- This change ensures that admin-only features are visible and accessible based on the Auth role, regardless of database RLS policies.
+- If you want to grant or revoke admin access, update the user's role in Supabase Auth.
