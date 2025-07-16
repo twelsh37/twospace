@@ -10,6 +10,8 @@ import { LocationDetailModal } from "./location-detail-modal";
 import { LocationEditModal } from "./location-edit-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { LocationAssignmentsModal } from "./location-assignments-modal";
+import { useAuth } from "@/lib/auth-context";
 
 export type Location = {
   id: string;
@@ -57,6 +59,16 @@ export function LocationTable({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteLocationId, setDeleteLocationId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  // State for assignments modal
+  const [assignmentsModalOpen, setAssignmentsModalOpen] = useState(false);
+  const [assignmentsLocationId, setAssignmentsLocationId] = useState<
+    string | null
+  >(null);
+
+  // Get authenticated user's role
+  const { session } = useAuth();
+  const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
+  const isUser = userRole === "USER";
 
   // Memoize fetchLocations to avoid useEffect dependency warning
   const fetchLocations = useCallback(async () => {
@@ -149,6 +161,11 @@ export function LocationTable({
   return (
     <ErrorBoundary>
       <div className="w-full">
+        <LocationAssignmentsModal
+          locationId={assignmentsLocationId}
+          open={assignmentsModalOpen}
+          onOpenChange={setAssignmentsModalOpen}
+        />
         <LocationDetailModal
           locationId={selectedLocationId}
           open={detailModalOpen}
@@ -188,22 +205,40 @@ export function LocationTable({
                   >
                     <Eye className="h-5 w-5" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEditClick(loc.id)}
-                    title="Edit location"
+                  <span
+                    title={
+                      isUser
+                        ? "You do not have permission to edit locations."
+                        : "Edit location"
+                    }
                   >
-                    <Edit className="h-5 w-5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteClick(loc.id)}
-                    title="Delete location"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEditClick(loc.id)}
+                      title="Edit location"
+                      disabled={isUser}
+                    >
+                      <Edit className="h-5 w-5" />
+                    </Button>
+                  </span>
+                  <span
+                    title={
+                      isUser
+                        ? "You do not have permission to delete locations."
+                        : "Delete location"
+                    }
                   >
-                    <Trash2 className="h-5 w-5" />
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteClick(loc.id)}
+                      title="Delete location"
+                      disabled={isUser}
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </Button>
+                  </span>
                 </div>
               </CardHeader>
               <CardContent className="px-0 pb-2">
@@ -223,42 +258,6 @@ export function LocationTable({
             </Card>
           ))}
         </div>
-        {/* Pagination controls and count: always visible, styled for mobile */}
-        {pagination && (
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4 mt-3 gap-4">
-            <div className="text-sm text-muted-foreground text-center sm:text-left">
-              Showing {locations.length} of {pagination.totalLocations}{" "}
-              locations
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="lg"
-                className="px-4 py-2 md:size-sm"
-                onClick={() => onPageChange(pagination.page - 1)}
-                disabled={!pagination.hasPrevPage}
-                aria-label="Previous page"
-                title="Previous page"
-              >
-                Previous
-              </Button>
-              <span className="text-sm font-medium">
-                Page {pagination.page} of {pagination.totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="lg"
-                className="px-4 py-2 md:size-sm"
-                onClick={() => onPageChange(pagination.page + 1)}
-                disabled={!pagination.hasNextPage}
-                aria-label="Next page"
-                title="Next page"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
         {/* Table layout for desktop/tablet */}
         <div className="hidden md:block">
           <table
@@ -352,7 +351,10 @@ export function LocationTable({
                     }}
                   >
                     <button
-                      onClick={() => handleLocationClick(loc.id)}
+                      onClick={() => {
+                        setAssignmentsLocationId(loc.id);
+                        setAssignmentsModalOpen(true);
+                      }}
                       style={{
                         background: "none",
                         border: "none",
@@ -417,28 +419,82 @@ export function LocationTable({
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditClick(loc.id)}
-                        title="Edit location"
+                      <span
+                        title={
+                          isUser
+                            ? "You do not have permission to edit locations."
+                            : "Edit location"
+                        }
                       >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteClick(loc.id)}
-                        title="Delete location"
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClick(loc.id)}
+                          title="Edit location"
+                          disabled={isUser}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </span>
+                      <span
+                        title={
+                          isUser
+                            ? "You do not have permission to delete locations."
+                            : "Delete location"
+                        }
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteClick(loc.id)}
+                          title="Delete location"
+                          disabled={isUser}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </span>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {/* Pagination controls moved below the table for consistency with other pages */}
+          {pagination && (
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 mt-3 gap-4">
+              <div className="text-sm text-muted-foreground text-center sm:text-left">
+                Showing {locations.length} of {pagination.totalLocations}{" "}
+                locations
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-4 py-2 md:size-sm"
+                  onClick={() => onPageChange(pagination.page - 1)}
+                  disabled={!pagination.hasPrevPage}
+                  aria-label="Previous page"
+                  title="Previous page"
+                >
+                  Previous
+                </Button>
+                <span className="text-sm font-medium">
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-4 py-2 md:size-sm"
+                  onClick={() => onPageChange(pagination.page + 1)}
+                  disabled={!pagination.hasNextPage}
+                  aria-label="Next page"
+                  title="Next page"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </ErrorBoundary>

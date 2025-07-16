@@ -18,9 +18,10 @@ import { createClientComponentClient } from "@/lib/supabase";
 
 export default function LocationsPage() {
   // Filter and pagination state
+  // Set default filter to show only active locations by default
   const [filters, setFilters] = useState<LocationFilterState>({
     location: "ALL",
-    isActive: "ALL",
+    isActive: "true", // Only show active locations by default
   });
   const [page, setPage] = useState(1);
   const [addModalOpen, setAddModalOpen] = useState(false);
