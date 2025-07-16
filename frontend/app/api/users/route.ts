@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db, usersTable, departmentsTable, locationsTable } from "@/lib/db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
 
@@ -33,17 +33,17 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(usersTable.role, roleValue));
     }
 
-    // Get total count for pagination
+    // Get total count for pagination (use SQL COUNT for performance)
     let totalCount = 0;
     if (conditions.length > 0) {
-      totalCount = (
-        await db
-          .select()
-          .from(usersTable)
-          .where(and(...conditions))
-      ).length;
+      const [{ value }] = await db
+        .select({ value: count() })
+        .from(usersTable)
+        .where(and(...conditions));
+      totalCount = Number(value) || 0;
     } else {
-      totalCount = (await db.select().from(usersTable)).length;
+      const [{ value }] = await db.select({ value: count() }).from(usersTable);
+      totalCount = Number(value) || 0;
     }
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 

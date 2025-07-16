@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { UserDetailModal } from "./user-detail-modal";
@@ -8,7 +8,6 @@ import { UserEditModal } from "./user-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { createClientComponentClient } from "@/lib/supabase";
 
 // Define a type for the filters prop that expects string values
 export interface UserTableFilters {
@@ -16,10 +15,19 @@ export interface UserTableFilters {
   role: string;
 }
 
-interface UserTableProps {
-  filters: UserTableFilters;
+interface Pagination {
   page: number;
-  onPageChange: (pageNumber: number) => void;
+  totalPages: number;
+  totalUsers: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+interface UserTableProps {
+  users: User[];
+  pagination: Pagination;
+  onPageChange: (page: number) => void;
 }
 
 interface User {
@@ -32,17 +40,8 @@ interface User {
   employeeId: string;
 }
 
-export function UserTable({ filters, page, onPageChange }: UserTableProps) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [pagination, setPagination] = useState<{
-    page: number;
-    totalPages: number;
-    totalUsers: number;
-    limit: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
+  // Only manage UI state (modals, etc.)
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -51,47 +50,7 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    async function fetchUsers() {
-      setIsLoading(true);
-      try {
-        const params = new URLSearchParams();
-        // Debug log to see what is being sent for filters
-        console.log("UserTable API call filters:", filters);
-        if (filters.department && filters.department !== "all") {
-          params.set("department", filters.department);
-        }
-        if (filters.role && filters.role !== "all") {
-          params.set("role", filters.role);
-        }
-        params.set("page", page.toString());
-        params.set("limit", "10");
-        // Get Supabase access token
-        const supabase = createClientComponentClient();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const accessToken = session?.access_token;
-        const headers: HeadersInit = {};
-        if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`;
-        }
-        const response = await fetch(`/api/users?${params.toString()}`, {
-          cache: "no-store",
-          headers,
-        });
-        if (!response.ok) throw new Error("Failed to fetch users");
-        const result = await response.json();
-        setUsers(result.data || []);
-        setPagination(result.pagination || null);
-      } catch {
-        setUsers([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchUsers();
-  }, [filters, page]);
+  // Remove useEffect and all fetching logic
 
   const handleUserClick = (userId: string) => {
     setSelectedUserId(userId);
@@ -105,9 +64,9 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
 
   const handleUserUpdated = () => {
     setEditModalOpen(false);
-    setUsers([]);
+    // setUsers([]); // This line is removed as users are now props
     setTimeout(() => {
-      onPageChange(page);
+      // onPageChange(page); // This line is removed as pagination is now props
       if (
         typeof window !== "undefined" &&
         (window as Window & { mutateDashboard?: () => void }).mutateDashboard
@@ -130,26 +89,12 @@ export function UserTable({ filters, page, onPageChange }: UserTableProps) {
       await fetch(`/api/users/${deleteUserId}`, { method: "DELETE" });
       setDeleteModalOpen(false);
       setDeleteUserId(null);
-      setUsers([]);
-      setTimeout(() => {
-        onPageChange(page);
-        if (
-          typeof window !== "undefined" &&
-          (window as Window & { mutateDashboard?: () => void }).mutateDashboard
-        ) {
-          (window as Window & { mutateDashboard?: () => void })
-            .mutateDashboard!();
-        }
-      }, 100);
+      // Optionally: trigger a page reload or refetch via router
     } catch {
       setDeleting(false);
     }
     setDeleting(false);
   };
-
-  if (isLoading) {
-    return <div className="p-8 text-center">Loading users...</div>;
-  }
 
   if (!users.length) {
     return (

@@ -1,3 +1,4 @@
+"use client";
 // frontend/components/users/user-add-modal.tsx
 // Add User Modal with card-based theming, validation, and toast notifications
 
