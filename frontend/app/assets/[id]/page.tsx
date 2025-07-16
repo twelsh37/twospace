@@ -97,7 +97,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               isUser ? "You do not have permission to delete assets." : "Delete"
             }
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 className="mr-2 h-4 w-4 text-red-400" />
             Delete
           </Button>
         </div>
