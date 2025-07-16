@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 export default function NewAssetPage() {
+  const { session } = useAuth(); // Get session from auth context
   return (
     // Outer container for page padding and spacing
     <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
@@ -59,7 +61,7 @@ export default function NewAssetPage() {
 
         <CardContent className="pt-0 px-8 pb-8">
           {/* Asset Creation Form */}
-          <AssetForm mode="create" />
+          <AssetForm mode="create" session={session} />
         </CardContent>
       </Card>
     </div>
