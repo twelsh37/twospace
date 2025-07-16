@@ -10,6 +10,7 @@ import { LocationDetailModal } from "./location-detail-modal";
 import { LocationEditModal } from "./location-edit-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { LocationAssignmentsModal } from "./location-assignments-modal";
 
 export type Location = {
   id: string;
@@ -57,6 +58,11 @@ export function LocationTable({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteLocationId, setDeleteLocationId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  // State for assignments modal
+  const [assignmentsModalOpen, setAssignmentsModalOpen] = useState(false);
+  const [assignmentsLocationId, setAssignmentsLocationId] = useState<
+    string | null
+  >(null);
 
   // Memoize fetchLocations to avoid useEffect dependency warning
   const fetchLocations = useCallback(async () => {
@@ -149,6 +155,11 @@ export function LocationTable({
   return (
     <ErrorBoundary>
       <div className="w-full">
+        <LocationAssignmentsModal
+          locationId={assignmentsLocationId}
+          open={assignmentsModalOpen}
+          onOpenChange={setAssignmentsModalOpen}
+        />
         <LocationDetailModal
           locationId={selectedLocationId}
           open={detailModalOpen}
@@ -352,7 +363,10 @@ export function LocationTable({
                     }}
                   >
                     <button
-                      onClick={() => handleLocationClick(loc.id)}
+                      onClick={() => {
+                        setAssignmentsLocationId(loc.id);
+                        setAssignmentsModalOpen(true);
+                      }}
                       style={{
                         background: "none",
                         border: "none",
