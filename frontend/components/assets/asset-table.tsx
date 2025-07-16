@@ -447,7 +447,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                                 : "Delete Asset"
                             }
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
+                            <Trash2 className="mr-2 h-4 w-4 text-red-400" />
                             Delete Asset
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -515,7 +515,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                             : "Delete Asset"
                         }
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="mr-2 h-4 w-4 text-red-400" />
                         Delete Asset
                       </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -77,7 +77,7 @@ export function AssetActions() {
               onClick={handleBulkAction}
               className="text-destructive"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="mr-2 h-4 w-4 text-red-400" />
               Delete Assets
             </DropdownMenuItem>
           </DropdownMenuContent>

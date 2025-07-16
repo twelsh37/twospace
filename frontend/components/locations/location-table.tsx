@@ -236,7 +236,7 @@ export function LocationTable({
                       title="Delete location"
                       disabled={isUser}
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="h-5 w-5 text-red-400" />
                     </Button>
                   </span>
                 </div>
@@ -450,7 +450,7 @@ export function LocationTable({
                           title="Delete location"
                           disabled={isUser}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 text-red-400" />
                         </Button>
                       </span>
                     </div>
