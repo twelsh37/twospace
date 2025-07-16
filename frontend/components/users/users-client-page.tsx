@@ -159,6 +159,10 @@ export default function UsersClientPage({
               users={users}
               pagination={initialPagination}
               onPageChange={handlePageChange}
+              // Pass the current user's role to UserTable for permission logic
+              currentUserRole={
+                user?.user_metadata?.role?.toUpperCase?.() || "USER"
+              }
             />
             {/* Add pagination controls here if needed, or inside UserTable */}
           </div>

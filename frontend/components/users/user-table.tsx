@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { UserDetailModal } from "./user-detail-modal";
 import { UserEditModal } from "./user-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
@@ -28,6 +28,7 @@ interface UserTableProps {
   users: User[];
   pagination: Pagination;
   onPageChange: (page: number) => void;
+  currentUserRole: string; // Add current user role for permission logic
 }
 
 interface User {
@@ -40,7 +41,12 @@ interface User {
   employeeId: string;
 }
 
-export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
+export function UserTable({
+  users,
+  pagination,
+  onPageChange,
+  currentUserRole,
+}: UserTableProps) {
   // Only manage UI state (modals, etc.)
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -58,8 +64,10 @@ export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
   };
 
   const handleEditClick = (userId: string) => {
+    console.log("handleEditClick called with userId:", userId);
     setEditUserId(userId);
     setEditModalOpen(true);
+    console.log("editModalOpen set to true, editUserId:", userId);
   };
 
   const handleUserUpdated = () => {
@@ -104,6 +112,14 @@ export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
     );
   }
 
+  // Add debug log for UserEditModal props before return
+  console.log(
+    "UserEditModal rendered with userId:",
+    editUserId,
+    "open:",
+    editModalOpen
+  );
+
   return (
     <ErrorBoundary>
       <div className="w-full">
@@ -138,29 +154,52 @@ export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
               <CardHeader className="flex flex-row items-center justify-between px-0 pb-2">
                 <CardTitle className="text-lg font-bold">{user.name}</CardTitle>
                 <div className="flex gap-2">
+                  {/* View action: opens user detail modal */}
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleUserClick(user.id)}
                     title="View details"
+                    aria-label="View details"
                   >
-                    <Edit className="h-5 w-5" />
+                    <Eye className="h-5 w-5" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleEditClick(user.id)}
+                    onClick={() => {
+                      if (currentUserRole === "USER") return; // Prevent action if not allowed
+                      handleEditClick(user.id);
+                    }}
                     title="Edit user"
+                    disabled={currentUserRole === "USER"}
+                    aria-disabled={currentUserRole === "USER"}
+                    className={
+                      currentUserRole === "USER"
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }
                   >
                     <Edit className="h-5 w-5" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDeleteClick(user.id)}
+                    onClick={() => {
+                      if (currentUserRole === "USER") return; // Prevent action if not allowed
+                      handleDeleteClick(user.id);
+                    }}
                     title="Delete user"
+                    disabled={currentUserRole === "USER"}
+                    aria-disabled={currentUserRole === "USER"}
+                    className={
+                      currentUserRole === "USER"
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }
                   >
-                    <Trash2 className="h-5 w-5" />
+                    {/* Trash icon uses a subdued red for visual clarity */}
+                    <Trash2 className="h-5 w-5 text-red-400" />
                   </Button>
                 </div>
               </CardHeader>
@@ -396,14 +435,35 @@ export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
                           justifyContent: "flex-end",
                         }}
                       >
+                        {/* Order: view, edit, delete */}
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={(e) => {
                             e.stopPropagation();
+                            handleUserClick(user.id);
+                          }}
+                          title="View details"
+                          aria-label="View details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (currentUserRole === "USER") return; // Prevent action if not allowed
                             handleEditClick(user.id);
                           }}
                           title="Edit user"
+                          disabled={currentUserRole === "USER"}
+                          aria-disabled={currentUserRole === "USER"}
+                          className={
+                            currentUserRole === "USER"
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -412,11 +472,20 @@ export function UserTable({ users, pagination, onPageChange }: UserTableProps) {
                           size="icon"
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (currentUserRole === "USER") return; // Prevent action if not allowed
                             handleDeleteClick(user.id);
                           }}
                           title="Delete user"
+                          disabled={currentUserRole === "USER"}
+                          aria-disabled={currentUserRole === "USER"}
+                          className={
+                            currentUserRole === "USER"
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {/* Trash icon uses a subdued red for visual clarity */}
+                          <Trash2 className="h-4 w-4 text-red-400" />
                         </Button>
                       </div>
                     </td>
