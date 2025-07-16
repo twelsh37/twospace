@@ -22,18 +22,18 @@ export const UnauthorizedToast: React.FC<UnauthorizedToastProps> = ({
     let closeTimeout: NodeJS.Timeout;
     if (open) {
       setVisible(true);
-      // Fade in
+      // Fade in over 1.5s
       fadeInTimeout = setTimeout(() => {
         setVisible(true);
       }, 10);
-      // Fade out after 3s
+      // Fade out after 3s visible (1.5s fade in + 3s visible = 4.5s)
       fadeOutTimeout = setTimeout(() => {
         setVisible(false);
-      }, 3000);
-      // Close after 4s (3s + 1s fade out)
+      }, 4500);
+      // Close after 1.5s fade out (total 6s)
       closeTimeout = setTimeout(() => {
         onClose();
-      }, 4000);
+      }, 6000);
     }
     return () => {
       clearTimeout(fadeInTimeout);
@@ -44,7 +44,7 @@ export const UnauthorizedToast: React.FC<UnauthorizedToastProps> = ({
 
   return open ? (
     <div
-      className={`fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 px-8 py-6 rounded-lg font-semibold text-white shadow-lg border-2 transition-opacity duration-1000 pointer-events-none select-none flex flex-col items-center justify-center min-w-[320px] max-w-[480px]
+      className={`fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 px-8 py-6 rounded-lg font-semibold text-white shadow-lg border-2 transition-opacity duration-[1500ms] pointer-events-none select-none flex flex-col items-center justify-center min-w-[320px] max-w-[480px]
         ${visible ? "opacity-100" : "opacity-0"}
       `}
       style={{

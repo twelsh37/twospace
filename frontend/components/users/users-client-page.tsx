@@ -6,9 +6,11 @@ import { UserTable } from "./user-table";
 import { UserFilters, UserFilterState, DepartmentOption } from "./user-filters";
 import { Button } from "@/components/ui/button";
 import { UserAddModal } from "./user-add-modal";
-import { Download } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
 
 interface User {
   id: string;
@@ -46,6 +48,9 @@ export default function UsersClientPage({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState(initialFilters);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const { user } = useAuth();
+  const [showUnauthorized, unauthorizedToast] = useUnauthorizedToast();
 
   // Handle filter changes by updating the URL (triggers SSR)
   const handleFilterChange = (
@@ -121,7 +126,24 @@ export default function UsersClientPage({
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
-              <UserAddModal />
+              <Button
+                size="sm"
+                className="bg-black text-white hover:bg-gray-900"
+                onClick={() => {
+                  if (user?.user_metadata?.role?.toUpperCase() !== "ADMIN") {
+                    showUnauthorized();
+                    return;
+                  }
+                  setAddModalOpen(true);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add User
+              </Button>
+              <UserAddModal
+                open={addModalOpen}
+                onOpenChange={setAddModalOpen}
+              />
             </div>
           </div>
         </CardHeader>
@@ -142,6 +164,7 @@ export default function UsersClientPage({
           </div>
         </CardContent>
       </Card>
+      {unauthorizedToast}
     </div>
   );
 }
