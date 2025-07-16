@@ -260,6 +260,7 @@ export function LocationTable({
         </div>
         {/* Table layout for desktop/tablet */}
         <div className="hidden md:block">
+          {/* Table is now left-aligned with filters, not centered */}
           <table
             style={{
               width: "100%",
@@ -269,6 +270,10 @@ export function LocationTable({
               overflow: "hidden",
               boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
               fontSize: "12px",
+              tableLayout: "fixed", // Ensures columns respect width
+              minWidth: "600px", // Prevents table from being too wide
+              maxWidth: "900px", // Restricts max width for compactness
+              marginLeft: 0, // Left align
             }}
           >
             <thead>
@@ -280,44 +285,48 @@ export function LocationTable({
                   fontSize: "1rem",
                 }}
               >
+                {/* Name column first */}
                 <th
                   style={{
                     padding: "0.5rem 8px 0.5rem 0.5rem",
                     border: "none",
                     borderTopLeftRadius: "12px",
                     textAlign: "left",
-                    width: "25%",
+                    width: "28%",
                   }}
                 >
                   Name
                 </th>
+                {/* Description column next */}
                 <th
                   style={{
                     padding: "0.5rem",
                     border: "none",
                     textAlign: "left",
-                    width: "25%",
+                    width: "32%",
                   }}
                 >
                   Description
                 </th>
+                {/* Status column */}
                 <th
                   style={{
                     padding: "0.5rem",
                     border: "none",
                     textAlign: "left",
-                    width: "25%",
+                    width: "14%",
                   }}
                 >
                   Status
                 </th>
+                {/* Actions column rightmost, right-aligned */}
                 <th
                   style={{
                     padding: "0.5rem",
                     border: "none",
                     borderTopRightRadius: "12px",
-                    textAlign: "left",
-                    width: "25%",
+                    textAlign: "right",
+                    width: "18%",
                   }}
                 >
                   Actions
@@ -341,13 +350,17 @@ export function LocationTable({
                   }
                   onMouseOut={(e) => (e.currentTarget.style.background = "")}
                 >
+                  {/* Name cell */}
                   <td
                     style={{
                       padding: "0.5rem 8px 0.5rem 0.5rem",
                       border: "none",
                       textAlign: "left",
                       fontWeight: 500,
-                      width: "25%",
+                      width: "28%",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
                   >
                     <button
@@ -368,22 +381,28 @@ export function LocationTable({
                       {loc.name}
                     </button>
                   </td>
+                  {/* Description cell */}
                   <td
                     style={{
-                      padding: "0.5rem",
+                      padding: "0.5rem 0.25rem",
                       border: "none",
                       textAlign: "left",
-                      width: "25%",
+                      width: "32%",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
                   >
                     {loc.description || "—"}
                   </td>
+                  {/* Status cell */}
                   <td
                     style={{
-                      padding: "0.5rem",
+                      padding: "0.5rem 0.25rem",
                       border: "none",
                       textAlign: "left",
-                      width: "25%",
+                      width: "14%",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {loc.isActive ? (
@@ -396,19 +415,20 @@ export function LocationTable({
                       </span>
                     )}
                   </td>
+                  {/* Actions cell, right-aligned, rightmost */}
                   <td
                     style={{
-                      padding: "0.5rem",
+                      padding: "0.5rem 0.25rem 0.5rem 0.25rem",
                       border: "none",
-                      textAlign: "left",
-                      width: "25%",
+                      textAlign: "right",
+                      width: "18%",
                     }}
                   >
                     <div
                       style={{
                         display: "flex",
-                        gap: 8,
-                        justifyContent: "flex-start",
+                        gap: 6,
+                        justifyContent: "flex-end", // Right-align actions
                       }}
                     >
                       <Button
@@ -459,13 +479,15 @@ export function LocationTable({
               ))}
             </tbody>
           </table>
-          {/* Pagination controls moved below the table for consistency with other pages */}
+          {/* Pagination controls moved below the table, right-aligned with table */}
           {pagination && (
             <div className="flex flex-col sm:flex-row items-center justify-between p-4 mt-3 gap-4">
-              <div className="text-sm text-muted-foreground text-center sm:text-left">
+              {/* Left-aligned: Showing X of Y locations */}
+              <div className="text-sm text-muted-foreground text-left">
                 Showing {locations.length} of {pagination.totalLocations}{" "}
                 locations
               </div>
+              {/* Right-aligned: Pagination controls */}
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"

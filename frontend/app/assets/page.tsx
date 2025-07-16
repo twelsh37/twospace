@@ -146,7 +146,8 @@ function AssetsPageContent() {
       {/* Assets Table */}
       <Card className="shadow-lg border rounded-xl">
         <CardHeader className="pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="text-center md:text-left">
+          {/* Change to py-6 (24px) vertical padding for a more compact card */}
+          <div className="py-6 text-center md:text-left">
             <CardTitle
               style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
             >
