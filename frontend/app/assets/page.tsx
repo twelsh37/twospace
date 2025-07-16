@@ -20,6 +20,7 @@ import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 import { AssetAddModal } from "@/components/assets/asset-add-modal";
 import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
 import { createClientComponentClient } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth-context";
 
 export default function AssetsPage() {
   return (
@@ -128,12 +129,10 @@ function AssetsPageContent() {
   };
 
   // Handler for Add Asset button
-  const handleAddAssetClick = async () => {
-    const supabase = createClientComponentClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const role = session?.user?.user_metadata?.role;
+  // Only allow ADMIN users to open the Add Asset modal; show unauthorized toast otherwise
+  const { user } = useAuth();
+  const handleAddAssetClick = () => {
+    const role = user?.user_metadata?.role;
     if (role !== "ADMIN") {
       showUnauthorizedToast();
       return;

@@ -1,3 +1,4 @@
+"use client";
 // frontend/components/users/user-add-modal.tsx
 // Add User Modal with card-based theming, validation, and toast notifications
 
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Location } from "@/lib/db/schema";
+import { useAuth } from "@/lib/auth-context";
 
 // Simple toast utility (if not found in codebase)
 function showToast({
@@ -89,6 +91,7 @@ export function UserAddModal({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useAuth(); // Get session from auth context
 
   // Fetch departments
   useEffect(() => {
@@ -182,9 +185,16 @@ export function UserAddModal({
     setSaving(true);
     setError(null);
     try {
+      // Attach Authorization header if access token is available
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
       const res = await fetch("/api/users", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           name: form.name,
           email: form.email,
@@ -195,7 +205,19 @@ export function UserAddModal({
           employeeId: form.employeeId,
         }),
       });
-      if (!res.ok) throw new Error("Failed to add user");
+      if (!res.ok) {
+        // Try to extract error message from backend
+        let errorMsg = "Failed to add user.";
+        try {
+          const errorJson = await res.json();
+          if (errorJson && errorJson.error) {
+            errorMsg = errorJson.error;
+          }
+        } catch {}
+        setError(errorMsg);
+        showToast({ message: errorMsg, type: "error" });
+        return;
+      }
       showToast({ message: "User added successfully!", type: "success" });
       setForm({
         name: "",
@@ -208,9 +230,13 @@ export function UserAddModal({
       });
       if (onAdded) onAdded();
       onOpenChange(false);
-    } catch {
-      setError("Failed to add user.");
-      showToast({ message: "Failed to add user.", type: "error" });
+    } catch (err) {
+      // Show error from fetch (network or unexpected)
+      setError(err instanceof Error ? err.message : "Failed to add user.");
+      showToast({
+        message: err instanceof Error ? err.message : "Failed to add user.",
+        type: "error",
+      });
     } finally {
       setSaving(false);
     }

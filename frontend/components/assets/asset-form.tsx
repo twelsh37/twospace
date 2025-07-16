@@ -26,15 +26,22 @@ type AssetFormProps = {
   asset?: Partial<Asset>;
   onSubmit?: (asset: Partial<Asset>) => Promise<void>;
   onCancel?: () => void; // Optional cancel handler
+  session?: { access_token?: string } | null; // Add session prop for auth
 };
 
-export function AssetForm({ mode, asset, onSubmit, onCancel }: AssetFormProps) {
+export function AssetForm({
+  mode,
+  asset,
+  onSubmit,
+  onCancel,
+  session,
+}: AssetFormProps) {
   const [formData, setFormData] = useState<Partial<Asset>>({
     type: AssetType.MOBILE_PHONE,
     state: AssetState.AVAILABLE, // Set default state to Available Stock
     serialNumber: "",
     description: "",
-    purchasePrice: "0",
+    purchasePrice: "", // Start empty, not 0
     location: "",
     ...asset,
   });
@@ -112,6 +119,31 @@ export function AssetForm({ mode, asset, onSubmit, onCancel }: AssetFormProps) {
       };
       if (onSubmit) {
         await onSubmit(submitData);
+      } else if (mode === "create") {
+        // If no onSubmit provided, handle API call here (for /assets/new page)
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+        const res = await fetch("/api/assets", {
+          method: "POST",
+          headers,
+          body: JSON.stringify(submitData),
+        });
+        if (!res.ok) {
+          let errorMsg = "Failed to add asset. Please try again.";
+          try {
+            const errorJson = await res.json();
+            if (errorJson && (errorJson.error || errorJson.details)) {
+              errorMsg = errorJson.error || errorJson.details;
+            }
+          } catch {}
+          setErrors([errorMsg]);
+          setIsSubmitting(false);
+          return;
+        }
       }
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -122,7 +154,7 @@ export function AssetForm({ mode, asset, onSubmit, onCancel }: AssetFormProps) {
           state: AssetState.AVAILABLE, // Reset to Available Stock
           serialNumber: "",
           description: "",
-          purchasePrice: "0",
+          purchasePrice: "",
           location: "",
         });
         setAssetNumber("");
@@ -232,9 +264,9 @@ export function AssetForm({ mode, asset, onSubmit, onCancel }: AssetFormProps) {
           type="number"
           step="0.01"
           min="0"
-          value={formData.purchasePrice || "0"}
+          value={formData.purchasePrice || ""}
           onChange={(e) => updateField("purchasePrice", e.target.value)}
-          placeholder="0.00"
+          placeholder="Enter asset cost" // Updated placeholder
         />
       </div>
 

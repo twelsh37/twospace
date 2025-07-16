@@ -1,290 +1,126 @@
 // frontend/app/users/page.tsx
-// Users Management Page
-"use client";
+// Users Management Page (SSR + Client Interactivity)
 
-import { Suspense, useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { UserTable } from "@/components/users/user-table";
-import { Button } from "@/components/ui/button";
-import { Plus, Download } from "lucide-react";
-import {
-  UserFilters,
-  UserFilterState,
-  DepartmentOption,
-  RoleOption,
-} from "@/components/users/user-filters";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { UserAddModal } from "@/components/users/user-add-modal";
-import { ExportModal } from "@/components/ui/export-modal";
-import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
-import { createClientComponentClient } from "@/lib/supabase";
+import { db, usersTable, departmentsTable, locationsTable } from "@/lib/db";
+import { eq, and, count } from "drizzle-orm";
+import UsersClientPage from "@/components/users/users-client-page";
 
-export default function UsersPage() {
-  return (
-    <Suspense fallback={<UsersLoadingSkeleton />}>
-      <UsersPageContent />
-    </Suspense>
-  );
-}
-
-function UsersPageContent() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [exportModalOpen, setExportModalOpen] = useState(false);
-  const [exportLoading, setExportLoading] = useState(false);
-  const [showUnauthorizedToast, unauthorizedToast] = useUnauthorizedToast();
-
-  // Parse filter values from URL and map to objects
-  // Always use uppercase 'ALL' for consistency
-  const departmentParam =
-    searchParams?.get("department")?.toUpperCase() || "ALL";
-  const roleParam = searchParams?.get("role")?.toUpperCase() || "ALL";
-
-  // filters object now only uses department and role as string values (not objects)
-  const filters: UserFilterState = {
-    department: departmentParam,
-    role: roleParam,
+export default async function UsersPage({
+  searchParams,
+}: {
+  searchParams: Record<string, undefined | string | string[]>;
+}) {
+  // Treat searchParams as a plain object (Next.js 15+)
+  const getParam = (key: string, fallback: string) => {
+    const value = searchParams[key];
+    if (Array.isArray(value)) return value[0] ?? fallback;
+    return value ?? fallback;
   };
-  const page = parseInt(searchParams?.get("page") || "1", 10);
+  const department = getParam("department", "ALL").toUpperCase();
+  const role = getParam("role", "ALL").toUpperCase();
+  const page = parseInt(getParam("page", "1"), 10);
+  const limit = 10;
+  const offset = (page - 1) * limit;
 
-  const handleFilterChange = (
-    key: keyof UserFilterState,
-    value: string | DepartmentOption | RoleOption | null
-  ) => {
-    const params = new URLSearchParams(searchParams?.toString() ?? "");
-    // Debug log to see what is being passed as value
-    console.log("handleFilterChange", key, value);
-    // Always use uppercase 'ALL' for consistency
-    if (
-      !value ||
-      (key === "role" &&
-        (typeof value === "string"
-          ? value.toUpperCase() === "ALL"
-          : (value as RoleOption).value === "ALL")) ||
-      (key === "department" &&
-        (typeof value === "string"
-          ? value.toUpperCase() === "ALL"
-          : (value as DepartmentOption).id === "ALL"))
-    ) {
-      params.delete(key);
-    } else {
-      if (key === "department") {
-        // Type guard: ensure value is DepartmentOption or string
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          "id" in value &&
-          typeof (value as DepartmentOption).id === "string"
-        ) {
-          params.set("department", (value as DepartmentOption).id);
-        } else if (typeof value === "string") {
-          params.set("department", value);
-        } else {
-          console.warn(
-            "Department value is not an object with string id:",
-            value
-          );
-        }
-      } else if (key === "role") {
-        // Type guard: ensure value is RoleOption or string
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          "value" in value &&
-          typeof (value as RoleOption).value === "string"
-        ) {
-          params.set("role", (value as RoleOption).value);
-        } else if (typeof value === "string") {
-          params.set("role", value);
-        } else {
-          console.warn("Role value is not an object with string value:", value);
-        }
-      }
-    }
-    params.set("page", "1");
-    router.replace(`${pathname}?${params.toString()}`);
+  // Build where conditions
+  const conditions = [];
+  if (department && department !== "ALL") {
+    conditions.push(eq(usersTable.departmentId, department));
+  }
+  if (role && role !== "ALL") {
+    const roleValue = role === "ADMIN" ? "ADMIN" : "USER";
+    conditions.push(eq(usersTable.role, roleValue));
+  }
+
+  // Get total count for pagination (use SQL COUNT for performance)
+  let totalCount = 0;
+  if (conditions.length > 0) {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(usersTable)
+      .where(and(...conditions));
+    totalCount = Number(value) || 0;
+  } else {
+    const [{ value }] = await db.select({ value: count() }).from(usersTable);
+    totalCount = Number(value) || 0;
+  }
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
+  // Get paginated users, join departments and locations for names
+  let users;
+  if (conditions.length > 0) {
+    users = await db
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        email: usersTable.email,
+        role: usersTable.role,
+        department: departmentsTable.name,
+        location: locationsTable.name,
+        isActive: usersTable.isActive,
+        employeeId: usersTable.employeeId,
+      })
+      .from(usersTable)
+      .leftJoin(
+        departmentsTable,
+        eq(usersTable.departmentId, departmentsTable.id)
+      )
+      .leftJoin(locationsTable, eq(usersTable.locationId, locationsTable.id))
+      .where(and(...conditions))
+      .orderBy(usersTable.name)
+      .limit(limit)
+      .offset(offset);
+  } else {
+    users = await db
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        email: usersTable.email,
+        role: usersTable.role,
+        department: departmentsTable.name,
+        location: locationsTable.name,
+        isActive: usersTable.isActive,
+        employeeId: usersTable.employeeId,
+      })
+      .from(usersTable)
+      .leftJoin(
+        departmentsTable,
+        eq(usersTable.departmentId, departmentsTable.id)
+      )
+      .leftJoin(locationsTable, eq(usersTable.locationId, locationsTable.id))
+      .orderBy(usersTable.name)
+      .limit(limit)
+      .offset(offset);
+  }
+
+  // Fetch all departments for filter dropdown
+  const departments = await db
+    .select({ id: departmentsTable.id, name: departmentsTable.name })
+    .from(departmentsTable)
+    .orderBy(departmentsTable.name);
+
+  // Prepare filters object for the filter component
+  const filters = {
+    department,
+    role,
   };
 
-  const handleClearFilters = () => {
-    router.push(pathname ?? "/");
-  };
-
-  const handlePageChange = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams?.toString() ?? "");
-    params.set("page", pageNumber.toString());
-    router.replace(`${pathname}?${params.toString()}`);
-  };
-
-  const handleExport = async (format: "pdf" | "csv") => {
-    setExportLoading(true);
-    try {
-      if (format === "csv") {
-        // Use GET for CSV export with filters as query params
-        const params = new URLSearchParams();
-        if (filters.department && filters.department !== "ALL") {
-          params.set("department", filters.department);
-        }
-        if (filters.role && filters.role !== "ALL") {
-          params.set("role", filters.role);
-        }
-        const res = await fetch(`/api/users/export?${params.toString()}`, {
-          method: "GET",
-        });
-        if (!res.ok) throw new Error(`Failed to export CSV`);
-        const blob = await res.blob();
-        const filename = "users-report.csv";
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      } else {
-        // Use POST for PDF export
-        const res = await fetch("/api/users/export", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            department: filters.department || "all",
-            role: filters.role || "all",
-            format,
-          }),
-        });
-        if (!res.ok) throw new Error(`Failed to export PDF`);
-        const blob = await res.blob();
-        const filename = "users-report.pdf";
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      }
-    } catch {
-      alert(
-        `Failed to export users ${format.toUpperCase()}. Please try again.`
-      );
-    } finally {
-      setExportLoading(false);
-      setExportModalOpen(false);
-    }
-  };
-
-  // Handler for Add User button
-  const handleAddUserClick = async () => {
-    const supabase = createClientComponentClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const role = session?.user?.user_metadata?.role;
-    if (role !== "ADMIN") {
-      showUnauthorizedToast();
-      return;
-    }
-    setAddModalOpen(true);
+  // Pagination info
+  const pagination = {
+    page,
+    limit,
+    totalUsers: totalCount,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
   };
 
   return (
-    <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
-      {unauthorizedToast}
-      <Card
-        style={{
-          maxWidth: 1200,
-          width: "100%",
-          margin: 0,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-          borderRadius: 16,
-        }}
-      >
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle
-                style={{
-                  fontSize: "2rem",
-                  textAlign: "left",
-                  marginBottom: 0,
-                  lineHeight: 1.1,
-                }}
-              >
-                Users
-              </CardTitle>
-              <p
-                className="text-muted-foreground"
-                style={{ marginTop: 2, marginBottom: 0 }}
-              >
-                Manage your organization&apos;s users and their roles
-              </p>
-            </div>
-            <div className="flex items-center space-x-5">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setExportModalOpen(true)}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              <Button size="sm" onClick={handleAddUserClick}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add User
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <UserFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-          />
-          {/* Match /assets: mt-4 below filters */}
-          <div className="mt-4">
-            <Suspense fallback={<UsersLoadingSkeleton />}>
-              <UserTable
-                filters={filters}
-                page={page}
-                onPageChange={handlePageChange}
-              />
-            </Suspense>
-          </div>
-        </CardContent>
-      </Card>
-      <UserAddModal
-        open={addModalOpen}
-        onOpenChange={setAddModalOpen}
-        onAdded={() => {
-          // Refresh the user list by navigating to the current page
-          const params = new URLSearchParams(searchParams?.toString() ?? "");
-          router.replace(`${pathname}?${params.toString()}`);
-        }}
-      />
-      <ExportModal
-        open={exportModalOpen}
-        onOpenChange={setExportModalOpen}
-        onExport={handleExport}
-        loading={exportLoading}
-      />
-    </div>
-  );
-}
-
-function UsersLoadingSkeleton() {
-  return (
-    <div className="p-8">
-      <div className="space-y-4">
-        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
-        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
-        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
-        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
-        <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
-      </div>
-    </div>
+    <UsersClientPage
+      users={users}
+      departments={departments}
+      filters={filters}
+      pagination={pagination}
+    />
   );
 }

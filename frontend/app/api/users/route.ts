@@ -1,51 +1,111 @@
 // backend/app/api/users/route.ts
-// API route to fetch paginated users from Supabase
+// API route to fetch paginated users from Drizzle ORM (not Supabase)
 
 import { NextRequest, NextResponse } from "next/server";
-import { getUsers, createUser } from "@/lib/supabase-db";
+import { db, usersTable, departmentsTable, locationsTable } from "@/lib/db";
+import { eq, and, count } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
 
 // GET /api/users - returns paginated users
 export async function GET(request: NextRequest) {
-  // Require authentication for listing users
+  // Require authentication for listing users (both ADMIN and USER roles allowed)
   const user = await requireAuth(request);
   if (user instanceof NextResponse) return user; // Not authenticated
-  // Log the start of the GET request
   appLogger.info(`GET /api/users called. URL: ${request.url}`);
-  const start = Date.now(); // Start timing
+  const start = Date.now();
   try {
-    // Parse query params for pagination and filters
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const department = searchParams.get("department") || "ALL";
     const role = searchParams.get("role") || "ALL";
+    const offset = (page - 1) * limit;
 
-    // Log the filters being used
-    appLogger.info("GET /api/users - Filters:", {
-      page,
-      limit,
-      department,
-      role,
-    });
-
-    // Only include filters if not 'ALL'
-    const filters: { department?: string; role?: string } = {};
+    // Build where conditions
+    const conditions = [];
     if (department && department.toUpperCase() !== "ALL") {
-      filters.department = department;
+      conditions.push(eq(usersTable.departmentId, department));
     }
+    // Only filter by role if a specific role is requested
     if (role && role.toUpperCase() !== "ALL") {
-      filters.role = role;
+      const roleValue = role.toUpperCase() === "ADMIN" ? "ADMIN" : "USER";
+      conditions.push(eq(usersTable.role, roleValue));
     }
 
-    const result = await getUsers(page, limit, filters);
-    const responseTime = Date.now() - start;
+    // Get total count for pagination (use SQL COUNT for performance)
+    let totalCount = 0;
+    if (conditions.length > 0) {
+      const [{ value }] = await db
+        .select({ value: count() })
+        .from(usersTable)
+        .where(and(...conditions));
+      totalCount = Number(value) || 0;
+    } else {
+      const [{ value }] = await db.select({ value: count() }).from(usersTable);
+      totalCount = Number(value) || 0;
+    }
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
-    appLogger.info(`Fetched users successfully in ${responseTime}ms`);
+    // Get paginated users, join departments and locations for names
+    let users;
+    if (conditions.length > 0) {
+      users = await db
+        .select({
+          id: usersTable.id,
+          name: usersTable.name,
+          email: usersTable.email,
+          role: usersTable.role,
+          department: departmentsTable.name,
+          location: locationsTable.name,
+          isActive: usersTable.isActive,
+          employeeId: usersTable.employeeId,
+        })
+        .from(usersTable)
+        .leftJoin(
+          departmentsTable,
+          eq(usersTable.departmentId, departmentsTable.id)
+        )
+        .leftJoin(locationsTable, eq(usersTable.locationId, locationsTable.id))
+        .where(and(...conditions))
+        .orderBy(usersTable.name)
+        .limit(limit)
+        .offset(offset);
+    } else {
+      users = await db
+        .select({
+          id: usersTable.id,
+          name: usersTable.name,
+          email: usersTable.email,
+          role: usersTable.role,
+          department: departmentsTable.name,
+          location: locationsTable.name,
+          isActive: usersTable.isActive,
+          employeeId: usersTable.employeeId,
+        })
+        .from(usersTable)
+        .leftJoin(
+          departmentsTable,
+          eq(usersTable.departmentId, departmentsTable.id)
+        )
+        .leftJoin(locationsTable, eq(usersTable.locationId, locationsTable.id))
+        .orderBy(usersTable.name)
+        .limit(limit)
+        .offset(offset);
+    }
+
+    appLogger.info(`Fetched ${users.length} users successfully`);
     return NextResponse.json({
-      ...result,
-      responseTime,
+      data: users,
+      pagination: {
+        page,
+        limit,
+        totalUsers: totalCount,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+      responseTime: Date.now() - start,
     });
   } catch (error) {
     systemLogger.error(
@@ -65,7 +125,6 @@ export async function POST(request: NextRequest) {
   // Require ADMIN for creating users
   const user = await requireAdmin(request);
   if (user instanceof NextResponse) return user; // Not authorized
-  // Log the start of the POST request
   appLogger.info("POST /api/users called");
   try {
     const body = await request.json();
@@ -79,7 +138,6 @@ export async function POST(request: NextRequest) {
       employeeId,
     } = body;
 
-    // Log the user creation attempt
     appLogger.info("Attempting to create user", {
       name,
       email,
@@ -105,22 +163,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use the provided departmentId and locationId
-    const userData = {
-      name,
-      email,
-      employee_id: employeeId,
-      location_id: locationId, // Use real locationId
-      department_id: departmentId, // Use real departmentId
-      role: role.toUpperCase() as "ADMIN" | "USER",
-      is_active: !!isActive,
-    };
+    // Insert new user
+    const [newUser] = await db
+      .insert(usersTable)
+      .values({
+        name,
+        email,
+        employeeId,
+        locationId,
+        departmentId,
+        role: role.toUpperCase() === "ADMIN" ? "ADMIN" : "USER",
+        isActive: !!isActive,
+      })
+      .returning();
 
-    const result = await createUser(userData);
-    appLogger.info(
-      `User created successfully: ${result.user?.id || "unknown id"}`
-    );
-    return NextResponse.json({ user: result.user }, { status: 201 });
+    appLogger.info(`User created successfully: ${newUser?.id || "unknown id"}`);
+    return NextResponse.json({ user: newUser }, { status: 201 });
   } catch (error) {
     systemLogger.error(
       `Error creating user: ${

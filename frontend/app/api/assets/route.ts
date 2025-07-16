@@ -368,11 +368,11 @@ export async function POST(request: NextRequest) {
       .values(newAssetData)
       .returning();
 
-    // Use the asset's UUID id for asset history
+    // Use the authenticated user's ID for asset history
     await createAssetHistory(
       newAsset.id,
       "AVAILABLE",
-      "system", // TODO: Replace with actual user ID from authentication
+      user.id, // Use the authenticated user's ID
       "Asset created",
       undefined,
       { createdFrom: "api" }

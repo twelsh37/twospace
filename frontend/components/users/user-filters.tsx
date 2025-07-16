@@ -1,7 +1,6 @@
 // frontend/components/users/user-filters.tsx
 // UserFilters component for filtering users by department and role
 
-import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -33,6 +32,7 @@ export interface UserFiltersProps {
     value: DepartmentOption | RoleOption | string | null
   ) => void;
   onClearFilters: () => void;
+  departments: DepartmentOption[];
 }
 
 const ROLE_OPTIONS: RoleOption[] = [
@@ -45,36 +45,8 @@ export function UserFilters({
   filters,
   onFilterChange,
   onClearFilters,
+  departments,
 }: UserFiltersProps) {
-  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
-
-  useEffect(() => {
-    // Fetch unique departments from the API
-    async function fetchDepartments() {
-      try {
-        const res = await fetch("/api/departments");
-        const json = await res.json();
-        // Expect departments as array of objects { id, name }
-        if (json.departments && Array.isArray(json.departments)) {
-          // Use 'unknown' instead of 'any' and add a type guard for ESLint compliance
-          const validDepartments = json.departments.filter(
-            (d: unknown) =>
-              d &&
-              typeof d === "object" &&
-              typeof (d as { id?: unknown }).id === "string" &&
-              typeof (d as { name?: unknown }).name === "string"
-          );
-          setDepartments(validDepartments);
-        } else {
-          setDepartments([]);
-        }
-      } catch {
-        setDepartments([]);
-      }
-    }
-    fetchDepartments();
-  }, []);
-
   return (
     <div className="flex flex-wrap items-center gap-4 pb-4">
       {/* Department Filter */}
