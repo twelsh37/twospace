@@ -41,7 +41,7 @@ export function AssetForm({
     state: AssetState.AVAILABLE, // Set default state to Available Stock
     serialNumber: "",
     description: "",
-    purchasePrice: "0",
+    purchasePrice: "", // Start empty, not 0
     location: "",
     ...asset,
   });
@@ -154,7 +154,7 @@ export function AssetForm({
           state: AssetState.AVAILABLE, // Reset to Available Stock
           serialNumber: "",
           description: "",
-          purchasePrice: "0",
+          purchasePrice: "",
           location: "",
         });
         setAssetNumber("");
@@ -264,9 +264,9 @@ export function AssetForm({
           type="number"
           step="0.01"
           min="0"
-          value={formData.purchasePrice || "0"}
+          value={formData.purchasePrice || ""}
           onChange={(e) => updateField("purchasePrice", e.target.value)}
-          placeholder="0.00"
+          placeholder="Enter asset cost" // Updated placeholder
         />
       </div>
 
