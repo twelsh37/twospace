@@ -27,6 +27,7 @@ import { AssetEditModal } from "./asset-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { UserAssetsModal } from "@/components/users/user-assets-modal";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { useAuth } from "@/lib/auth-context";
 
 // Utility function to map asset state to solid background color classes
 const getStateColorClass = (state: AssetState) => {
@@ -72,6 +73,11 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
 
   // Placeholder for userId until real auth is implemented
   const currentUserId = "admin-user-id"; // TODO: Replace with real user ID from auth context
+
+  // Get authenticated user's role
+  const { session } = useAuth();
+  const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
+  const isUser = userRole === "USER";
 
   // Fetch assets function is now reusable for refetching after delete
   const fetchAssets = async () => {
@@ -421,6 +427,12 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleEditClick(asset.assetNumber)}
+                            disabled={isUser}
+                            title={
+                              isUser
+                                ? "You do not have permission to edit assets."
+                                : "Edit Asset"
+                            }
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Asset
@@ -428,6 +440,12 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => handleDeleteClick(asset.assetNumber)}
+                            disabled={isUser}
+                            title={
+                              isUser
+                                ? "You do not have permission to delete assets."
+                                : "Delete Asset"
+                            }
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete Asset
@@ -477,6 +495,12 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleEditClick(asset.assetNumber)}
+                        disabled={isUser}
+                        title={
+                          isUser
+                            ? "You do not have permission to edit assets."
+                            : "Edit Asset"
+                        }
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Asset
@@ -484,6 +508,12 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                       <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => handleDeleteClick(asset.assetNumber)}
+                        disabled={isUser}
+                        title={
+                          isUser
+                            ? "You do not have permission to delete assets."
+                            : "Delete Asset"
+                        }
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Asset

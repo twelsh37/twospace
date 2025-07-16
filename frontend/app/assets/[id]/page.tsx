@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { useRouter } from "next/navigation";
 import { Asset } from "@/lib/types";
+import { useAuth } from "@/lib/auth-context";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -21,6 +22,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [asset, setAsset] = useState<Asset | null>(null);
   const router = useRouter();
   const { id } = use(params);
+  const { session } = useAuth();
+  const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
+  const isUser = userRole === "USER";
 
   // Fetch asset data once for all subcomponents
   useEffect(() => {
@@ -88,6 +92,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             variant="destructive"
             size="sm"
             onClick={() => setDeleteModalOpen(true)}
+            disabled={isUser}
+            title={
+              isUser ? "You do not have permission to delete assets." : "Delete"
+            }
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
