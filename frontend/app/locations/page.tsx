@@ -106,12 +106,15 @@ export default function LocationsPage() {
     }
   };
 
+  // Halve the space above the card by reducing pt-4 md:pt-8 to pt-2 md:pt-4
   return (
-    <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
+    <div className="flex-1 flex flex-col pt-8
+     pb-2 md:pb-2 px-4 md:px-8">
       {unauthorizedToast}
       <Card
         style={{
-          maxWidth: 1200,
+          // Card maxWidth is table (900px) + 2*32px (px-8 padding)
+          maxWidth: 964,
           width: "100%",
           boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
           borderRadius: 16,
@@ -120,28 +123,21 @@ export default function LocationsPage() {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle
-                style={{ fontSize: "2rem", textAlign: "left", marginBottom: 0 }}
-              >
-                Locations
-              </CardTitle>
-              <p className="text-muted-foreground" style={{ marginTop: 4 }}>
-                Manage your organization&apos;s locations and their details
-              </p>
-            </div>
-            <div className="flex items-center space-x-5">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setExportModalOpen(true)}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              <Button size="sm" onClick={handleAddLocationClick}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Location
-              </Button>
+              {/* Reduce vertical padding to py-6 (24px) for a more compact gap above filters */}
+              <div className="py-6">
+                <CardTitle
+                  style={{
+                    fontSize: "2rem",
+                    textAlign: "left",
+                    marginBottom: 0,
+                  }}
+                >
+                  Locations
+                </CardTitle>
+                <p className="text-muted-foreground" style={{ marginTop: 4 }}>
+                  Manage your organization&apos;s locations and their details
+                </p>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -162,22 +158,59 @@ export default function LocationsPage() {
               }
             }}
           />
-          <LocationFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-          />
-          {/* Match /assets: mt-4 below filters */}
-          <div className="mt-4">
-            <Suspense fallback={<LocationsLoadingSkeleton />}>
-              <LocationTable
-                key={`${refreshTrigger}-${page}-${filters.location}-${filters.isActive}`}
-                filters={filters}
-                page={page}
-                onPageChange={handlePageChange}
-                onRefresh={handleRefresh}
-              />
-            </Suspense>
+          {/* Filters and action buttons in a single row */}
+          {/* Add px-8 (32px) left/right padding to match card */}
+          <div
+            style={{
+              maxWidth: 900,
+              width: "100%",
+              marginLeft: 0,
+              paddingLeft: 32,
+              paddingRight: 32,
+            }}
+          >
+            {/* Reduce gap and remove extra bottom padding for a tighter filter row */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
+              {/* Filters left */}
+              <div className="flex flex-wrap items-center gap-4">
+                <LocationFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onClearFilters={handleClearFilters}
+                />
+              </div>
+              {/* Buttons right */}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExportModalOpen(true)}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+                <Button size="sm" onClick={handleAddLocationClick}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Location
+                </Button>
+              </div>
+            </div>
+            {/* Table below filters/buttons row */}
+            <div>
+              <Suspense fallback={<LocationsLoadingSkeleton />}>
+                <LocationTable
+                  key={`${refreshTrigger}-${page}-${filters.location}-${filters.isActive}`}
+                  filters={filters}
+                  page={page}
+                  onPageChange={handlePageChange}
+                  onRefresh={handleRefresh}
+                />
+              </Suspense>
+            </div>
+            {/* Pagination controls: left-aligned with table, below table */}
+            <div className="flex items-center justify-start p-4 mt-3 gap-4">
+              {/* Pagination is rendered by LocationTable, so this is a placeholder for future extraction if needed */}
+            </div>
           </div>
           <ExportModal
             open={exportModalOpen}

@@ -91,7 +91,7 @@ export default function UsersClientPage({
   };
 
   return (
-    <div className="flex-1 flex flex-col pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8">
+    <div className="flex-1 flex flex-col pt-6 pb-2 md:pb-4 px-4 md:px-8">
       <Card
         style={{
           maxWidth: 1200,
@@ -102,7 +102,8 @@ export default function UsersClientPage({
         }}
       >
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
+          {/* Add py-8 (32px) vertical padding between the top of the page and the Users title */}
+          <div className="py-8 flex items-center justify-between">
             <div>
               <CardTitle
                 style={{
