@@ -1,0 +1,50 @@
+---
+alwaysApply: false
+---
+# Project Rule: NEVER USE `any` Type in Typescript files
+
+
+## Rule Statement
+
+- **NEVER use the `any` type in TypeScript code.**
+- If you must use a fallback, use `unknown` instead of `any`.
+- Always prefer a specific type, interface, or union that accurately describes the data.
+- At all interfaces, APIs, and boundaries, you **must** know and document the shape of the data being received or returned.
+- If you use `unknown`, you must use type guards or validation before accessing properties.
+
+## Rationale
+
+- Using `any` defeats the purpose of TypeScript's type safety and can hide bugs.
+- `unknown` is safer, but explicit types/interfaces are best for maintainability and clarity.
+- This rule enforces robust, predictable, and self-documenting code.
+
+## Example
+
+```ts
+// Good
+interface User {
+  id: string;
+  name: string;
+}
+function handleUser(user: User) {
+  /* ... */
+}
+
+// Acceptable (with type guard)
+function processData(data: unknown) {
+  if (typeof data === "object" && data !== null && "id" in data) {
+    // Safe to use data.id
+  }
+}
+
+// Bad
+function handleAnything(data: any) {
+  /* ... */
+}
+```
+
+## Enforcement
+
+- Code reviews and linting should reject any usage of `any`.
+- Prefer to model all data shapes explicitly.
+- If you are unsure of a type, investigate and define it before proceeding.

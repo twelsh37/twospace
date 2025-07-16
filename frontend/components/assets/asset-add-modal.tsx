@@ -11,6 +11,7 @@ import {
 import { AssetForm } from "@/components/assets/asset-form";
 import { useState, useEffect } from "react";
 import { Asset } from "@/lib/types";
+import { useAuth } from "@/lib/auth-context";
 
 interface AssetAddModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ export function AssetAddModal({
 }: AssetAddModalProps) {
   // Track error state for user feedback
   const [error, setError] = useState<string | null>(null);
+  const { session } = useAuth(); // Get session from auth context
 
   // Reset error when modal opens
   useEffect(() => {
@@ -37,19 +39,41 @@ export function AssetAddModal({
   const handleSubmit = async (asset: Partial<Asset>) => {
     setError(null);
     try {
+      // Attach Authorization header if access token is available
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
       // POST to API (same as /assets/new page would do)
       const res = await fetch("/api/assets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(asset),
       });
-      if (!res.ok) throw new Error("Failed to add asset");
+      if (!res.ok) {
+        // Try to extract error message from backend
+        let errorMsg = "Failed to add asset. Please try again.";
+        try {
+          const errorJson = await res.json();
+          if (errorJson && (errorJson.error || errorJson.details)) {
+            errorMsg = errorJson.error || errorJson.details;
+          }
+        } catch {}
+        setError(errorMsg);
+        return;
+      }
       // Optionally call parent callback to refresh asset list
       if (onAdded) onAdded();
       // Close modal
       onOpenChange(false);
-    } catch {
-      setError("Failed to add asset. Please try again.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to add asset. Please try again."
+      );
     }
   };
 
