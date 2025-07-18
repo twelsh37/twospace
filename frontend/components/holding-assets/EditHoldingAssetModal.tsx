@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
 
 // Helper to parse asset type from asset number prefix (returns enum value)
 function getAssetTypeEnumFromNumber(assetNumber: string): string | null {
@@ -69,6 +70,8 @@ export default function EditHoldingAssetModal({
     setLoading(true);
     setError("");
     try {
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/holding-assets/assign", {
         method: "POST",
         body: JSON.stringify({
@@ -77,7 +80,10 @@ export default function EditHoldingAssetModal({
           userId: user?.id, // Use the real user UUID
           type: assetTypeEnum, // Send the enum value
         }),
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
       if (res.ok) {
         setLoading(false);

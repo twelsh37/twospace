@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 // Define the importable data types
 const DATA_TYPES = [
@@ -106,10 +107,17 @@ const ImportModal: React.FC<ImportModalProps> = ({
       formData.append("file", file);
       formData.append("type", dataType);
       formData.append("format", fileFormat);
+      // Get the current session for authentication
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       // Send POST request to backend import API
       const res = await fetch("/api/import", {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
       if (res.ok) {
         setToast({ message: "Import successful!", type: "success" });

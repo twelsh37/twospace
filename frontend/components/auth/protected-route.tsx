@@ -3,16 +3,9 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { getUserById } from "@/lib/supabase-db";
-
-// Define a minimal AppUser type for role-based checks
-interface AppUser {
-  role: string;
-  // Add other fields as needed
-}
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,49 +18,25 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, loading, session } = useAuth();
   const router = useRouter();
-  // State to hold the user's app record (including role)
-  const [appUser, setAppUser] = useState<AppUser | null>(null);
-  const [roleLoading, setRoleLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // If user is authenticated, fetch their app user record from the users table
-    if (user && requireAdmin) {
-      setRoleLoading(true);
-      setError(null);
-      // Get user by ID (no access token needed for this function)
-      getUserById(user.id)
-        .then((result) => {
-          setAppUser(result.data);
-        })
-        .catch((err) => {
-          setAppUser(null);
-          setError(
-            `Failed to load user record: ${err?.message || String(err)}`
-          );
-          // Log the error for debugging
-          console.error("ProtectedRoute getUserById error:", err);
-        })
-        .finally(() => setRoleLoading(false));
-    }
-  }, [user, requireAdmin, session]);
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         // Redirect to login if not authenticated
         router.push("/auth/login");
-      } else if (requireAdmin && !roleLoading && appUser) {
-        if (appUser.role?.toLowerCase() !== "admin") {
-          // Redirect non-admins to dashboard or another page
+      } else if (requireAdmin) {
+        // Check role from user metadata (same as backend)
+        const role = user.user_metadata?.role;
+        if (role !== "ADMIN") {
+          // Redirect non-admins to dashboard
           router.push("/dashboard");
         }
       }
     }
-  }, [user, loading, router, requireAdmin, appUser, roleLoading]);
+  }, [user, loading, router, requireAdmin, session]);
 
-  // Show loading state while checking authentication or role
-  if (loading || (requireAdmin && (roleLoading || !appUser) && !error)) {
+  // Show loading state while checking authentication
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -78,26 +47,12 @@ export function ProtectedRoute({
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p className="font-bold">Error loading user record</p>
-          <pre className="text-xs whitespace-pre-wrap break-all">{error}</pre>
-        </div>
-      </div>
-    );
-  }
-
   // Don't render children if not authenticated or not admin (handled by redirect)
-  if (
-    !user ||
-    (requireAdmin && (!appUser || appUser.role?.toLowerCase() !== "admin"))
-  ) {
+  if (!user || (requireAdmin && user.user_metadata?.role !== "ADMIN")) {
     return null;
   }
 
   return <>{children}</>;
 }
 
-// Reasoning: This update fetches the user's app record from the users table using their Supabase auth user ID. If requireAdmin is true, it checks the user's role and only allows access for admins. Non-admins are redirected. This ensures secure, auditable admin-only access using the roles stored in the database.
+// Reasoning: This update simplifies the ProtectedRoute component by checking the admin role from user metadata instead of making a database call. This matches how the backend API routes check for admin roles and eliminates the potential for authentication issues that were causing the infinite loading spinner.

@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { supabase } from "@/lib/supabase";
 
 // Main Imports Page component
 const ImportsPage: React.FC = () => {
@@ -36,7 +37,15 @@ const ImportsPage: React.FC = () => {
   // Fetch count of unassigned assets
   const fetchUnassignedAssets = async () => {
     try {
-      const res = await fetch("/api/holding-assets");
+      // Get the current session for authentication
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const res = await fetch("/api/holding-assets", {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
       const data = await res.json();
       setHasUnassignedAssets(
         Array.isArray(data?.data?.assets) && data.data.assets.length > 0
@@ -56,7 +65,15 @@ const ImportsPage: React.FC = () => {
     await fetchUnassignedAssets();
     // Fetch the latest imported assets with status 'holding' from the backend
     try {
-      const res = await fetch("/api/assets?status=holding&limit=20");
+      // Get the current session for authentication
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const res = await fetch("/api/assets?status=holding&limit=20", {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
       if (res.ok) {
         const data = await res.json();
         setImportedData(data.data.assets || []);

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import EditHoldingAssetModal from "./EditHoldingAssetModal";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 interface HoldingAsset {
   id: string;
@@ -25,7 +26,13 @@ const HoldingAssetsTable: React.FC = () => {
   const fetchAssets = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/holding-assets");
+      // Get the current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/holding-assets", {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
       if (res.ok) {
         const data = await res.json();
         setAssets(data.data.assets || []);
