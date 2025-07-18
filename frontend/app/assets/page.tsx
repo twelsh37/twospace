@@ -19,7 +19,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 import { AssetAddModal } from "@/components/assets/asset-add-modal";
 import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
-import { createClientComponentClient } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 
 export default function AssetsPage() {

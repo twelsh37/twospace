@@ -7,12 +7,12 @@ import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ assetNumber: string }> }
+  context: { params: { assetNumber: string } }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/assets/[assetNumber]/history called");
   try {
-    const { assetNumber } = await context.params;
+    const { assetNumber } = context.params;
     appLogger.info("Fetching asset history by assetNumber", { assetNumber });
     if (!assetNumber) {
       appLogger.warn(

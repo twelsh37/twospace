@@ -77,6 +77,7 @@ export const ASSET_STATE_LABELS: Record<AssetState, string> = {
   [AssetState.BUILDING]: "Building",
   [AssetState.READY_TO_GO]: "Ready To Go Stock",
   [AssetState.ISSUED]: "Issued",
+  [AssetState.HOLDING]: "Holding (Imported)", // Added for imported/holding assets
 };
 
 // Asset type display names

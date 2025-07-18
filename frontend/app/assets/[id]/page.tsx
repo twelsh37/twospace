@@ -4,7 +4,7 @@
 //
 // NOTE: Next.js 15 dynamic route pages must use params as a Promise and unwrap with use().
 
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AssetDetail } from "@/components/assets/asset-detail";
 import { AssetStateTransition } from "@/components/assets/asset-state-transition";
 import { AssetHistory } from "@/components/assets/asset-history";
@@ -16,12 +16,13 @@ import { useRouter } from "next/navigation";
 import { Asset } from "@/lib/types";
 import { useAuth } from "@/lib/auth-context";
 
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
+export default function Page({ params }: { params: { id: string } }) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [asset, setAsset] = useState<Asset | null>(null);
   const router = useRouter();
-  const { id } = use(params);
+  // Use id directly from params (no use() needed)
+  const { id } = params;
   const { session } = useAuth();
   const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
   const isUser = userRole === "USER";

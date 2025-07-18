@@ -56,6 +56,9 @@ All notable changes to this project will be documented in this file.
   - Removed all references to Winston, file-based logs, and log file locations from the codebase and documentation.
   - **Reason:** Vercel and similar platforms do not support persistent file storage. Console logging is the recommended and supported approach for reliability and operational visibility.
 
+## [Unreleased]
+- Changed: Sidebar and protected route admin checks now use Supabase Auth role (`user.user_metadata.role`) instead of the app `users` table. This avoids issues with RLS and ensures consistent admin access. Update user roles in Supabase Auth to control admin privileges.
+
 ## [0.0.3] - 2025-06-11
 
 ### Added

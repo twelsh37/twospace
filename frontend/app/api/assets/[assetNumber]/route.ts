@@ -13,7 +13,6 @@ import { eq, desc, isNull, and } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { archivedAssetsTable } from "@/lib/db/schema";
-import { assetCache } from "../route";
 import { systemLogger, appLogger } from "@/lib/logger";
 
 /**
@@ -22,12 +21,13 @@ import { systemLogger, appLogger } from "@/lib/logger";
  */
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ assetNumber: string }> }
+  context: { params: { assetNumber: string } }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/assets/[assetNumber] called");
   try {
-    const { assetNumber } = await context.params;
+    // Access assetNumber directly from context.params (no await needed)
+    const { assetNumber } = context.params;
     appLogger.info("Fetching asset by assetNumber", { assetNumber });
 
     if (!assetNumber) {
@@ -120,12 +120,13 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ assetNumber: string }> }
+  context: { params: { assetNumber: string } }
 ) {
   // Log the start of the PATCH request
   appLogger.info("PATCH /api/assets/[assetNumber] called");
   try {
-    const { assetNumber } = await context.params;
+    // Access assetNumber directly from context.params (no await needed)
+    const { assetNumber } = context.params;
     appLogger.info("Updating asset by assetNumber", { assetNumber });
     if (!assetNumber) {
       appLogger.warn(
@@ -194,13 +195,13 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ assetNumber: string }> }
+  context: { params: { assetNumber: string } }
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/assets/[assetNumber] called");
   try {
-    // Parse assetNumber from route params
-    const { assetNumber } = await context.params;
+    // Access assetNumber directly from context.params (no await needed)
+    const { assetNumber } = context.params;
     appLogger.info("Deleting asset by assetNumber", { assetNumber });
     if (!assetNumber) {
       appLogger.warn(
@@ -211,97 +212,20 @@ export async function DELETE(
         { status: 400 }
       );
     }
-
-    // Parse archiveReason, comment, and userId from request body
-    let archiveReason = "Deleted via API";
-    let userId = null;
-    let comment = "";
-    try {
-      const body = await request.json();
-      archiveReason = body.archiveReason || archiveReason;
-      userId = body.userId;
-      comment = body.comment || "";
-    } catch {
-      // If no body or invalid JSON, use defaults
-      return NextResponse.json(
-        {
-          error:
-            "Request body with 'archiveReason', 'comment', and 'userId' is required",
-        },
-        { status: 400 }
-      );
-    }
-    if (!userId) {
-      appLogger.warn(
-        "'userId' is required in DELETE /api/assets/[assetNumber]",
-        { assetNumber }
-      );
-      return NextResponse.json(
-        { error: "'userId' is required in request body" },
-        { status: 400 }
-      );
-    }
-
-    // Fetch the asset to delete
-    const assetResult = await db
-      .select()
-      .from(assetsTable)
-      .where(eq(assetsTable.assetNumber, assetNumber));
-    if (assetResult.length === 0) {
+    // Soft delete: set deletedAt timestamp
+    const deleted = await db
+      .update(assetsTable)
+      .set({ deletedAt: new Date() })
+      .where(eq(assetsTable.assetNumber, assetNumber))
+      .returning();
+    if (!deleted.length) {
+      appLogger.warn("Asset not found in DELETE /api/assets/[assetNumber]", {
+        assetNumber,
+      });
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
     }
-    const asset = assetResult[0];
-
-    // Soft delete: set deletedAt
-    const now = new Date();
-    await db
-      .update(assetsTable)
-      .set({ deletedAt: now })
-      .where(eq(assetsTable.assetNumber, assetNumber));
-
-    // Archive: copy to archived_assets with valid state (use previous state or 'holding')
-    await db.insert(archivedAssetsTable).values({
-      id: asset.id,
-      assetNumber: asset.assetNumber,
-      type: asset.type,
-      state: asset.state, // Keep the last known state for audit
-      serialNumber: asset.serialNumber,
-      description: asset.description,
-      purchasePrice: asset.purchasePrice,
-      locationId: asset.locationId,
-      assignmentType: asset.assignmentType,
-      assignedTo: asset.assignedTo,
-      employeeId: asset.employeeId,
-      department: asset.department,
-      createdAt: asset.createdAt,
-      updatedAt: asset.updatedAt,
-      deletedAt: now,
-      status: asset.status,
-      archivedAt: now,
-      archivedBy: userId,
-      archiveReason: comment ? `${archiveReason}: ${comment}` : archiveReason,
-    });
-
-    // Add to asset_history for audit trail (use previous state and keep newState as previous state for traceability)
-    await db.insert(assetHistoryTable).values({
-      assetId: asset.id,
-      previousState: asset.state,
-      newState: asset.state, // Not a real state change, just for audit
-      changedBy: userId,
-      changeReason: archiveReason,
-      timestamp: now,
-      details: comment ? { comment } : undefined,
-    });
-
-    // Invalidate asset list cache so deleted asset disappears from /assets page
-    assetCache.clear();
-
-    // After successful deletion (archive), log the event
-    appLogger.info("Asset deleted (archived) successfully", {
-      assetNumber,
-      userId,
-    });
-    return new NextResponse(null, { status: 204 });
+    appLogger.info("Asset deleted successfully", { assetNumber });
+    return NextResponse.json({ data: deleted[0] });
   } catch (error) {
     systemLogger.error(
       `Error deleting asset: ${
