@@ -11,24 +11,47 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // Helper: Extract Supabase session from request (Authorization header or cookies)
 export async function getSupabaseUserFromRequest(req: NextRequest) {
+  console.log("=== AUTH DEBUG ===");
+  console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+
   // Try to get the access token from the Authorization header (Bearer)
   const authHeader = req.headers.get("authorization");
+  console.log("Authorization header:", authHeader);
+
   let accessToken = null;
   if (authHeader && authHeader.startsWith("Bearer ")) {
     accessToken = authHeader.replace("Bearer ", "");
+    console.log("Extracted access token from header");
   } else {
     // Fallback: Try to get from cookies (if using cookie-based auth)
     const cookie = req.cookies.get("sb-access-token")?.value;
+    console.log("Cookie value:", cookie);
     if (cookie) accessToken = cookie;
   }
-  if (!accessToken) return null;
+
+  console.log("Final access token:", accessToken ? "Present" : "Missing");
+  if (!accessToken) {
+    console.log("No access token found");
+    return null;
+  }
+
   // Create a Supabase client with the access token
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     global: { headers: { Authorization: `Bearer ${accessToken}` } },
   });
+
   // Get the user session
+  console.log("Calling supabase.auth.getUser");
   const { data, error } = await supabase.auth.getUser(accessToken);
-  if (error || !data?.user) return null;
+  console.log("Supabase response - error:", error);
+  console.log("Supabase response - user:", data?.user ? "Present" : "Missing");
+
+  if (error || !data?.user) {
+    console.log("Authentication failed");
+    return null;
+  }
+
+  console.log("Authentication successful for user:", data.user.email);
   return data.user;
 }
 

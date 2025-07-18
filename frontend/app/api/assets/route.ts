@@ -20,6 +20,7 @@ import type { NewAsset } from "@/lib/db/schema";
 import { settingsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
 import { requireAdmin } from "@/lib/supabase-auth-helpers";
+import { usersTable } from "@/lib/db/schema";
 
 // Define standard CORS headers for reusability
 const corsHeaders = {
@@ -45,6 +46,32 @@ async function getCacheDurationFromSettings(): Promise<number> {
     // Fallback to default if error
   }
   return 30 * 60 * 1000; // 30 minutes default
+}
+
+// Helper to get database user ID from Supabase Auth user
+async function getDatabaseUserId(supabaseUser: {
+  email?: string;
+}): Promise<string> {
+  console.log("getDatabaseUserId called with email:", supabaseUser.email);
+  if (!supabaseUser.email) {
+    console.log("No email provided");
+    throw new Error("User email not found");
+  }
+
+  console.log("Looking up user in database by email:", supabaseUser.email);
+  const dbUser = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.email, supabaseUser.email))
+    .limit(1);
+
+  console.log("Database query result:", dbUser);
+  if (dbUser.length === 0) {
+    console.log("No user found in database");
+    throw new Error("User not found in database");
+  }
+  console.log("User found in database with ID:", dbUser[0].id);
+  return dbUser[0].id;
 }
 
 /**
@@ -368,11 +395,14 @@ export async function POST(request: NextRequest) {
       .values(newAssetData)
       .returning();
 
-    // Use the authenticated user's ID for asset history
+    // Get the database user ID for asset history
+    const dbUserId = await getDatabaseUserId(user);
+
+    // Use the database user's ID for asset history
     await createAssetHistory(
       newAsset.id,
       "AVAILABLE",
-      user.id, // Use the authenticated user's ID
+      dbUserId, // Use the database user ID, not the Supabase Auth user ID
       "Asset created",
       undefined,
       { createdFrom: "api" }
@@ -475,7 +505,9 @@ export async function PUT(request: NextRequest) {
     // Process the operation
     switch (operation) {
       case "stateTransition":
+        console.log("=== STATE TRANSITION START ===");
         if (!newState) {
+          console.log("Missing newState");
           return NextResponse.json(
             {
               success: false,
@@ -485,21 +517,59 @@ export async function PUT(request: NextRequest) {
             { status: 400, headers: corsHeaders }
           );
         }
+
+        console.log("Getting database user ID for user:", user.email);
+        // Get the database user ID for the audit trail
+        let dbUserId: string;
+        try {
+          dbUserId = await getDatabaseUserId(user);
+          console.log("Database user ID found:", dbUserId);
+        } catch (error) {
+          console.error("Error finding user in database:", error);
+          return NextResponse.json(
+            {
+              success: false,
+              error: "User not found in database",
+              details:
+                "User must exist in the users table to perform state transitions",
+            },
+            { status: 400, headers: corsHeaders }
+          );
+        }
+
+        console.log(
+          "Creating asset history for",
+          assetsToUpdate.length,
+          "assets"
+        );
         for (const asset of assetsToUpdate) {
+          console.log(
+            "Creating history for asset:",
+            asset.assetNumber,
+            "new state:",
+            newState
+          );
           await createAssetHistory(
             asset.id,
             newState,
-            userId, // Use the provided userId for audit
+            dbUserId, // Use the database user ID, not the Supabase Auth user ID
             "Bulk state transition",
             asset.state as "AVAILABLE" | "ISSUED"
           );
+          console.log("History created for asset:", asset.assetNumber);
         }
+
+        console.log("Updating asset states in database");
         await db
           .update(assetsTable)
           .set({ state: newState, updatedAt: new Date() })
           .where(inArray(assetsTable.assetNumber, assetIds));
+        console.log("Asset states updated");
+
         // Clear in-memory asset cache to ensure fresh data
         assetCache.clear();
+        console.log("Cache cleared");
+        console.log("=== STATE TRANSITION COMPLETE ===");
         break;
 
       case "bulkUpdate":

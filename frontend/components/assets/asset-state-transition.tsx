@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import React from "react";
 import { mutate } from "swr";
-import { supabase } from "@/lib/supabase";
+
 
 interface AssetStateTransitionProps {
   asset: Asset;
@@ -48,7 +48,7 @@ export function AssetStateTransition({
   asset,
   setAsset,
 }: AssetStateTransitionProps) {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showModal, setShowModal] = useState<null | AssetState>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,24 +90,36 @@ export function AssetStateTransition({
 
   // Handles the state transition after confirmation
   const handleStateTransition = async (nextState: AssetState) => {
+    console.log("=== FRONTEND STATE TRANSITION START ===");
+    console.log("Transitioning to state:", nextState);
+    console.log("Asset:", asset.assetNumber);
+    console.log("User:", user?.id, user?.email);
+
     setIsTransitioning(true);
     setError(null);
     try {
       if (!user) {
+        console.log("No user found");
         setError("You must be signed in to perform this action.");
         setIsTransitioning(false);
         return;
       }
 
-      // Get the current session for authentication
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      // Use the session from auth context (like other components do)
       if (!session?.access_token) {
+        console.log("No access token in session");
         setError("Authentication token not found. Please sign in again.");
         setIsTransitioning(false);
         return;
       }
+
+      console.log("Making API request to /api/assets");
+      const requestBody = {
+        assetIds: [asset.assetNumber],
+        operation: "stateTransition",
+        payload: { newState: nextState, userId: user.id },
+      };
+      console.log("Request body:", requestBody);
 
       // Use asset.assetNumber and user.id for backend API
       const res = await fetch("/api/assets", {
@@ -116,29 +128,40 @@ export function AssetStateTransition({
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          assetIds: [asset.assetNumber],
-          operation: "stateTransition",
-          payload: { newState: nextState, userId: user.id },
-        }),
+        body: JSON.stringify(requestBody),
       });
+
+      console.log("Response status:", res.status);
       const json = await res.json();
-      if (!json.success) throw new Error(json.error || "Transition failed");
+      console.log("Response body:", json);
+
+      if (!json.success) {
+        console.log("API call failed:", json.error);
+        throw new Error(json.error || "Transition failed");
+      }
+
+      console.log("API call successful");
       setCurrentState(nextState); // Update local state
       setShowModal(null);
+
+      console.log("Fetching updated asset");
       // Fetch updated asset and update parent state
       const updatedRes = await fetch(`/api/assets/${asset.assetNumber}`);
       if (updatedRes.ok) {
         const updatedJson = await updatedRes.json();
         setAsset(updatedJson.data);
+        console.log("Asset updated in UI");
       }
+
       // Invalidate SWR cache for all /api/assets keys to sync all asset lists
       mutate(
         (key) => typeof key === "string" && key.startsWith("/api/assets"),
         undefined,
         { revalidate: true }
       );
+      console.log("=== FRONTEND STATE TRANSITION COMPLETE ===");
     } catch (err: unknown) {
+      console.error("Error in state transition:", err);
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsTransitioning(false);

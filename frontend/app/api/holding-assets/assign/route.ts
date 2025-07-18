@@ -5,23 +5,64 @@ import {
   holdingAssetsTable,
   assetsTable,
   assetHistoryTable,
+  usersTable,
 } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
+
+// Helper to get database user ID from Supabase Auth user
+async function getDatabaseUserId(supabaseUser: {
+  email?: string;
+}): Promise<string> {
+  if (!supabaseUser.email) {
+    throw new Error("User email not found");
+  }
+
+  const dbUser = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.email, supabaseUser.email))
+    .limit(1);
+
+  if (dbUser.length === 0) {
+    throw new Error("User not found in database");
+  }
+  return dbUser[0].id;
+}
 
 // Remove unused: IT_STORE_ROOM_ID, getAssetTypeFromNumber, toIsoStringSafe
 
 export async function POST(req: NextRequest) {
+  // Require ADMIN for assigning holding assets
+  const user = await requireAdmin(req);
+  if (user instanceof NextResponse) return user; // Not authorized
+
   // Log the start of the POST request
   appLogger.info("POST /api/holding-assets/assign called");
   try {
-    const { holdingAssetId, assetNumber, userId, type } = await req.json();
+    const { holdingAssetId, assetNumber, type } = await req.json();
     appLogger.info("Assigning holding asset", {
       holdingAssetId,
       assetNumber,
-      userId,
       type,
     });
+
+    // Get the database user ID for the audit trail
+    let dbUserId: string;
+    try {
+      dbUserId = await getDatabaseUserId(user);
+    } catch (error) {
+      console.error("Error finding user in database:", error);
+      return NextResponse.json(
+        {
+          error: "User not found in database",
+          details: "User must exist in the users table to perform this action",
+        },
+        { status: 400 }
+      );
+    }
+
     // Validate type
     const validTypes = [
       "MOBILE_PHONE",
@@ -108,7 +149,7 @@ export async function POST(req: NextRequest) {
         previousState: null,
         newState:
           "AVAILABLE" as (typeof assetHistoryTable.$inferInsert)["newState"],
-        changedBy: userId,
+        changedBy: dbUserId, // Use the database user ID, not the Supabase Auth user ID
         changeReason: "Asset assigned number and moved from holding_assets",
         timestamp: new Date(), // Pass Date object, not string
         details: JSON.stringify({

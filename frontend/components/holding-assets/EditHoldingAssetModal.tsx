@@ -1,7 +1,6 @@
 // frontend/components/holding-assets/EditHoldingAssetModal.tsx
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 
 // Helper to parse asset type from asset number prefix (returns enum value)
@@ -48,7 +47,6 @@ export default function EditHoldingAssetModal({
   const [loading, setLoading] = useState(false);
   // State for error message
   const [error, setError] = useState("");
-  const { user } = useAuth();
 
   // Parse asset type from asset number (enum value)
   const assetTypeEnum = getAssetTypeEnumFromNumber(assetNumber);
@@ -71,13 +69,14 @@ export default function EditHoldingAssetModal({
     setError("");
     try {
       // Get the current session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const res = await fetch("/api/holding-assets/assign", {
         method: "POST",
         body: JSON.stringify({
           holdingAssetId: asset.id,
           assetNumber,
-          userId: user?.id, // Use the real user UUID
           type: assetTypeEnum, // Send the enum value
         }),
         headers: {
