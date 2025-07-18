@@ -35,9 +35,8 @@ export function ProtectedRoute({
     if (user && requireAdmin) {
       setRoleLoading(true);
       setError(null);
-      // Pass the access token if available
-      const accessToken = session?.access_token;
-      getUserById(user.id, accessToken)
+      // Get user by ID (no access token needed for this function)
+      getUserById(user.id)
         .then((result) => {
           setAppUser(result.data);
         })

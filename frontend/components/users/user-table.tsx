@@ -36,7 +36,7 @@ interface User {
   name: string;
   email: string;
   role: string;
-  department: string;
+  department: string | null;
   isActive: boolean;
   employeeId: string;
 }

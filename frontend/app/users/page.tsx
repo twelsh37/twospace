@@ -8,11 +8,12 @@ import UsersClientPage from "@/components/users/users-client-page";
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: Record<string, undefined | string | string[]>;
+  searchParams: Promise<Record<string, undefined | string | string[]>>;
 }) {
-  // Treat searchParams as a plain object (Next.js 15+)
+  // Await searchParams as required by Next.js 15
+  const resolvedSearchParams = await searchParams;
   const getParam = (key: string, fallback: string) => {
-    const value = searchParams[key];
+    const value = resolvedSearchParams[key];
     if (Array.isArray(value)) return value[0] ?? fallback;
     return value ?? fallback;
   };

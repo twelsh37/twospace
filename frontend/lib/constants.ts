@@ -25,6 +25,7 @@ export const VALID_STATE_TRANSITIONS: Record<
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
     [AssetState.READY_TO_GO]: [AssetState.ISSUED],
     [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
+    [AssetState.HOLDING]: [AssetState.AVAILABLE], // Holding assets can move to Available
   },
   [AssetType.TABLET]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
@@ -32,6 +33,7 @@ export const VALID_STATE_TRANSITIONS: Record<
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
     [AssetState.READY_TO_GO]: [AssetState.ISSUED],
     [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
+    [AssetState.HOLDING]: [AssetState.AVAILABLE], // Holding assets can move to Available
   },
   [AssetType.DESKTOP]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
@@ -39,6 +41,7 @@ export const VALID_STATE_TRANSITIONS: Record<
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
     [AssetState.READY_TO_GO]: [AssetState.ISSUED],
     [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
+    [AssetState.HOLDING]: [AssetState.AVAILABLE], // Holding assets can move to Available
   },
   [AssetType.LAPTOP]: {
     [AssetState.AVAILABLE]: [AssetState.SIGNED_OUT],
@@ -46,6 +49,7 @@ export const VALID_STATE_TRANSITIONS: Record<
     [AssetState.BUILDING]: [AssetState.READY_TO_GO, AssetState.SIGNED_OUT],
     [AssetState.READY_TO_GO]: [AssetState.ISSUED],
     [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available, must rebuild
+    [AssetState.HOLDING]: [AssetState.AVAILABLE], // Holding assets can move to Available
   },
   // Monitors: Available → Signed Out → RTGS → Issued → Available (no BUILDING state)
   [AssetType.MONITOR]: {
@@ -54,6 +58,7 @@ export const VALID_STATE_TRANSITIONS: Record<
     [AssetState.READY_TO_GO]: [AssetState.ISSUED],
     [AssetState.ISSUED]: [AssetState.AVAILABLE], // Can only return to Available
     [AssetState.BUILDING]: [], // Monitors don't use BUILDING state
+    [AssetState.HOLDING]: [AssetState.AVAILABLE], // Holding assets can move to Available
   },
 };
 

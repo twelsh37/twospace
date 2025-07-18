@@ -1,17 +1,17 @@
 // frontend/app/api/locations/[id]/assignments/route.ts
 // API route to fetch users and assets assigned to a location
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { usersTable, assetsTable } from "@/lib/db/schema";
 import { eq, count } from "drizzle-orm";
 
 export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  // Await context.params as required by Next.js dynamic API routes
-  const { id: locationId } = await context.params;
+  // Await params as required by Next.js 15 dynamic API routes
+  const { id: locationId } = await params;
   if (!locationId) {
     return NextResponse.json({ error: "Missing locationId" }, { status: 400 });
   }

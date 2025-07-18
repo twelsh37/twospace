@@ -1,7 +1,7 @@
 // frontend/app/api/users/by-employee-id/[employeeId]/route.ts
 // API route to fetch a single user by employee ID
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import {
   usersTable,
@@ -13,14 +13,14 @@ import { eq } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { employeeId: string } }
+  request: Request,
+  { params }: { params: Promise<{ employeeId: string }> }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/users/by-employee-id/[employeeId] called");
   try {
-    // Access employeeId directly from context.params (no await needed)
-    const { employeeId } = context.params;
+    // Access employeeId from params (await needed in Next.js 15)
+    const { employeeId } = await params;
     appLogger.info("Fetching user by employee ID", { employeeId });
     if (!employeeId) {
       appLogger.warn(

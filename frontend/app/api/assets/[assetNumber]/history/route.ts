@@ -1,18 +1,18 @@
 // frontend/app/api/assets/[assetNumber]/history/route.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { assetHistoryTable, assetsTable, usersTable } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { assetNumber: string } }
+  request: Request,
+  { params }: { params: Promise<{ assetNumber: string }> }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/assets/[assetNumber]/history called");
   try {
-    const { assetNumber } = context.params;
+    const { assetNumber } = await params;
     appLogger.info("Fetching asset history by assetNumber", { assetNumber });
     if (!assetNumber) {
       appLogger.warn(

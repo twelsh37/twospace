@@ -11,7 +11,7 @@ import {
 } from "@/lib/db/schema";
 import { eq, desc, isNull, and } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
-import { NextRequest } from "next/server";
+
 import { archivedAssetsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
 
@@ -20,14 +20,14 @@ import { systemLogger, appLogger } from "@/lib/logger";
  * Fetches detailed information for a single asset.
  */
 export async function GET(
-  request: NextRequest,
-  context: { params: { assetNumber: string } }
+  request: Request,
+  { params }: { params: Promise<{ assetNumber: string }> }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/assets/[assetNumber] called");
   try {
-    // Access assetNumber directly from context.params (no await needed)
-    const { assetNumber } = context.params;
+    // Access assetNumber from params (await needed in Next.js 15)
+    const { assetNumber } = await params;
     appLogger.info("Fetching asset by assetNumber", { assetNumber });
 
     if (!assetNumber) {
@@ -119,14 +119,14 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: NextRequest,
-  context: { params: { assetNumber: string } }
+  request: Request,
+  { params }: { params: Promise<{ assetNumber: string }> }
 ) {
   // Log the start of the PATCH request
   appLogger.info("PATCH /api/assets/[assetNumber] called");
   try {
-    // Access assetNumber directly from context.params (no await needed)
-    const { assetNumber } = context.params;
+    // Access assetNumber from params (await needed in Next.js 15)
+    const { assetNumber } = await params;
     appLogger.info("Updating asset by assetNumber", { assetNumber });
     if (!assetNumber) {
       appLogger.warn(
@@ -194,14 +194,14 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  context: { params: { assetNumber: string } }
+  request: Request,
+  { params }: { params: Promise<{ assetNumber: string }> }
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/assets/[assetNumber] called");
   try {
-    // Access assetNumber directly from context.params (no await needed)
-    const { assetNumber } = context.params;
+    // Access assetNumber from params (await needed in Next.js 15)
+    const { assetNumber } = await params;
     appLogger.info("Deleting asset by assetNumber", { assetNumber });
     if (!assetNumber) {
       appLogger.warn(

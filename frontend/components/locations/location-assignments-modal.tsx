@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User } from "@/types/user";
-import { Asset } from "@/types/asset";
+import { User } from "@/lib/types";
+import { Asset } from "@/lib/types";
 import { useAuth } from "@/lib/auth-context";
 
 interface LocationAssignmentsModalProps {
@@ -154,7 +154,7 @@ export function LocationAssignmentsModal({
                 ) : (
                   <ul className="mb-2">
                     {assets.map((asset) => (
-                      <li key={asset.id}>
+                      <li key={asset.assetNumber}>
                         {asset.type}: {asset.description}
                       </li>
                     ))}

@@ -57,7 +57,7 @@ export default function UsersClientPage({
     key: keyof UserFilterState,
     value: DepartmentOption | { value: string; label: string } | string | null
   ) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || "");
     let newValue = value;
     if (typeof value === "object" && value !== null) {
       if ("id" in value) newValue = value.id;
@@ -75,7 +75,7 @@ export default function UsersClientPage({
 
   // Handle clearing all filters
   const handleClearFilters = () => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.delete("department");
     params.delete("role");
     params.set("page", "1");
@@ -85,7 +85,7 @@ export default function UsersClientPage({
 
   // Handle pagination
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() || "");
     params.set("page", String(page));
     router.push(`${pathname}?${params.toString()}`);
   };

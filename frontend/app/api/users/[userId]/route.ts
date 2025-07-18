@@ -1,21 +1,21 @@
 // backend/app/api/users/[userId]/route.ts
 // API route to fetch a single user by ID
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { usersTable, departmentsTable, locationsTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { userId: string } }
+  request: Request,
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/users/[userId] called");
   try {
-    // Access userId directly from context.params (no await needed)
-    const { userId } = context.params;
+    // Access userId from params (await needed in Next.js 15)
+    const { userId } = await params;
     appLogger.info("Fetching user by ID", { userId });
     if (!userId) {
       appLogger.warn("User ID is required in GET /api/users/[userId]");
@@ -67,13 +67,13 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: NextRequest,
-  context: { params: { userId: string } }
+  request: Request,
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   // Log the start of the PATCH request
   appLogger.info("PATCH /api/users/[userId] called");
   try {
-    const { userId } = context.params;
+    const { userId } = await params;
     appLogger.info("Updating user by ID", { userId });
     if (!userId) {
       appLogger.warn("User ID is required in PATCH /api/users/[userId]");
@@ -133,13 +133,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  context: { params: { userId: string } }
+  request: Request,
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/users/[userId] called");
   try {
-    const { userId } = context.params;
+    const { userId } = await params;
     appLogger.info("Deleting user by ID", { userId });
     if (!userId) {
       appLogger.warn("User ID is required in DELETE /api/users/[userId]");

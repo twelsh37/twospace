@@ -12,12 +12,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export async function GET(_req: Request, context: { params: { id: string } }) {
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   // Log the start of the GET request
   appLogger.info("GET /api/locations/[id] called");
   try {
-    // Access id directly from context.params (no await needed)
-    const { id } = context.params;
+    // Access id from params (await needed in Next.js 15)
+    const { id } = await params;
     appLogger.info("Fetching location by ID", { id });
     const location = await db
       .select()
@@ -52,11 +55,14 @@ export async function GET(_req: Request, context: { params: { id: string } }) {
   }
 }
 
-export async function PUT(req: Request, context: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   // Log the start of the PUT request
   appLogger.info("PUT /api/locations/[id] called");
   try {
-    const { id } = context.params;
+    const { id } = await params;
     appLogger.info("Updating location by ID", { id });
     const body = await req.json();
     const { name, description, isActive } = body;
@@ -130,12 +136,12 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
 
 export async function DELETE(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/locations/[id] called");
   try {
-    const { id } = context.params;
+    const { id } = await params;
     appLogger.info("Deleting location by ID (soft delete)", { id });
     // Soft delete: set isActive to false
     const [deleted] = await db
