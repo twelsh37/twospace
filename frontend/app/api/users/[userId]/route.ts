@@ -3,23 +3,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import {
-  usersTable,
-  departmentsTable,
-  locationsTable,
-  assetsTable,
-} from "@/lib/db/schema";
+import { usersTable, departmentsTable, locationsTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ userId: string }> }
+  context: { params: { userId: string } }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/users/[userId] called");
   try {
-    const { userId } = await context.params;
+    // Access userId directly from context.params (no await needed)
+    const { userId } = context.params;
     appLogger.info("Fetching user by ID", { userId });
     if (!userId) {
       appLogger.warn("User ID is required in GET /api/users/[userId]");
@@ -52,27 +48,19 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
     const user = users[0];
-    // Fetch assets assigned to this user by email
-    const assets = await db
-      .select({
-        assetNumber: assetsTable.assetNumber,
-        type: assetsTable.type,
-        description: assetsTable.description,
-        state: assetsTable.state,
-        location: assetsTable.locationId,
-      })
-      .from(assetsTable)
-      .where(eq(assetsTable.assignedTo, user.email));
-    appLogger.info("Fetched user and assets successfully", { userId });
-    return NextResponse.json({ data: user, assets });
+    return NextResponse.json({ success: true, data: user });
   } catch (error) {
     systemLogger.error(
-      `Error fetching user by ID: ${
+      `Error fetching user: ${
         error instanceof Error ? error.stack : String(error)
       }`
     );
     return NextResponse.json(
-      { error: "Failed to fetch user" },
+      {
+        success: false,
+        error: "Failed to fetch user",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }
@@ -80,12 +68,12 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ userId: string }> }
+  context: { params: { userId: string } }
 ) {
   // Log the start of the PATCH request
   appLogger.info("PATCH /api/users/[userId] called");
   try {
-    const { userId } = await context.params;
+    const { userId } = context.params;
     appLogger.info("Updating user by ID", { userId });
     if (!userId) {
       appLogger.warn("User ID is required in PATCH /api/users/[userId]");
@@ -146,12 +134,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ userId: string }> }
+  context: { params: { userId: string } }
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/users/[userId] called");
   try {
-    const { userId } = await context.params;
+    const { userId } = context.params;
     appLogger.info("Deleting user by ID", { userId });
     if (!userId) {
       appLogger.warn("User ID is required in DELETE /api/users/[userId]");

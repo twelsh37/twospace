@@ -12,14 +12,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export async function GET(
-  _req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, context: { params: { id: string } }) {
   // Log the start of the GET request
   appLogger.info("GET /api/locations/[id] called");
   try {
-    const { id } = await context.params;
+    // Access id directly from context.params (no await needed)
+    const { id } = context.params;
     appLogger.info("Fetching location by ID", { id });
     const location = await db
       .select()
@@ -54,14 +52,11 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function PUT(req: Request, context: { params: { id: string } }) {
   // Log the start of the PUT request
   appLogger.info("PUT /api/locations/[id] called");
   try {
-    const { id } = await context.params;
+    const { id } = context.params;
     appLogger.info("Updating location by ID", { id });
     const body = await req.json();
     const { name, description, isActive } = body;
@@ -135,12 +130,12 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/locations/[id] called");
   try {
-    const { id } = await context.params;
+    const { id } = context.params;
     appLogger.info("Deleting location by ID (soft delete)", { id });
     // Soft delete: set isActive to false
     const [deleted] = await db

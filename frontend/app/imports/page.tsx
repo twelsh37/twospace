@@ -117,7 +117,11 @@ const ImportsPage: React.FC = () => {
 
   // Map imported data to only include the required columns and override assignmentType/location
   const displayData: Record<string, string>[] = importedData.map((row) => {
-    const stateEnum = mapToAllowedStateEnum(row.state);
+    // If status is HOLDING, show as Holding (Imported)
+    const isHolding = String(row.status).toUpperCase() === "HOLDING";
+    const stateEnum = isHolding
+      ? AssetState.HOLDING
+      : mapToAllowedStateEnum(row.state);
     return {
       assetNumber: String(row.assetNumber || ""),
       type: String(row.type || ""),
@@ -176,15 +180,18 @@ const ImportsPage: React.FC = () => {
               </Button>
               {/* Import Modal (conditionally rendered) */}
               {modalOpen && (
-                <ImportModal
-                  open={modalOpen}
-                  onClose={handleCloseModal}
-                  onSuccess={async () => {
-                    handleCloseModal();
-                    await handleImportSuccess();
-                  }}
-                  setErrorDetails={setErrorDetails}
-                />
+                <>
+                  {console.log("[DEBUG] Rendering ImportModal", { modalOpen })}
+                  <ImportModal
+                    open={modalOpen}
+                    onClose={handleCloseModal}
+                    onSuccess={async () => {
+                      handleCloseModal();
+                      await handleImportSuccess();
+                    }}
+                    setErrorDetails={setErrorDetails}
+                  />
+                </>
               )}
               {/* Holding Assets Modal (flyout) */}
               {holdingModalOpen && (

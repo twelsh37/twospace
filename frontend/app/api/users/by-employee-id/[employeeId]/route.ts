@@ -14,12 +14,13 @@ import { systemLogger, appLogger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ employeeId: string }> }
+  context: { params: { employeeId: string } }
 ) {
   // Log the start of the GET request
   appLogger.info("GET /api/users/by-employee-id/[employeeId] called");
   try {
-    const { employeeId } = await context.params;
+    // Access employeeId directly from context.params (no await needed)
+    const { employeeId } = context.params;
     appLogger.info("Fetching user by employee ID", { employeeId });
     if (!employeeId) {
       appLogger.warn(

@@ -16,6 +16,7 @@ export enum AssetState {
   BUILDING = "BUILDING",
   READY_TO_GO = "READY_TO_GO",
   ISSUED = "ISSUED",
+  HOLDING = "HOLDING", // Added to support imported/holding assets (matches backend/DB)
 }
 
 export enum AssignmentType {

@@ -1,73 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Changelog
 
-## Getting Started
+All notable changes to this project will be documented in this file.
 
-First, run the development server:
+## [0.0.5] - 2025-06-13
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Added
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Asset Inventory PDF export now includes all charts and table data as seen on the screen.
+- Export modal provides a robust, user-friendly workflow for exporting reports as PDF.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Fixed
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Fixed invalid React hook call in reports page by moving useState inside the component.
+- Prevented infinite render loop by gathering export data only on export action, not on every render.
+- Removed unused imports to resolve ESLint build errors.
+- Export workflow is now robust and bug-free for Asset Inventory reports.
 
-## Learn More
+## [0.0.4] - 2025-06-12
 
-To learn more about Next.js, take a look at the following resources:
+### Fixed
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Fixed all build and type errors related to filter state and enum usage in assets and users pages.
+- Enforced consistent use of uppercase enum values (e.g., 'HOLDING', 'ACTIVE', 'STOCK') throughout schema and seed files.
+- Resolved all linter errors and removed unused variables/imports.
+- Ensured filter logic uses 'all' (lowercase) for UI, but always sends correct enum values to backend.
+- Project now builds and passes type checks cleanly.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## [Unreleased]
 
-## Deploy on Vercel
+### Added
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Comprehensive error trapping and handling fortifications across all major pages and client components:
+  - Wrapped all critical client components in ErrorBoundary for robust runtime error trapping.
+  - /dashboard: ErrorBoundary applied to RecentActivity and all client widgets; server components use fallback UI for data errors.
+  - /assets: AssetTable wrapped in ErrorBoundary for runtime error trapping.
+  - /locations: LocationTable wrapped in ErrorBoundary for robust error handling.
+  - /users: UserTable wrapped in ErrorBoundary to catch rendering errors.
+  - /reports: Main ReportsPageContent wrapped in ErrorBoundary for comprehensive error trapping.
+  - /imports: ImportsPage wrapped in ErrorBoundary for bulk import UI resilience.
+  - /settings: SettingsPage wrapped in ErrorBoundary for system configuration safety.
+- All user-facing error messages are now clear, actionable, and never technical.
+- All data fetch and rendering errors are handled gracefully with user-friendly fallback UI.
+- No technical or system errors are surfaced to end users; all errors are logged and/or displayed in a non-confusing manner.
+- Updated code comments and documentation to clarify error handling strategy and reasoning.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Added
 
-## Logging and Audit Trail
+- Comprehensive server-side logging using Winston for all API routes and utilities.
+- Daily log rotation with 30-day retention using winston-daily-rotate-file.
+- Separate logs for system events (`system.log_YYYYMMDD.log`) and application events (`app.log_YYYYMMDD.log`).
+- Extensive explanatory comments and documentation for logging usage, audit, and troubleshooting.
+- Logging is server-side only (no Winston on client).
+- Migrated all server-side logging from Winston/file-based logging to console-based logging for full compatibility with Vercel and other serverless platforms.
+  - All logs are now output to the console and viewable in the Vercel dashboard (or your serverless provider's logs UI).
+  - Removed all references to Winston, file-based logs, and log file locations from the codebase and documentation.
+  - **Reason:** Vercel and similar platforms do not support persistent file storage. Console logging is the recommended and supported approach for reliability and operational visibility.
 
-This project now uses console-based logging for all server-side events. Logs are output to the console, which is captured and viewable in the Vercel dashboard (or your serverless provider's logs UI). There are two log types:
+## [0.0.3] - 2025-06-11
 
-- **System Logs**: For infrastructure, API, and error events (labelled as SYSTEM)
-- **Application Logs**: For business logic, user actions, and workflow events (labelled as APP)
+### Added
 
-### How Logging Works
+- Default filter state for assets, users, and locations now set to 'ALL' for all dropdowns.
+- Asset filters always show 'All Types', 'All States', and 'All Statuses' as default options.
+- Consistent filter UX and clear filters button across assets, users, and locations pages.
+- Documentation of all filter designators in `FILTERS_DESIGNATORS.md`.
 
-- All API routes and server-side utilities are instrumented with logging.
-- Logs are output to the console only (no file-based logging).
-- **Why?** Vercel and other serverless platforms do not support persistent file storage. Console logging is the recommended approach for compatibility and reliability.
+### Changed
 
-### How to Use Logs
+- Filter logic updated to never send 'ALL' to the backend; 'ALL' is treated as no filter.
+- All filter designators and enums are now uppercase in both frontend and backend.
+- Improved URL query param handling for filters to use uppercase consistently.
+- Asset page now always shows all assets by default.
 
-- **Admins**: Use the Vercel dashboard to audit system activity, investigate errors, and monitor usage.
-- **Users**: If you encounter an error, notify the admin, who can review logs in the Vercel dashboard.
-- **Log Review**: Use the Vercel dashboard's "Functions" or "Logs" section to search for timestamps, error messages, or user actions.
+### Fixed
 
-### Example Log Entry
+- Fixed issues where selecting 'ALL' would cause enum errors in the backend.
+- Ensured clear filters resets all dropdowns to 'ALL' and shows all assets.
 
-[2024-07-01T12:34:56.789Z] [APP] info: Asset created | meta: {"assetId":"123","userId":"456"}
+## [0.0.2] - 2025-06-10
 
-## PDF Export and Reporting
+### Added
 
-- Asset Inventory reports can be exported as PDFs with all charts and tables included, exactly as seen on the screen.
-- The export modal provides a simple, robust user experience for exporting reports.
-- Recent bugfixes ensure that React state and hooks are used correctly, preventing errors and infinite loops during export.
-- The export workflow is modular and ready for future extension to other report types.
+- Migration script for department ID consistency (`fix-it-department-ids.ts`).
+- Yarn script (`db:fix-departments`) for department migration using `tsx`.
+- Exported `DepartmentOption` and `RoleOption` types for cross-component type safety.
+- Extensive explanatory comments for maintainability.
 
-## Role-Based Access Control (RBAC)
+### Changed
 
-- The application now determines admin access for sidebar menu items (such as Imports) and protected routes using the Supabase Auth role (`user.user_metadata.role`).
-- The app no longer relies on the `role` field in the app's `users` table for these checks.
-- This change ensures that admin-only features are visible and accessible based on the Auth role, regardless of database RLS policies.
-- If you want to grant or revoke admin access, update the user's role in Supabase Auth.
+- Refactored all filter-related code to use strict types (no `any`) and robust type guards.
+- Updated all filter and user management code for strict typing and ESLint compliance.
+- Updated Supabase integration for department typing with explicit `Department` type.
+- Removed unused `LocationOption` and replaced all `any` with `unknown` and type guards.
+
+### Fixed
+
+- Type errors and linter issues in filters, user management, and Supabase integration.
+- Ensured all code builds and lints cleanly (`yarn build`).
+
+## [0.0.1] - 2025-06-01
+
+### Added
+
+- Initial release.
