@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { ASSET_TYPE_LABELS, ASSET_STATE_LABELS } from "@/lib/constants";
 import { AssetType, AssetState } from "@/lib/types";
+import { useAuth } from "@/lib/auth-context";
 
 interface AssetEditModalProps {
   assetNumber: string | null;
@@ -51,6 +52,7 @@ export function AssetEditModal({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useAuth(); // Get session from auth context
 
   useEffect(() => {
     if (!assetNumber || !open) return;
@@ -95,9 +97,17 @@ export function AssetEditModal({
     setSaving(true);
     setError(null);
     try {
+      // Attach Authorization header if access token is available
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch(`/api/assets/${assetNumber}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error("Failed to update asset");

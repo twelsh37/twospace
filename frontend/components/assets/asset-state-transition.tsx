@@ -17,13 +17,14 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import React from "react";
 import { mutate } from "swr";
+import { supabase } from "@/lib/supabase";
 
 interface AssetStateTransitionProps {
   asset: Asset;
   setAsset: (asset: Asset) => void; // Use Asset type for setAsset
 }
 
-// Utility function to map asset state to solid background color classes (matches badge colors)
+// Helper function to get color classes for state badges
 function getStateColorClass(state: AssetState): string {
   switch (state) {
     case AssetState.AVAILABLE:
@@ -36,6 +37,8 @@ function getStateColorClass(state: AssetState): string {
       return "bg-purple-600 text-white border-purple-600";
     case AssetState.ISSUED:
       return "bg-green-600 text-white border-green-600";
+    case AssetState.HOLDING:
+      return "bg-gray-600 text-white border-gray-600";
     default:
       return "bg-gray-400 text-white border-gray-400";
   }
@@ -95,10 +98,24 @@ export function AssetStateTransition({
         setIsTransitioning(false);
         return;
       }
+
+      // Get the current session for authentication
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError("Authentication token not found. Please sign in again.");
+        setIsTransitioning(false);
+        return;
+      }
+
       // Use asset.assetNumber and user.id for backend API
       const res = await fetch("/api/assets", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           assetIds: [asset.assetNumber],
           operation: "stateTransition",

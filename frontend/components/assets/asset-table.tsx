@@ -134,9 +134,17 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
     if (!deleteAssetNumber) return;
     setDeleting(true);
     try {
+      // Attach Authorization header if access token is available
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       await fetch(`/api/assets/${deleteAssetNumber}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           archiveReason: reason,
           comment: comment,
