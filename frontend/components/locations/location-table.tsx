@@ -66,9 +66,9 @@ export function LocationTable({
   >(null);
 
   // Get authenticated user's role
-  const { session } = useAuth();
-  const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
-  const isUser = userRole === "USER";
+  const { userRole } = useAuth();
+  const currentUserRole = userRole || "USER";
+  const isUser = currentUserRole === "USER";
 
   // Memoize fetchLocations to avoid useEffect dependency warning
   const fetchLocations = useCallback(async () => {

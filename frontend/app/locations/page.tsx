@@ -14,22 +14,22 @@ import { LocationAddModal } from "@/components/locations/location-add-modal";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ExportModal } from "@/components/ui/export-modal";
 import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
-import { createClientComponentClient } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth-context";
 
 export default function LocationsPage() {
-  // Filter and pagination state
-  // Set default filter to show only active locations by default
   const [filters, setFilters] = useState<LocationFilterState>({
     location: "ALL",
-    isActive: "true", // Only show active locations by default
+    isActive: "ALL",
   });
   const [page, setPage] = useState(1);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  // Add a refresh trigger to force re-render of the table
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [showUnauthorizedToast, unauthorizedToast] = useUnauthorizedToast();
+
+  // Get auth context at component level
+  const { userRole } = useAuth();
 
   const handleFilterChange = (
     key: keyof LocationFilterState,
@@ -54,14 +54,8 @@ export default function LocationsPage() {
   }, []);
 
   // Handler for Add Location button
-  const handleAddLocationClick = async () => {
-    // Get Supabase user role from session metadata
-    const supabase = createClientComponentClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const role = session?.user?.user_metadata?.role;
-    if (role !== "ADMIN") {
+  const handleAddLocationClick = () => {
+    if (userRole !== "ADMIN") {
       showUnauthorizedToast();
       return;
     }
@@ -108,8 +102,10 @@ export default function LocationsPage() {
 
   // Halve the space above the card by reducing pt-4 md:pt-8 to pt-2 md:pt-4
   return (
-    <div className="flex-1 flex flex-col pt-8
-     pb-2 md:pb-2 px-4 md:px-8">
+    <div
+      className="flex-1 flex flex-col pt-8
+     pb-2 md:pb-2 px-4 md:px-8"
+    >
       {unauthorizedToast}
       <Card
         style={{

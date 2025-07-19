@@ -16,7 +16,7 @@ export function ProtectedRoute({
   children,
   requireAdmin = false,
 }: ProtectedRouteProps) {
-  const { user, loading, session } = useAuth();
+  const { user, loading, session, userRole } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -25,15 +25,14 @@ export function ProtectedRoute({
         // Redirect to login if not authenticated
         router.push("/auth/login");
       } else if (requireAdmin) {
-        // Check role from user metadata (same as backend)
-        const role = user.user_metadata?.role;
-        if (role !== "ADMIN") {
+        // Check role from database (same as backend)
+        if (userRole !== "ADMIN") {
           // Redirect non-admins to dashboard
           router.push("/dashboard");
         }
       }
     }
-  }, [user, loading, router, requireAdmin, session]);
+  }, [user, loading, router, requireAdmin, session, userRole]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -48,7 +47,7 @@ export function ProtectedRoute({
   }
 
   // Don't render children if not authenticated or not admin (handled by redirect)
-  if (!user || (requireAdmin && user.user_metadata?.role !== "ADMIN")) {
+  if (!user || (requireAdmin && userRole !== "ADMIN")) {
     return null;
   }
 

@@ -24,8 +24,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   // Use id from params (use() needed in Next.js 15)
   const { id } = use(params);
   const { session } = useAuth();
-  const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
-  const isUser = userRole === "USER";
+  const { userRole } = useAuth();
+  const currentUserRole = userRole || "USER";
+  const isUser = currentUserRole === "USER";
 
   // Fetch asset data once for all subcomponents
   useEffect(() => {

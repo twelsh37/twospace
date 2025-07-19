@@ -49,7 +49,7 @@ export default function UsersClientPage({
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState(initialFilters);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const { user } = useAuth();
+  const { userRole } = useAuth();
   const [showUnauthorized, unauthorizedToast] = useUnauthorizedToast();
 
   // Handle filter changes by updating the URL (triggers SSR)
@@ -131,7 +131,7 @@ export default function UsersClientPage({
                 size="sm"
                 className="bg-black text-white hover:bg-gray-900"
                 onClick={() => {
-                  if (user?.user_metadata?.role?.toUpperCase() !== "ADMIN") {
+                  if (userRole !== "ADMIN") {
                     showUnauthorized();
                     return;
                   }
@@ -161,9 +161,7 @@ export default function UsersClientPage({
               pagination={initialPagination}
               onPageChange={handlePageChange}
               // Pass the current user's role to UserTable for permission logic
-              currentUserRole={
-                user?.user_metadata?.role?.toUpperCase?.() || "USER"
-              }
+              currentUserRole={userRole || "USER"}
             />
             {/* Add pagination controls here if needed, or inside UserTable */}
           </div>

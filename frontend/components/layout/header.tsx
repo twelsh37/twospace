@@ -34,14 +34,14 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { user, signOut } = useAuth();
+  const { user, userRole, signOut } = useAuth();
 
   // Get user display info
   const userDisplay = user
     ? {
         name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
         email: user.email || "",
-        role: user.user_metadata?.role || "User",
+        role: userRole || "User",
         avatar: user.user_metadata?.avatar_url || "",
       }
     : {

@@ -129,9 +129,9 @@ function AssetsPageContent() {
 
   // Handler for Add Asset button
   // Only allow ADMIN users to open the Add Asset modal; show unauthorized toast otherwise
-  const { user } = useAuth();
+  const { userRole } = useAuth();
   const handleAddAssetClick = () => {
-    const role = user?.user_metadata?.role;
+    const role = userRole;
     if (role !== "ADMIN") {
       showUnauthorizedToast();
       return;

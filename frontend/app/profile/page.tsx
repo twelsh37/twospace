@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
 interface ProfileData {
   name: string;
@@ -17,6 +18,7 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
+  const { userRole } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -35,14 +37,14 @@ export default function ProfilePage() {
         setProfile({
           name: session.user.user_metadata?.name || session.user.email || "",
           email: session.user.email || "",
-          role: session.user.user_metadata?.role || "USER",
+          role: userRole || "USER",
           avatar_url: session.user.user_metadata?.avatar_url || undefined,
         });
         setAvatarPreview(session.user.user_metadata?.avatar_url || null);
       }
     };
     fetchProfile();
-  }, []);
+  }, [userRole]);
 
   // Handle avatar file selection
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {

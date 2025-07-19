@@ -3,7 +3,7 @@
 // Imports Page for bulk importing assets, users, and locations
 // This page provides an 'Import Data' button to open the import modal dialog
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 // Import the ImportModal component (to be created)
 import ImportModal from "@/components/imports/import-modal";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import HoldingAssetsTable from "@/components/holding-assets/HoldingAssetsTable";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth-context";
 
 // Main Imports Page component
 const ImportsPage: React.FC = () => {
@@ -22,6 +22,7 @@ const ImportsPage: React.FC = () => {
   const [holdingModalOpen, setHoldingModalOpen] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string | null>(null); // Persistent error area
   const [hasUnassignedAssets, setHasUnassignedAssets] = useState(false); // Track if there are unassigned assets
+  const [holdingAssetsCount, setHoldingAssetsCount] = useState(0); // Track count of holding assets
   // State to store imported data for display
   // The imported data is an array of objects, where each object represents a row from the imported CSV/XLSX file.
   // The keys are column names and the values are dynamic (string, number, boolean, etc.), so we use Record<string, unknown> for type safety.
@@ -29,49 +30,74 @@ const ImportsPage: React.FC = () => {
     []
   );
 
+  // Get auth context
+  const { session } = useAuth();
+
   // Handler to open the modal
   const handleOpenModal = () => setModalOpen(true);
   // Handler to close the modal
   const handleCloseModal = () => setModalOpen(false);
 
   // Fetch count of unassigned assets
-  const fetchUnassignedAssets = async () => {
+  const fetchUnassignedAssets = useCallback(async () => {
     try {
-      // Get the current session for authentication
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        console.log("No access token available, skipping fetch");
+        setHasUnassignedAssets(false);
+        setHoldingAssetsCount(0);
+        return;
+      }
+
       const res = await fetch("/api/holding-assets", {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
-      const data = await res.json();
-      setHasUnassignedAssets(
-        Array.isArray(data?.data?.assets) && data.data.assets.length > 0
-      );
-    } catch {
-      setHasUnassignedAssets(false);
-    }
-  };
 
-  // Fetch on page load
+      if (!res.ok) {
+        console.error(
+          "Failed to fetch holding assets:",
+          res.status,
+          res.statusText
+        );
+        setHasUnassignedAssets(false);
+        setHoldingAssetsCount(0);
+        return;
+      }
+
+      const data = await res.json();
+      const assets = data?.data?.assets;
+      const hasAssets = Array.isArray(assets) && assets.length > 0;
+
+      setHasUnassignedAssets(hasAssets);
+      setHoldingAssetsCount(assets?.length || 0);
+    } catch (error) {
+      console.error("Error fetching unassigned assets:", error);
+      setHasUnassignedAssets(false);
+      setHoldingAssetsCount(0);
+    }
+  }, [session]);
+
+  // Fetch on page load and when session changes
   useEffect(() => {
-    fetchUnassignedAssets();
-  }, []);
+    if (session?.access_token) {
+      fetchUnassignedAssets();
+    }
+  }, [session, fetchUnassignedAssets]);
 
   // Handler to refresh data after successful import
   const handleImportSuccess = async () => {
-    await fetchUnassignedAssets();
+    await fetchUnassignedAssets(); // This will update both hasUnassignedAssets and holdingAssetsCount
     // Fetch the latest imported assets with status 'holding' from the backend
     try {
-      // Get the current session for authentication
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        console.log("No access token available for import success fetch");
+        return;
+      }
+
       const res = await fetch("/api/assets?status=holding&limit=20", {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (res.ok) {
@@ -193,12 +219,12 @@ const ImportsPage: React.FC = () => {
                 }`}
                 variant={hasUnassignedAssets ? undefined : "secondary"}
               >
-                View Holding Assets
+                View Holding Assets{" "}
+                {hasUnassignedAssets ? `(${holdingAssetsCount} assets)` : ""}
               </Button>
               {/* Import Modal (conditionally rendered) */}
               {modalOpen && (
                 <>
-                  {console.log("[DEBUG] Rendering ImportModal", { modalOpen })}
                   <ImportModal
                     open={modalOpen}
                     onClose={handleCloseModal}

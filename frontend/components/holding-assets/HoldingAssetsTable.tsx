@@ -1,8 +1,8 @@
 // frontend/components/holding-assets/HoldingAssetsTable.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import EditHoldingAssetModal from "./EditHoldingAssetModal";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth-context";
 
 interface HoldingAsset {
   id: string;
@@ -22,15 +22,22 @@ const HoldingAssetsTable: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
+  // Get auth context
+  const { session } = useAuth();
+
   // Fetch holding assets
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     setLoading(true);
     try {
-      // Get the current session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        console.log("No access token available for holding assets fetch");
+        setAssets([]);
+        return;
+      }
+
       const res = await fetch("/api/holding-assets", {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (res.ok) {
@@ -43,11 +50,13 @@ const HoldingAssetsTable: React.FC = () => {
       setAssets([]);
     }
     setLoading(false);
-  };
+  }, [session]);
 
   useEffect(() => {
-    fetchAssets();
-  }, []);
+    if (session?.access_token) {
+      fetchAssets();
+    }
+  }, [session, fetchAssets]);
 
   // Pagination logic
   const totalAssets = assets.length;

@@ -12,6 +12,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  userRole: "ADMIN" | "USER" | null;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (
     email: string,
@@ -28,11 +29,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<"ADMIN" | "USER" | null>(null);
   const supabase = createClientComponentClient();
   const router = useRouter();
   const pathname = usePathname();
   // Used to prevent repeated sign-outs in a single render cycle
   const [hasHandledInvalidToken, setHasHandledInvalidToken] = useState(false);
+
+  // Clear old authentication cookies on mount
+  useEffect(() => {
+    // Clear any leftover Clerk or other auth cookies
+    const clearOldAuthCookies = () => {
+      const cookies = document.cookie.split(";");
+      cookies.forEach((cookie) => {
+        const [name] = cookie.split("=");
+        const trimmedName = name.trim();
+        // Clear Clerk cookies and any other non-Supabase auth cookies
+        if (
+          trimmedName.startsWith("__clerk") ||
+          (trimmedName.startsWith("sb-") === false &&
+            trimmedName.includes("auth"))
+        ) {
+          document.cookie = `${trimmedName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+      });
+    };
+
+    clearOldAuthCookies();
+  }, []);
+
+  // Function to get user role from Supabase Auth metadata
+  const getUserRole = (user: User | null): "ADMIN" | "USER" | null => {
+    if (!user) return null;
+
+    // Check user metadata for role
+    const role = user.user_metadata?.role;
+    if (role === "ADMIN" || role === "USER") {
+      return role;
+    }
+
+    // Fallback: check if user is admin based on email (for backward compatibility)
+    if (
+      user.email === "tom.welsh@gtrailway.com" ||
+      user.email === "tom.welsh@theaiaa.com"
+    ) {
+      return "ADMIN";
+    }
+
+    return "USER"; // Default to USER if no role specified
+  };
 
   useEffect(() => {
     // Helper to handle invalid refresh token error gracefully
@@ -56,6 +101,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
+
+        // Set user role from Supabase Auth metadata
+        setUserRole(getUserRole(session?.user ?? null));
+
         setLoading(false);
       } catch (error: unknown) {
         // Type guard for error object
@@ -91,6 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+
+      // Set user role from Supabase Auth metadata
+      setUserRole(getUserRole(session?.user ?? null));
+
       setLoading(false);
       // If session is null, check for invalid refresh token error
       if (!session && !hasHandledInvalidToken) {
@@ -161,6 +214,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     session,
     loading,
+    userRole,
     signIn,
     signUp,
     signOut,

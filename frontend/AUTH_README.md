@@ -75,6 +75,8 @@ If you're having trouble logging in with the demo user (`demo@example.com`), it'
    .\scripts\setup-demo-user.ps1
    ```
 
+
+
 See `scripts/fix-auth-issue.md` for detailed troubleshooting.
 
 - **Via API:**

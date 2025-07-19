@@ -70,15 +70,32 @@ export async function requireAdmin(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-  // Check role from user metadata (assumes role is stored in user.user_metadata.role)
+
+  // Check role from Supabase Auth metadata
   const role = user.user_metadata?.role;
-  if (role !== "ADMIN") {
-    return NextResponse.json(
-      { error: "Forbidden: Admins only" },
-      { status: 403 }
-    );
+  console.log("User role from metadata:", role);
+  console.log("User email:", user.email);
+
+  // Check if user has ADMIN role in metadata
+  if (role === "ADMIN") {
+    console.log("User is ADMIN based on metadata");
+    return user;
   }
-  return user;
+
+  // Fallback: Check if user is admin based on email (for backward compatibility)
+  if (
+    user.email === "tom.welsh@gtrailway.com" ||
+    user.email === "tom.welsh@theaiaa.com"
+  ) {
+    console.log("User is ADMIN based on email fallback");
+    return user;
+  }
+
+  console.log("User is not ADMIN");
+  return NextResponse.json(
+    { error: "Forbidden: Admins only" },
+    { status: 403 }
+  );
 }
 
 /*

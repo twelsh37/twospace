@@ -76,8 +76,9 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
 
   // Get authenticated user's role
   const { session } = useAuth();
-  const userRole = session?.user?.user_metadata?.role?.toUpperCase() || "USER";
-  const isUser = userRole === "USER";
+  const { userRole } = useAuth();
+  const currentUserRole = userRole || "USER";
+  const isUser = currentUserRole === "USER";
 
   // Fetch assets function is now reusable for refetching after delete
   const fetchAssets = async () => {

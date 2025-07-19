@@ -96,10 +96,10 @@ export function Sidebar({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [reportsOpen, setReportsOpen] = useState(false); // Only used for mobile
   // --- App user state for role-based sidebar entries ---
-  const { user } = useAuth();
+  const { userRole } = useAuth();
 
-  // Use Supabase Auth role directly
-  const isAdmin = user?.user_metadata?.role?.toLowerCase() === "admin";
+  // Use database role instead of Supabase Auth metadata
+  const isAdmin = userRole === "ADMIN";
 
   // Filter nav items: Only show Imports for Admins
   const filteredNavItems = navItems.filter((item) => {

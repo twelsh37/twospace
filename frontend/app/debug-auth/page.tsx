@@ -1,120 +1,135 @@
-"use client";
 // frontend/app/debug-auth/page.tsx
-// Debug page to test authentication
+// Debug page to troubleshoot authentication issues
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import type { Session } from "@supabase/supabase-js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function DebugAuthPage() {
-  const [authState, setAuthState] = useState<{
-    session?: Session | null;
-    error?: unknown;
-  } | null>(null);
-  const [result, setResult] = useState<object | null>(null);
-  const [testLoading, setTestLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+const DebugAuthPage: React.FC = () => {
+  const { user, session, loading, userRole } = useAuth();
+  const [cookies, setCookies] = useState<string[]>([]);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        console.log("Checking auth state...");
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
-        console.log("Session check result:", { session, error });
-        setAuthState({ session, error });
-      } catch (err) {
-        console.error("Error checking auth:", err);
-        setAuthState({ error: err });
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Get all cookies
+    const allCookies = document.cookie
+      .split(";")
+      .map((cookie) => cookie.trim());
+    setCookies(allCookies);
 
-    checkAuth();
-  }, []);
+    // Get access token from session
+    if (session?.access_token) {
+      setAccessToken(session.access_token);
+    }
+  }, [session]);
 
-  const testAuth = async () => {
-    setTestLoading(true);
+  const clearAllCookies = () => {
+    const cookies = document.cookie.split(";");
+    cookies.forEach((cookie) => {
+      const [name] = cookie.split("=");
+      const trimmedName = name.trim();
+      document.cookie = `${trimmedName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+    window.location.reload();
+  };
+
+  const testHoldingAssetsAPI = async () => {
     try {
-      console.log("=== TESTING AUTH ===");
-      console.log("Auth state:", authState);
-
-      if (!authState?.session?.access_token) {
-        setResult({ error: "No access token in session" });
-        return;
-      }
-
-      const response = await fetch("/api/debug-user", {
+      const res = await fetch("/api/holding-assets", {
         headers: {
-          Authorization: `Bearer ${authState.session.access_token}`,
+          Authorization: `Bearer ${session?.access_token}`,
         },
       });
 
-      const data = await response.json();
-      console.log("Debug endpoint response:", data);
-      setResult(data);
+      const data = await res.json();
+      alert(
+        `API Response Status: ${res.status}\nData: ${JSON.stringify(
+          data,
+          null,
+          2
+        )}`
+      );
     } catch (error) {
-      console.error("Auth test error:", error);
-      setResult({
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    } finally {
-      setTestLoading(false);
+      alert(`API Error: ${error}`);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-4">Authentication Debug</h1>
-        <div className="text-lg">Loading authentication state...</div>
-        <div className="text-sm text-gray-600 mt-2">
-          This might take a moment if there are authentication issues.
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Authentication Debug</h1>
+    <div className="container mx-auto p-4 space-y-4">
+      <h1 className="text-2xl font-bold">Authentication Debug</h1>
 
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Current Auth State:</h2>
-        <div className="mb-2">
-          <strong>Loading:</strong> {loading ? "Yes" : "No"}
-        </div>
-        <div className="mb-2">
-          <strong>Session:</strong> {authState?.session ? "Present" : "None"}
-        </div>
-        <div className="mb-2">
-          <strong>Access Token:</strong>{" "}
-          {authState?.session?.access_token ? "Present" : "Missing"}
-        </div>
-        <div className="mb-2">
-          <strong>Error:</strong> {authState?.error ? "Yes" : "No"}
-        </div>
-        <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
-          {JSON.stringify(authState, null, 2)}
-        </pre>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Current Auth State</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p>
+            <strong>Loading:</strong> {loading ? "Yes" : "No"}
+          </p>
+          <p>
+            <strong>User:</strong> {user ? user.email : "None"}
+          </p>
+          <p>
+            <strong>User Role:</strong> {userRole || "None"}
+          </p>
+          <p>
+            <strong>Session:</strong> {session ? "Present" : "None"}
+          </p>
+          <p>
+            <strong>Access Token:</strong>{" "}
+            {accessToken ? `${accessToken.substring(0, 20)}...` : "None"}
+          </p>
+        </CardContent>
+      </Card>
 
-      <Button onClick={testAuth} disabled={testLoading} className="mb-4">
-        {testLoading ? "Testing..." : "Test Authentication"}
-      </Button>
-
-      {result && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Test Result:</h2>
-          <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
-            {JSON.stringify(result, null, 2)}
+      <Card>
+        <CardHeader>
+          <CardTitle>User Metadata</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto">
+            {JSON.stringify(user?.user_metadata, null, 2)}
           </pre>
-        </div>
-      )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Session Data</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto">
+            {JSON.stringify(session, null, 2)}
+          </pre>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Browser Cookies</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            {cookies.map((cookie, index) => (
+              <div key={index} className="text-xs bg-gray-100 p-1 rounded">
+                {cookie}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex gap-2">
+        <Button onClick={clearAllCookies} variant="destructive">
+          Clear All Cookies
+        </Button>
+        <Button onClick={testHoldingAssetsAPI}>Test Holding Assets API</Button>
+      </div>
     </div>
   );
-}
+};
+
+export default DebugAuthPage;
