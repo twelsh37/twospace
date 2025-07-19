@@ -72,7 +72,7 @@ export function DashboardStats({
 
   const stats: StatCard[] = [
     {
-      title: "New Stock Awaiting Asseting",
+      title: "New Imported Assets",
       value:
         holdingCount > 0 ? holdingCount.toLocaleString() : "No Imported Assets",
       description: "Assets in holding (imported) status.",
@@ -107,7 +107,7 @@ export function DashboardStats({
   // Helper to get the correct link for each card
   const getCardLink = (title: string) => {
     switch (title) {
-      case "New Stock Awaiting Asseting":
+      case "New Imported Assets":
         return "/assets?status=holding&state=all";
       case "Available Stock":
         return "/assets?state=AVAILABLE";
