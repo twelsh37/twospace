@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 
 // Helper to parse asset type from asset number prefix (returns enum value)
+// Only validates prefix after first two characters are entered
 function getAssetTypeEnumFromNumber(assetNumber: string): string | null {
+  // Don't validate until at least 2 characters are entered
+  if (assetNumber.length < 2) {
+    return null;
+  }
+
   const prefix = assetNumber.slice(0, 2);
   switch (prefix) {
     case "01":
@@ -123,7 +129,8 @@ export default function EditHoldingAssetModal({
           className="border px-2 py-1 rounded"
         />
       </div>
-      {assetNumber && (
+      {/* Only show type validation after first two characters are entered */}
+      {assetNumber.length >= 2 && (
         <div className="mb-2">
           <span>Type:&nbsp;</span>
           <b>
