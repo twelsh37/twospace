@@ -1,9 +1,0 @@
----
-description: PIP package manager
-globs: 
-alwaysApply: true
----
-# PIP
-We are using pip package manager to manage python packages
-
-
