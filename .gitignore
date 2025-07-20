@@ -47,4 +47,7 @@ next-env.d.ts
 .vercel
 .env*.local
 .cursor
+.cursor/
+.cursorrules
+.cursorrules-comprehensive
 node_modules

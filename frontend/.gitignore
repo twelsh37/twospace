@@ -105,3 +105,8 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+
+# Cursor IDE
+.cursor/
+.cursorrules
+.cursorrules-comprehensive
