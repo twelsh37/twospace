@@ -174,4 +174,4 @@ For technical support or questions about the application, refer to the documenta
 
 ## License
 
-This project is proprietary software. All rights reserved.
+This project is distributed under the MIT Licence. All rights reserved.
