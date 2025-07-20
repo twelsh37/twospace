@@ -1,0 +1,79 @@
+---
+description: Best practices for using Drizzle ORM with TypeScript and Next.js projects.
+globs: **/db/**/*, **/lib/db/**/*, drizzle.config.ts, drizzle/**/*, **/migrations/**/*
+alwaysApply: false
+---
+
+# Drizzle ORM Best Practices
+
+## Installation & Setup
+- Install core packages: `drizzle-orm`, your database driver (e.g., `pg`, `@vercel/postgres`, `mysql2`), and `drizzle-kit` for migrations.
+- Use `drizzle-orm/pg-core`, `drizzle-orm/node-postgres`, or the appropriate submodule for your database[2][4][8].
+- Use TypeScript for all Drizzle code. Enable `"strict": true` in `tsconfig.json` for maximum type safety[1][3][6].
+
+## Schema Definition
+- Define database schemas in TypeScript using Drizzle's schema functions (e.g., `pgTable`, `mysqlTable`).
+- Co-locate schema files in a dedicated directory (e.g., `/db/schema/` or `/lib/schema/`)[2][4].
+- Use descriptive table and column names.
+- Define primary keys, foreign keys, indexes, and constraints explicitly using Drizzle's API[7].
+
+## Type Safety & Validation
+- Leverage Drizzle's type inference for queries and mutations.
+- Use Zod and `drizzle-zod` for runtime validation of user input before database operations[3][8].
+- Always validate and sanitize data before inserting or updating records[7].
+
+## Database Connection
+- Create a single Drizzle instance per application using a connection pool (not a singleton of the pool itself)[7].
+- Store credentials in environment variables and load them with `dotenv` or similar tools[2][4][8].
+
+## Querying & Mutations
+- Use Drizzle's query builder for all database operations to ensure type safety and prevent SQL injection[5][6].
+- Prefer parameterized queries and avoid raw SQL unless necessary.
+- Use relational query APIs for nested data fetching and partial selects when needed[5].
+
+## Migrations
+- Use `drizzle-kit` to generate and manage migration files based on schema changes[2][4][6][9].
+- Keep migrations atomic and focused on single logical changes.
+- Name migration files with timestamps and descriptive names (e.g., `20250702_add_user_table.ts`)[9].
+- Always test both `up()` and `down()` functions before deployment.
+- Never modify existing migrations; version control all migration files[9].
+
+## Project Structure
+- Place Drizzle config in `drizzle.config.ts` at the project root.
+- Output generated migrations to a dedicated folder (e.g., `/drizzle/`).
+- Organize database logic in `/db/` or `/lib/db/`, separating schema, clients, and queries[2][4].
+
+## Security
+- Never store secrets or credentials in source code; use environment variables[2][4][8].
+- Validate all user input before database access.
+- Handle errors gracefully and avoid leaking sensitive information.
+
+## Example Directory Structure
+
+/db/
+schema/
+users.ts
+posts.ts
+client.ts
+index.ts
+drizzle.config.ts
+/drizzle/ # Generated Migrations
+.env.local # Environment Variables
+
+## Example Drizzle Instance (PostgreSQL)
+
+import { drizzle } from "drizzle-orm/node-postgres";
+import { client } from "@/db/client";
+import * as schema from "@/db/schema";
+
+export const db = drizzle(client, { schema });
+
+## Example Migration File Naming
+
+- `20250702_add_user_table.ts`
+- `20250702_update_email_index.ts`
+
+---
+
+By following these rules, you ensure type safety, maintainability, and a robust workflow for all Drizzle ORM usage in your codebase.
+

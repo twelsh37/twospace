@@ -1,0 +1,243 @@
+# Comprehensive Cursor Rules for TwoSpace Frontend
+
+## 🎯 Project Overview
+TwoSpace is a Next.js 15 application with TypeScript, using Drizzle ORM, Supabase, and Shadcn UI components. This rule set ensures consistent, maintainable, and production-ready code.
+
+## 📦 Import Standards - ES6 Only (CRITICAL)
+
+### 🚫 Forbidden: require() Statements
+- **NEVER** use `require()` style imports in any TypeScript/JavaScript files
+- **NEVER** use `const module = require('module')` patterns
+- **NEVER** use `require('@/lib/db')` or similar require statements
+- **NEVER** use `require()` in test files unless absolutely necessary for module testing
+
+### ✅ Required: ES6 Import Statements
+- **ALWAYS** use ES6 `import` statements for all module imports
+- **ALWAYS** use named imports: `import { functionName } from 'module'`
+- **ALWAYS** use default imports: `import Component from './Component'`
+- **ALWAYS** use type imports: `import type { TypeName } from 'module'`
+
+### 📝 Import Patterns
+
+#### Named Imports
+```typescript
+// ✅ CORRECT
+import { db, appLogger, systemLogger } from '@/lib/db';
+import { requireAuth, requireAdmin } from '@/lib/supabase-auth-helpers';
+import { generateAssetNumber, getActiveAssets } from './utils';
+
+// ❌ INCORRECT
+const { db } = require('@/lib/db');
+const mockDb = require('@/lib/db').db;
+```
+
+#### Test File Imports
+```typescript
+// ✅ CORRECT - Import at top of file
+import { db } from '@/lib/db';
+import { appLogger, systemLogger } from '@/lib/logger';
+import { getDashboardData } from './dashboard';
+
+describe('Test Suite', () => {
+  const mockDb = db;
+  const mockAppLogger = appLogger;
+
+  // Test implementation...
+});
+```
+
+## 🔧 TypeScript Best Practices
+
+### Type Safety
+- **NEVER** use `any` type - use `unknown` or proper interfaces
+- **ALWAYS** define explicit return types for functions
+- **ALWAYS** use proper TypeScript interfaces for props and data structures
+- **ALWAYS** use type guards when working with `unknown` types
+
+### Interface Definitions
+```typescript
+// ✅ CORRECT
+interface Asset {
+  id: string;
+  assetNumber: string;
+  type: AssetType;
+  description: string;
+  state: AssetState;
+}
+
+// ❌ INCORRECT
+const asset: any = { id: '1', type: 'LAPTOP' };
+```
+
+## 🧪 Testing Standards
+
+### Test File Structure
+- **ALWAYS** place test files next to the files they test: `Component.test.tsx`
+- **ALWAYS** use descriptive test names that explain the behavior
+- **ALWAYS** use React Testing Library for component tests
+- **ALWAYS** mock external dependencies properly
+
+### Test Patterns
+```typescript
+// ✅ CORRECT
+describe('AssetForm', () => {
+  it('should submit form with valid asset data', async () => {
+    // Arrange
+    const mockSubmit = jest.fn();
+
+    // Act
+    render(<AssetForm onSubmit={mockSubmit} />);
+    await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+    // Assert
+    expect(mockSubmit).toHaveBeenCalledWith(expect.objectContaining({
+      assetNumber: expect.any(String)
+    }));
+  });
+});
+```
+
+## 🎨 Component Standards
+
+### Component Structure
+- **ALWAYS** use functional components with explicit props typing
+- **ALWAYS** use the RORO (Receive an Object, Return an Object) pattern for complex functions
+- **ALWAYS** keep components small and focused (< 200 lines)
+- **ALWAYS** use proper TypeScript interfaces for component props
+
+### Component Example
+```typescript
+// ✅ CORRECT
+interface AssetFormProps {
+  onSubmit: (asset: Asset) => void;
+  initialData?: Partial<Asset>;
+  isLoading?: boolean;
+}
+
+export function AssetForm({ onSubmit, initialData, isLoading = false }: AssetFormProps) {
+  // Component implementation
+}
+```
+
+## 🗄️ Database & API Standards
+
+### Drizzle ORM Usage
+- **ALWAYS** use Drizzle ORM for database operations
+- **ALWAYS** use proper TypeScript types from schema
+- **ALWAYS** handle database errors gracefully
+- **NEVER** use raw SQL unless absolutely necessary
+
+### API Route Structure
+- **ALWAYS** use Next.js 15 App Router API routes
+- **ALWAYS** implement proper error handling
+- **ALWAYS** use proper HTTP status codes
+- **ALWAYS** validate input data
+
+```typescript
+// ✅ CORRECT
+export async function GET(request: NextRequest) {
+  try {
+    const assets = await db.select().from(assetsTable);
+    return NextResponse.json({ success: true, data: assets });
+  } catch (error) {
+    systemLogger.error('Failed to fetch assets:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch assets' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## 🎯 File Organization
+
+### Import Order
+1. **External libraries** (React, Next.js, etc.)
+2. **Internal absolute imports** (@/lib/*, @/components/*)
+3. **Relative imports** (./Component, ../utils)
+4. **Type imports** (import type {...})
+5. **Style imports** (CSS, SCSS)
+
+### File Naming
+- **Components**: PascalCase (`AssetForm.tsx`)
+- **Tests**: Same name with `.test.tsx` suffix (`AssetForm.test.tsx`)
+- **Hooks**: `use` prefix (`useAssetData.ts`)
+- **Utils**: camelCase (`assetUtils.ts`)
+- **Types**: PascalCase (`AssetTypes.ts`)
+
+## 🚨 ESLint & Code Quality
+
+### ESLint Rules to Follow
+- `@typescript-eslint/no-require-imports`: Prevents require() usage
+- `@typescript-eslint/no-unused-vars`: Prevents unused variables
+- `@typescript-eslint/no-explicit-any`: Prevents any type usage
+- `import/order`: Enforces import ordering
+
+### Code Quality Checklist
+- [ ] No `require()` statements
+- [ ] No `any` types used
+- [ ] All imports use ES6 syntax
+- [ ] Proper TypeScript interfaces defined
+- [ ] Error handling implemented
+- [ ] Tests written for new functionality
+- [ ] ESLint passes without errors
+
+## 🛠️ Development Workflow
+
+### Before Committing
+1. **Run ESLint**: `yarn lint`
+2. **Run TypeScript check**: `yarn type-check`
+3. **Run tests**: `yarn test`
+4. **Ensure clean build**: `yarn build`
+
+### Code Review Guidelines
+- Check for proper TypeScript usage
+- Verify ES6 imports are used
+- Ensure proper error handling
+- Review test coverage
+- Check for unused variables/imports
+
+## 📚 Common Patterns
+
+### Error Handling
+```typescript
+// ✅ CORRECT
+try {
+  const result = await someAsyncOperation();
+  return NextResponse.json({ success: true, data: result });
+} catch (error) {
+  systemLogger.error('Operation failed:', error);
+  return NextResponse.json(
+    { success: false, error: 'Operation failed' },
+    { status: 500 }
+  );
+}
+```
+
+### Loading States
+```typescript
+// ✅ CORRECT
+const [isLoading, setIsLoading] = useState(false);
+const [error, setError] = useState<string | null>(null);
+
+if (isLoading) return <LoadingSpinner />;
+if (error) return <ErrorMessage message={error} />;
+```
+
+### Form Handling
+```typescript
+// ✅ CORRECT
+const handleSubmit = async (data: FormData) => {
+  try {
+    setIsLoading(true);
+    const result = await submitForm(data);
+    onSuccess(result);
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+This comprehensive rule set ensures the TwoSpace frontend maintains high code quality, consistency, and follows modern JavaScript/TypeScript best practices.

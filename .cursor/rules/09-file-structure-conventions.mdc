@@ -1,0 +1,24 @@
+---
+description: File and directory structure conventions for maintainability.
+globs: **/*
+alwaysApply: false
+---
+
+# File Structure Conventions
+
+## Directories
+- Use lowercase, dash-separated names (e.g., `user-profile`).
+- Group related files in feature folders.
+
+## File Naming
+- Component: `ComponentName.tsx`
+- Test: `ComponentName.test.tsx`
+- Hook: `useFeature.ts`
+- API route: `route.ts`
+
+## Placement
+- Components: `src/components/`
+- Hooks: `src/hooks/`
+- Utils: `src/utils/`
+- Context: `src/contexts/`
+- API: `src/app/api/`
