@@ -1,5 +1,29 @@
 // filepath: frontend/lib/db/utils.test.ts
 
+/*
+MIT License
+
+Copyright (c) 2025 Tom Welsh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 import {
   generateAssetNumber,
   getActiveAssets,
@@ -72,7 +96,7 @@ describe("lib/db/utils", () => {
       });
 
       // Import the function dynamically to avoid module loading issues
-      
+
       const result = await generateAssetNumber("MOBILE_PHONE");
 
       expect(result).toBe("01-01000");
@@ -95,7 +119,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       const result = await generateAssetNumber("LAPTOP");
 
       expect(result).toBe("04-05000");
@@ -110,7 +133,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       await expect(generateAssetNumber("MOBILE_PHONE")).rejects.toThrow(
         "Failed to generate asset number"
       );
@@ -123,7 +145,6 @@ describe("lib/db/utils", () => {
         throw dbError;
       });
 
-      
       await expect(generateAssetNumber("MOBILE_PHONE")).rejects.toThrow(
         "Failed to generate asset number"
       );
@@ -146,7 +167,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       const result = await getActiveAssets();
 
       expect(result).toEqual(mockAssets);
@@ -166,7 +186,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       await getActiveAssets({ type: "MOBILE_PHONE" });
 
       expect(appLogger.info).toHaveBeenCalledWith("getActiveAssets called", {
@@ -185,7 +204,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       await getActiveAssets({ state: "AVAILABLE" });
 
       expect(appLogger.info).toHaveBeenCalledWith("getActiveAssets called", {
@@ -204,7 +222,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       await getActiveAssets({ locationId: "loc-123" });
 
       expect(appLogger.info).toHaveBeenCalledWith("getActiveAssets called", {
@@ -223,7 +240,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       await getActiveAssets({ search: "iPhone" });
 
       expect(appLogger.info).toHaveBeenCalledWith("getActiveAssets called", {
@@ -244,7 +260,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       await getActiveAssets({ limit: 10, offset: 20 });
 
       expect(appLogger.info).toHaveBeenCalledWith("getActiveAssets called", {
@@ -258,7 +273,6 @@ describe("lib/db/utils", () => {
         throw dbError;
       });
 
-      
       await expect(getActiveAssets()).rejects.toThrow(
         "Failed to retrieve assets"
       );
@@ -300,7 +314,6 @@ describe("lib/db/utils", () => {
           }),
         });
 
-      
       const result = await getAssetStatistics();
 
       expect(result).toEqual({
@@ -327,7 +340,6 @@ describe("lib/db/utils", () => {
         }),
       });
 
-      
       const result = await getAssetStatistics();
 
       expect(result).toEqual({
@@ -343,7 +355,6 @@ describe("lib/db/utils", () => {
         throw dbError;
       });
 
-      
       await expect(getAssetStatistics()).rejects.toThrow(
         "Failed to get asset statistics"
       );

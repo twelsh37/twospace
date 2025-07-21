@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/30</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -257,7 +257,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -338,21 +338,21 @@
 &nbsp;
 "use client";
 &nbsp;
-<span class="cstat-no" title="statement not covered" >import React, { useState, useEffect } from "react";</span>
-<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
-<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
-<span class="cstat-no" title="statement not covered" >import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";</span>
+import React, { useState, useEffect } from <span class="cstat-no" title="statement not covered" >"react";</span>
+import { useAuth } from <span class="cstat-no" title="statement not covered" >"@/lib/auth-context";</span>
+import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
+import { Card, CardContent, CardHeader, CardTitle } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
 &nbsp;
-const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
   const { user, session, loading, userRole } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
   const [cookies, setCookies] = <span class="cstat-no" title="statement not covered" >useState&lt;string[]&gt;([]);</span>
   const [accessToken, setAccessToken] = <span class="cstat-no" title="statement not covered" >useState&lt;string | null&gt;(null);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
     // Get all cookies
     const allCookies = <span class="cstat-no" title="statement not covered" >document.cookie</span>
       .split(";")
-      .map(<span class="fstat-no" title="function not covered" >(c</span>ookie) =&gt; <span class="cstat-no" title="statement not covered" >cookie.trim())</span>;
+      .map(<span class="fstat-no" title="function not covered" >(c</span>ookie) =&gt; <span class="cstat-no" title="statement not covered" >cookie.trim());</span>
 <span class="cstat-no" title="statement not covered" >    setCookies(allCookies);</span>
 &nbsp;
     // Get access token from session
@@ -361,7 +361,7 @@ const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not cove
     }
   }, [session]);
 &nbsp;
-  const clearAllCookies = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+  const clearAllCookies = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
     const cookies = <span class="cstat-no" title="statement not covered" >document.cookie.split(";");</span>
 <span class="cstat-no" title="statement not covered" >    cookies.forEach(<span class="fstat-no" title="function not covered" >(c</span>ookie) =&gt; {</span>
       const [name] = <span class="cstat-no" title="statement not covered" >cookie.split("=");</span>
@@ -371,7 +371,7 @@ const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not cove
 <span class="cstat-no" title="statement not covered" >    window.location.reload();</span>
   };
 &nbsp;
-  const testHoldingAssetsAPI = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
+  const testHoldingAssetsAPI = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async () =&gt; {</span></span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const res = <span class="cstat-no" title="statement not covered" >await fetch("/api/holding-assets", {</span>
         headers: {
@@ -392,7 +392,7 @@ const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not cove
     }
   };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;div className="container mx-auto p-4 space-y-4"&gt;
       &lt;h1 className="text-2xl font-bold"&gt;Authentication Debug&lt;/h1&gt;
 &nbsp;
@@ -467,7 +467,7 @@ const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not cove
   );
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default DebugAuthPage;</span>
+<span class="cstat-no" title="statement not covered" >export default <span class="cstat-no" title="statement not covered" >D</span>ebugAuthPage;</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -475,7 +475,7 @@ const DebugAuthPage: React.FC = <span class="cstat-no" title="statement not cove
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T12:06:55.983Z
+                at 2025-07-21T01:43:14.893Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

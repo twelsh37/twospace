@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/46</span>
+                <span class='fraction'>0/44</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/51</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/45</span>
+                <span class='fraction'>0/43</span>
             </div>
         
             
@@ -282,10 +282,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -343,13 +343,13 @@
 // User Profile Page: View and update profile info, including avatar
 &nbsp;
 "use client";
-<span class="cstat-no" title="statement not covered" >import { useEffect, useState, ChangeEvent } from "react";</span>
-<span class="cstat-no" title="statement not covered" >import { createClientComponentClient } from "@/lib/supabase";</span>
-<span class="cstat-no" title="statement not covered" >import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";</span>
-<span class="cstat-no" title="statement not covered" >import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";</span>
-<span class="cstat-no" title="statement not covered" >import { Input } from "@/components/ui/input";</span>
-<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
-<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
+import { useEffect, useState, ChangeEvent } from <span class="cstat-no" title="statement not covered" >"react";</span>
+import { createClientComponentClient } from <span class="cstat-no" title="statement not covered" >"@/lib/supabase";</span>
+import { Avatar, AvatarImage, AvatarFallback } from <span class="cstat-no" title="statement not covered" >"@/components/ui/avatar";</span>
+import { Card, CardHeader, CardTitle, CardContent } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
+import { Input } from <span class="cstat-no" title="statement not covered" >"@/components/ui/input";</span>
+import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
+import { useAuth } from <span class="cstat-no" title="statement not covered" >"@/lib/auth-context";</span>
 &nbsp;
 interface ProfileData {
   name: string;
@@ -358,7 +358,7 @@ interface ProfileData {
   avatar_url?: string;
 }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default function <span class="fstat-no" title="function not covered" >P</span>rofilePage(</span>) {
+export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >ProfilePage() {</span></span>
   const { userRole } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
   const [profile, setProfile] = <span class="cstat-no" title="statement not covered" >useState&lt;ProfileData | null&gt;(null);</span>
   const [avatarFile, setAvatarFile] = <span class="cstat-no" title="statement not covered" >useState&lt;File | null&gt;(null);</span>
@@ -368,8 +368,8 @@ interface ProfileData {
   const [error, setError] = <span class="cstat-no" title="statement not covered" >useState&lt;string | null&gt;(null);</span>
 &nbsp;
   // Fetch user profile from Supabase session
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
-    const fetchProfile = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+    const fetchProfile = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async () =&gt; {</span></span>
       const supabase = <span class="cstat-no" title="statement not covered" >createClientComponentClient();</span>
       const {
         data: { session },
@@ -401,7 +401,7 @@ interface ProfileData {
   };
 &nbsp;
   // Handle avatar upload (Supabase Storage or placeholder)
-  const handleAvatarUpload = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
+  const handleAvatarUpload = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async () =&gt; {</span></span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!avatarFile) <span class="cstat-no" title="statement not covered" >return;</span></span>
 <span class="cstat-no" title="statement not covered" >    setSaving(true);</span>
 <span class="cstat-no" title="statement not covered" >    setError(null);</span>
@@ -409,7 +409,7 @@ interface ProfileData {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       // Placeholder: In production, upload to Supabase Storage and update user profile
       // For now, just simulate success
-<span class="cstat-no" title="statement not covered" >      setTimeout(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      setTimeout(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
 <span class="cstat-no" title="statement not covered" >        setSuccess("Avatar updated (placeholder, not actually uploaded)");</span>
 <span class="cstat-no" title="statement not covered" >        setSaving(false);</span>
       }, 1000);
@@ -420,10 +420,10 @@ interface ProfileData {
   };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!profile) {</span>
-<span class="cstat-no" title="statement not covered" >    return &lt;div className="p-8 text-center"&gt;Loading profile...&lt;/div&gt;;</span>
+    return &lt;div className="p-8 text-center"&gt;Loading profile...&lt;/div&gt;;
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;div className="flex flex-col items-center justify-center min-h-[60vh] py-8 px-4"&gt;
       &lt;Card className="w-full max-w-md mx-auto shadow-lg border rounded-xl"&gt;
         &lt;CardHeader className="pb-2"&gt;
@@ -443,15 +443,15 @@ interface ProfileData {
               Change Avatar
             &lt;/label&gt;
             &lt;Input type="file" accept="image/*" onChange={handleAvatarChange} /&gt;
-            {avatarFile &amp;&amp; (
+            {<span class="branch-0 cbranch-no" title="branch not covered" >avatarFile &amp;&amp; (</span>
               &lt;Button size="sm" onClick={handleAvatarUpload} disabled={saving}&gt;
                 {saving ? "Uploading..." : "Upload Avatar"}
               &lt;/Button&gt;
             )}
-            {success &amp;&amp; (
+            {<span class="branch-0 cbranch-no" title="branch not covered" >success &amp;&amp; (</span>
               &lt;div className="text-green-600 text-sm mt-1"&gt;{success}&lt;/div&gt;
             )}
-            {error &amp;&amp; &lt;div className="text-red-600 text-sm mt-1"&gt;{error}&lt;/div&gt;}
+            {<span class="branch-0 cbranch-no" title="branch not covered" >error &amp;&amp; &lt;</span>div className="text-red-600 text-sm mt-1"&gt;{error}&lt;/div&gt;}
           &lt;/div&gt;
           {/* Profile Info */}
           &lt;div className="w-full flex flex-col gap-2 mt-4"&gt;
@@ -484,7 +484,7 @@ interface ProfileData {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T12:06:55.922Z
+                at 2025-07-21T01:43:14.831Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

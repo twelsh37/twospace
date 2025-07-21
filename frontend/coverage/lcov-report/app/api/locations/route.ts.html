@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">67.69% </span>
+                <span class="strong">56.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>44/65</span>
+                <span class='fraction'>42/74</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">58.33% </span>
+                <span class="strong">52.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>21/36</span>
+                <span class='fraction'>21/40</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">68.25% </span>
+                <span class="strong">56.94% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>43/63</span>
+                <span class='fraction'>41/72</span>
             </div>
         
             
@@ -263,7 +263,23 @@
 <a name='L198'></a><a href='#L198'>198</a>
 <a name='L199'></a><a href='#L199'>199</a>
 <a name='L200'></a><a href='#L200'>200</a>
-<a name='L201'></a><a href='#L201'>201</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -282,7 +298,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
@@ -390,16 +406,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -473,7 +505,7 @@ import { systemLogger, appLogger } from "@/lib/logger";
 import { requireAdmin } from "@/lib/supabase-auth-helpers";
 import { NextRequest } from "next/server";
 &nbsp;
-export const dynamic = "force-dynamic";
+export const <span class="cstat-no" title="statement not covered" >dynamic = "</span>force-dynamic";
 &nbsp;
 // Define standard CORS headers for reusability
 const corsHeaders = {
@@ -590,20 +622,36 @@ export async function GET(req: NextRequest) {
 }
 &nbsp;
 // Add an OPTIONS handler for preflight requests
-export async function <span class="fstat-no" title="function not covered" >OPTIONS(</span>) {
+export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >OPTIONS() {</span></span>
 <span class="cstat-no" title="statement not covered" >  return new NextResponse(null, { headers: corsHeaders });</span>
 }
 &nbsp;
 // Add POST handler for creating a new location
-export async function <span class="fstat-no" title="function not covered" >POST(</span>req: NextRequest) {
+export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >POST(r</span></span>eq: NextRequest) {
+<span class="cstat-no" title="statement not covered" >  console.log("=== LOCATIONS API DEBUG ===");</span>
+<span class="cstat-no" title="statement not covered" >  console.log("Request headers:", Object.fromEntries(req.headers.entries()));</span>
+&nbsp;
   // Require ADMIN for creating locations
-  const user = <span class="cstat-no" title="statement not covered" >await requireAdmin(req);</span>
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (user instanceof NextResponse) <span class="cstat-no" title="statement not covered" >return user; </span></span>// Not authorized
+  const authResult = <span class="cstat-no" title="statement not covered" >await requireAdmin(req);</span>
+<span class="cstat-no" title="statement not covered" >  console.log("Auth result:", authResult);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (authResult.error || !authResult.data.user) {</span>
+<span class="cstat-no" title="statement not covered" >    console.log("Authentication failed:", authResult.error);</span>
+<span class="cstat-no" title="statement not covered" >    return NextResponse.json(</span>
+      { error: authResult.error?.message || "Not authorized" },
+      { status: 401, headers: corsHeaders }
+    );
+  }
+  const user = <span class="cstat-no" title="statement not covered" >authResult.data.user;</span>
+<span class="cstat-no" title="statement not covered" >  console.log("User authenticated:", user.email);</span>
+&nbsp;
   // Log the start of the POST request
 <span class="cstat-no" title="statement not covered" >  appLogger.info("POST /api/locations called");</span>
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const body = <span class="cstat-no" title="statement not covered" >await req.json();</span>
+<span class="cstat-no" title="statement not covered" >    console.log("Request body:", body);</span>
     const { name, description, isActive } = <span class="cstat-no" title="statement not covered" >body;</span>
+<span class="cstat-no" title="statement not covered" >    console.log("Extracted fields:", { name, description, isActive });</span>
 <span class="cstat-no" title="statement not covered" >    appLogger.info("Creating new location", { name, description, isActive });</span>
 &nbsp;
     // Validate required fields
@@ -670,7 +718,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T12:06:55.922Z
+                at 2025-07-21T01:43:14.831Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

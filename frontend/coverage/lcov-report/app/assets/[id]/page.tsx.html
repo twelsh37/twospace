@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/42</span>
+                <span class='fraction'>0/41</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/41</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -278,7 +278,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -351,19 +351,19 @@
 //
 // NOTE: Next.js 15 dynamic route pages must use params as a Promise and unwrap with use().
 &nbsp;
-<span class="cstat-no" title="statement not covered" >import { useState, useEffect, use } from "react";</span>
-<span class="cstat-no" title="statement not covered" >import { AssetDetail } from "@/components/assets/asset-detail";</span>
-<span class="cstat-no" title="statement not covered" >import { AssetStateTransition } from "@/components/assets/asset-state-transition";</span>
-<span class="cstat-no" title="statement not covered" >import { AssetHistory } from "@/components/assets/asset-history";</span>
-<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
-<span class="cstat-no" title="statement not covered" >import { ArrowLeft, Edit, Trash2 } from "lucide-react";</span>
-<span class="cstat-no" title="statement not covered" >import Link from "next/link";</span>
-<span class="cstat-no" title="statement not covered" >import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";</span>
-<span class="cstat-no" title="statement not covered" >import { useRouter } from "next/navigation";</span>
+import { useState, useEffect, use } from <span class="cstat-no" title="statement not covered" >"react";</span>
+import { AssetDetail } from <span class="cstat-no" title="statement not covered" >"@/components/assets/asset-detail";</span>
+import { AssetStateTransition } from <span class="cstat-no" title="statement not covered" >"@/components/assets/asset-state-transition";</span>
+import { AssetHistory } from <span class="cstat-no" title="statement not covered" >"@/components/assets/asset-history";</span>
+import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
+import { ArrowLeft, Edit, Trash2 } from <span class="cstat-no" title="statement not covered" >"lucide-react";</span>
+import Link from <span class="cstat-no" title="statement not covered" >"next/link";</span>
+import { ConfirmDeleteModal } from <span class="cstat-no" title="statement not covered" >"@/components/ui/confirm-delete-modal";</span>
+import { useRouter } from <span class="cstat-no" title="statement not covered" >"next/navigation";</span>
 import { Asset } from "@/lib/types";
-<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
+import { useAuth } from <span class="cstat-no" title="statement not covered" >"@/lib/auth-context";</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export default function <span class="fstat-no" title="function not covered" >P</span>age(</span>{ params }: { params: Promise&lt;{ id: string }&gt; }) {
+export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >Page({</span></span> params }: { params: Promise&lt;{ id: string }&gt; }) {
   const [deleteModalOpen, setDeleteModalOpen] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
   const [deleting, setDeleting] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
   const [asset, setAsset] = <span class="cstat-no" title="statement not covered" >useState&lt;Asset | null&gt;(null);</span>
@@ -376,8 +376,8 @@ import { Asset } from "@/lib/types";
   const isUser = <span class="cstat-no" title="statement not covered" >currentUserRole === "USER";</span>
 &nbsp;
   // Fetch asset data once for all subcomponents
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
-    async function <span class="fstat-no" title="function not covered" >fetchAsset(</span>) {
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+    async function <span class="fstat-no" title="function not covered" >fetchAsset() {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
         const res = <span class="cstat-no" title="statement not covered" >await fetch(`/api/assets/${id}`);</span>
 <span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (!res.ok) <span class="cstat-no" title="statement not covered" >throw new Error("Failed to fetch asset");</span></span>
@@ -391,7 +391,7 @@ import { Asset } from "@/lib/types";
   }, [id]);
 &nbsp;
   // Handler for delete confirmation
-  const handleDeleteConfirmed = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>(reason: string, comment: string) =&gt; {</span>
+  const handleDeleteConfirmed = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async (r</span>eason: string, comment: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    setDeleting(true);</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
       // Attach Authorization header if access token is available
@@ -419,7 +419,7 @@ import { Asset } from "@/lib/types";
 <span class="cstat-no" title="statement not covered" >    setDeleting(false);</span>
   };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;div className="flex-1 space-y-4 p-4 pt-6 md:p-8"&gt;
       {/* Page Header */}
       &lt;div className="flex items-center space-x-2"&gt;
@@ -448,7 +448,7 @@ import { Asset } from "@/lib/types";
           &lt;Button
             variant="destructive"
             size="sm"
-            onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setDeleteModalOpen(true)}</span>
+            onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etDeleteModalOpen(true)}</span>
             disabled={isUser}
             title={
               isUser ? "You do not have permission to delete assets." : "Delete"
@@ -476,12 +476,12 @@ import { Asset } from "@/lib/types";
       &lt;div className="grid gap-6 md:grid-cols-2"&gt;
         {/* Asset Details */}
         &lt;div className="space-y-6"&gt;
-          {asset &amp;&amp; &lt;AssetDetail asset={asset} /&gt;}
+          {<span class="branch-0 cbranch-no" title="branch not covered" >asset &amp;&amp; &lt;</span>AssetDetail asset={asset} /&gt;}
           {/* Only show state transition if asset exists */}
-          {asset &amp;&amp; &lt;AssetStateTransition asset={asset} setAsset={setAsset} /&gt;}
+          {<span class="branch-0 cbranch-no" title="branch not covered" >asset &amp;&amp; &lt;</span>AssetStateTransition asset={asset} setAsset={setAsset} /&gt;}
         &lt;/div&gt;
         {/* Only show asset history if asset exists */}
-        &lt;div&gt;{asset &amp;&amp; &lt;AssetHistory assetNumber={asset.assetNumber} /&gt;}&lt;/div&gt;
+        &lt;div&gt;{<span class="branch-0 cbranch-no" title="branch not covered" >asset &amp;&amp; &lt;</span>AssetHistory assetNumber={asset.assetNumber} /&gt;}&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   );
@@ -493,7 +493,7 @@ import { Asset } from "@/lib/types";
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T12:06:55.922Z
+                at 2025-07-21T01:43:14.831Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

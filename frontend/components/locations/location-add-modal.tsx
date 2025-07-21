@@ -1,4 +1,29 @@
 // frontend/components/locations/location-add-modal.tsx
+
+/*
+MIT License
+
+Copyright (c) 2025 Tom Welsh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 // Modal for adding a new location
 
 import {
@@ -33,7 +58,11 @@ export function LocationAddModal({
   onOpenChange,
   onAdded,
 }: LocationAddModalProps) {
-  const [form, setForm] = useState({ name: "", description: "", isActive: "true" });
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    isActive: "true",
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { session } = useAuth(); // Get session from auth context
@@ -47,7 +76,10 @@ export function LocationAddModal({
   const getValidationError = () => {
     if (!form.name.trim()) return "Name is required.";
     if (!form.description.trim()) return "Description is required.";
-    if (!form.isActive || (form.isActive !== "true" && form.isActive !== "false")) {
+    if (
+      !form.isActive ||
+      (form.isActive !== "true" && form.isActive !== "false")
+    ) {
       return "Please select a status.";
     }
     return null;
@@ -60,7 +92,7 @@ export function LocationAddModal({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Check validation first
@@ -84,7 +116,10 @@ export function LocationAddModal({
       const accessToken = session.access_token;
 
       console.log("Location Add - Session:", session ? "Present" : "Missing");
-      console.log("Location Add - Access Token:", accessToken ? "Present" : "Missing");
+      console.log(
+        "Location Add - Access Token:",
+        accessToken ? "Present" : "Missing"
+      );
 
       const res = await fetch("/api/locations", {
         method: "POST",
@@ -113,7 +148,7 @@ export function LocationAddModal({
         throw new Error(errorMsg);
       }
 
-            const result = await res.json();
+      const result = await res.json();
       console.log("Location Add - Success:", result);
 
       // Show success toast

@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/91</span>
+                <span class='fraction'>0/75</span>
             </div>
         
             
@@ -780,7 +780,51 @@
 <a name='L715'></a><a href='#L715'>715</a>
 <a name='L716'></a><a href='#L716'>716</a>
 <a name='L717'></a><a href='#L717'>717</a>
-<a name='L718'></a><a href='#L718'>718</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L718'></a><a href='#L718'>718</a>
+<a name='L719'></a><a href='#L719'>719</a>
+<a name='L720'></a><a href='#L720'>720</a>
+<a name='L721'></a><a href='#L721'>721</a>
+<a name='L722'></a><a href='#L722'>722</a>
+<a name='L723'></a><a href='#L723'>723</a>
+<a name='L724'></a><a href='#L724'>724</a>
+<a name='L725'></a><a href='#L725'>725</a>
+<a name='L726'></a><a href='#L726'>726</a>
+<a name='L727'></a><a href='#L727'>727</a>
+<a name='L728'></a><a href='#L728'>728</a>
+<a name='L729'></a><a href='#L729'>729</a>
+<a name='L730'></a><a href='#L730'>730</a>
+<a name='L731'></a><a href='#L731'>731</a>
+<a name='L732'></a><a href='#L732'>732</a>
+<a name='L733'></a><a href='#L733'>733</a>
+<a name='L734'></a><a href='#L734'>734</a>
+<a name='L735'></a><a href='#L735'>735</a>
+<a name='L736'></a><a href='#L736'>736</a>
+<a name='L737'></a><a href='#L737'>737</a>
+<a name='L738'></a><a href='#L738'>738</a>
+<a name='L739'></a><a href='#L739'>739</a>
+<a name='L740'></a><a href='#L740'>740</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1500,15 +1544,37 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// backend/lib/db/seed.ts
 // Standalone seed script for generating a large, realistic dataset.
 // FILEPATH: frontend/lib/db/seed.ts
-//
-// REASONING: Updated to support new schema with departments table and user location/department foreign keys. Locations and departments are now seeded from config. Users are assigned to both location and department by ID. Old department string field removed from user inserts. Admin user is assigned to a valid location and department.
 &nbsp;
-<span class="cstat-no" title="statement not covered" >import * as dotenv from "dotenv";</span>
-<span class="cstat-no" title="statement not covered" >import { drizzle } from "drizzle-orm/postgres-js";</span>
-<span class="cstat-no" title="statement not covered" >import postgres from "postgres";</span>
-<span class="cstat-no" title="statement not covered" >import { eq, ne } from "drizzle-orm";</span>
-<span class="cstat-no" title="statement not covered" >import * as schema from "./schema";</span>
-<span class="cstat-no" title="statement not covered" >import { systemLogger, appLogger } from "@/lib/logger";</span>
+/*
+MIT License
+&nbsp;
+Copyright (c) 2025 Tom Welsh
+&nbsp;
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+&nbsp;
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+&nbsp;
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+&nbsp;
+import * as dotenv from <span class="cstat-no" title="statement not covered" >"dotenv";</span>
+import { drizzle } from <span class="cstat-no" title="statement not covered" >"drizzle-orm/postgres-js";</span>
+import postgres from <span class="cstat-no" title="statement not covered" >"postgres";</span>
+import { eq, ne } from <span class="cstat-no" title="statement not covered" >"drizzle-orm";</span>
+import * as schema from <span class="cstat-no" title="statement not covered" >"./schema";</span>
+import { systemLogger, appLogger } from <span class="cstat-no" title="statement not covered" >"@/lib/logger";</span>
 &nbsp;
 const {
   usersTable,
@@ -1530,7 +1596,7 @@ type AssetBlueprint = {
 &nbsp;
 // --- Configuration ---
 const TOTAL_USERS = <span class="cstat-no" title="statement not covered" >12000;</span>
-const BATCH_SIZE = <span class="cstat-no" title="statement not covered" >500;</span> // Increased batch size for performance with large datasets
+const BATCH_SIZE = <span class="cstat-no" title="statement not covered" >500; /</span>/ Increased batch size for performance with large datasets
 &nbsp;
 // Explicitly load .env.local for this script
 <span class="cstat-no" title="statement not covered" >dotenv.config({ path: ".env.local" });</span>
@@ -1540,7 +1606,7 @@ const { POSTGRES_URL } = <span class="cstat-no" title="statement not covered" >p
 <span class="cstat-no" title="statement not covered" >  throw new Error("🔴 POSTGRES_URL environment variable is not set.");</span>
 }
 &nbsp;
-const client = <span class="cstat-no" title="statement not covered" >postgres(POSTGRES_URL, { max: 20 });</span> // Increase pool size for seeding
+const client = <span class="cstat-no" title="statement not covered" >postgres(POSTGRES_URL, { max: 20 }); /</span>/ Increase pool size for seeding
 const db = <span class="cstat-no" title="statement not covered" >drizzle(client, { schema });</span>
 &nbsp;
 // --- Data for random generation ---
@@ -1620,7 +1686,7 @@ const DEPARTMENTS_CONFIG: { [location: string]: string[] } = <span class="cstat-
 &nbsp;
 // --- Helper Functions ---
 const shuffleArray = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >&lt;T&gt;(a</span>rray: T[]): void =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >array.length - 1;</span> i &gt; 0; i--) {</span>
+<span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >array.length - 1; i</span> &gt; 0; i--) {</span>
     const j = <span class="cstat-no" title="statement not covered" >Math.floor(Math.random() * (i + 1));</span>
 <span class="cstat-no" title="statement not covered" >    [array[i], array[j]] = [array[j], array[i]];</span>
   }
@@ -1709,7 +1775,7 @@ const DEPT_HARDWARE = <span class="cstat-no" title="statement not covered" >{</s
 &nbsp;
 // --- Utility: Map state variants to canonical values for normalization ---
 const canonicalizeState = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(s</span>tate: string | undefined): string =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!state) <span class="cstat-no" title="statement not covered" >return "AVAILABLE"; </span></span>// Default for unassigned assets
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!state) <span class="cstat-no" title="statement not covered" >return "AVAILABLE"; /</span></span>/ Default for unassigned assets
   const map: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{</span>
     // Holding/Imported
     holding: "holding",
@@ -1745,18 +1811,18 @@ const canonicalizeState = <span class="cstat-no" title="statement not covered" >
  * Returns a random date between start and end.
  * If biasRecent is true, uses a quadratic distribution for more recent dates.
  */
-function <span class="fstat-no" title="function not covered" >randomDateInRange(</span>start: Date, end: Date, biasRecent = <span class="branch-0 cbranch-no" title="branch not covered" >false)</span>: Date {
+function <span class="fstat-no" title="function not covered" >randomDateInRange(s</span>tart: Date, end: Date, biasRecent = <span class="branch-0 cbranch-no" title="branch not covered" >false)</span>: Date {
   const startMs = <span class="cstat-no" title="statement not covered" >start.getTime();</span>
   const endMs = <span class="cstat-no" title="statement not covered" >end.getTime();</span>
   let t = <span class="cstat-no" title="statement not covered" >Math.random();</span>
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (biasRecent) {</span>
-<span class="cstat-no" title="statement not covered" >    t = 1 - Math.sqrt(1 - t); </span>// More recent dates are more likely
+<span class="cstat-no" title="statement not covered" >    t = 1 - Math.sqrt(1 - t); /</span>/ More recent dates are more likely
   }
   const dateMs = <span class="cstat-no" title="statement not covered" >startMs + (endMs - startMs) * t;</span>
 <span class="cstat-no" title="statement not covered" >  return new Date(dateMs);</span>
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >seedDatabase(</span>) {
+async function <span class="fstat-no" title="function not covered" >seedDatabase() {</span>
   // Log the start of the seed process
 <span class="cstat-no" title="statement not covered" >  appLogger.info("Seeding database started");</span>
 <span class="cstat-no" title="statement not covered" >  try {</span>
@@ -1838,9 +1904,9 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
     // --- Stage 3: Generate and Insert Users ---
 <span class="cstat-no" title="statement not covered" >    console.log(`\n--- Stage 3: Generating ${TOTAL_USERS} Users ---`);</span>
     const usersToInsert: schema.NewUser[] = <span class="cstat-no" title="statement not covered" >[];</span>
-    const emailCounts: { [key: string]: number } = <span class="cstat-no" title="statement not covered" >{};</span> // To track duplicate names
+    const emailCounts: { [key: string]: number } = <span class="cstat-no" title="statement not covered" >{}; /</span>/ To track duplicate names
     // Build a flat list of department-location pairs for user assignment
-    const deptLocPairs = <span class="cstat-no" title="statement not covered" >departments.map(<span class="fstat-no" title="function not covered" >(d</span>) =&gt; <span class="cstat-no" title="statement not covered" >({</span></span>
+    const deptLocPairs = <span class="cstat-no" title="statement not covered" >departments.map(<span class="fstat-no" title="function not covered" >(d</span>) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
       departmentId: d.id,
       locationId: d.locationId,
       departmentName: d.name,
@@ -1865,7 +1931,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
 <span class="cstat-no" title="statement not covered" >    emailCounts["linda.taylor"] = 1;</span>
 &nbsp;
     // 2. Generate the rest of the users (excluding Linda Taylor)
-<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; TOTAL_USERS - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0; i</span> &lt; TOTAL_USERS - 1; i++) {</span>
       const gender = <span class="cstat-no" title="statement not covered" >Math.random() &gt; 0.5 ? "male" : "female";</span>
       const firstName =
 <span class="cstat-no" title="statement not covered" >        gender === "male"</span>
@@ -1898,7 +1964,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
         updatedAt: new Date(),
       });
     }
-<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; usersToInsert.length; i += BATCH_SIZE) {</span>
+<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0; i</span> &lt; usersToInsert.length; i += BATCH_SIZE) {</span>
       const batch = <span class="cstat-no" title="statement not covered" >usersToInsert.slice(i, i + BATCH_SIZE);</span>
 <span class="cstat-no" title="statement not covered" >      console.log(</span>
         `   - 👤 Inserting user batch ${i / BATCH_SIZE + 1} of ${Math.ceil(
@@ -1915,7 +1981,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
       where: eq(usersTable.role, "USER"),
     });
     // Debug: Print all users named Linda Taylor
-    const lindaUsers = <span class="cstat-no" title="statement not covered" >allUsers.filter(<span class="fstat-no" title="function not covered" >(u</span>) =&gt; <span class="cstat-no" title="statement not covered" >u.name === "Linda Taylor")</span>;</span>
+    const lindaUsers = <span class="cstat-no" title="statement not covered" >allUsers.filter(<span class="fstat-no" title="function not covered" >(u</span>) =&gt; <span class="cstat-no" title="statement not covered" >u.name === "Linda Taylor");</span></span>
 <span class="cstat-no" title="statement not covered" >    console.log("[DEBUG] Users named Linda Taylor:");</span>
 <span class="cstat-no" title="statement not covered" >    lindaUsers.forEach(<span class="fstat-no" title="function not covered" >(u</span>) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      console.log(</span>
@@ -2024,7 +2090,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
 <span class="cstat-no" title="statement not covered" >          continue;</span>
 <span class="cstat-no" title="statement not covered" >        if (Array.isArray(modelData)) {</span>
 <span class="cstat-no" title="statement not covered" >          for (const m of modelData) {</span>
-<span class="cstat-no" title="statement not covered" >            for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; Math.ceil(count / 10); i++) {</span>
+<span class="cstat-no" title="statement not covered" >            for (let i = <span class="cstat-no" title="statement not covered" >0; i</span> &lt; Math.ceil(count / 10); i++) {</span>
 <span class="cstat-no" title="statement not covered" >              stock.push({</span>
                 type: type as (typeof assetTypeEnum.enumValues)[number],
                 model: m.model,
@@ -2034,7 +2100,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
             }
           }
         } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (modelData &amp;&amp; typeof modelData === "object") {</span>
-<span class="cstat-no" title="statement not covered" >          for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; Math.ceil(count / 5); i++) {</span>
+<span class="cstat-no" title="statement not covered" >          for (let i = <span class="cstat-no" title="statement not covered" >0; i</span> &lt; Math.ceil(count / 5); i++) {</span>
 <span class="cstat-no" title="statement not covered" >            stock.push({</span>
               type: type as (typeof assetTypeEnum.enumValues)[number],
               model: modelData.model,
@@ -2072,7 +2138,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
 <span class="cstat-no" title="statement not covered" >      throw new Error("Could not find required locations or Admin User");</span>
     }
 &nbsp;
-    const sequenceMap = <span class="cstat-no" title="statement not covered" >new Map(assetTypeEnum.enumValues.map(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >[e, 1])</span>);</span>
+    const sequenceMap = <span class="cstat-no" title="statement not covered" >new Map(assetTypeEnum.enumValues.map(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >[e, 1]));</span></span>
     const assetTypePrefixes: Record&lt;
       (typeof assetTypeEnum.enumValues)[number],
       string
@@ -2084,7 +2150,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
       MONITOR: "05",
     };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; assetBlueprints.length; i += BATCH_SIZE) {</span>
+<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0; i</span> &lt; assetBlueprints.length; i += BATCH_SIZE) {</span>
       const batchBlueprints = <span class="cstat-no" title="statement not covered" >assetBlueprints.slice(i, i + BATCH_SIZE);</span>
       const assetsToInsert: schema.NewAsset[] = <span class="cstat-no" title="statement not covered" >[];</span>
 <span class="cstat-no" title="statement not covered" >      console.log(</span>
@@ -2101,10 +2167,10 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
 <span class="cstat-no" title="statement not covered" >      fourYearsAgo.setFullYear(now.getFullYear() - 4);</span>
       const fiveYearsAgo = <span class="cstat-no" title="statement not covered" >new Date();</span>
 <span class="cstat-no" title="statement not covered" >      fiveYearsAgo.setFullYear(now.getFullYear() - 5);</span>
-<span class="cstat-no" title="statement not covered" >      for (let j = <span class="cstat-no" title="statement not covered" >0;</span> j &lt; batchBlueprints.length; j++) {</span>
+<span class="cstat-no" title="statement not covered" >      for (let j = <span class="cstat-no" title="statement not covered" >0; j</span> &lt; batchBlueprints.length; j++) {</span>
         const blueprint = <span class="cstat-no" title="statement not covered" >batchBlueprints[j];</span>
         const globalIdx = <span class="cstat-no" title="statement not covered" >i + j;</span>
-        const type = <span class="cstat-no" title="statement not covered" >blueprint.type!;</span>
+        const type = <span class="cstat-no" title="statement not covered" >blueprint.type!</span>;
         const currentSequence = <span class="cstat-no" title="statement not covered" >sequenceMap.get(type) || 1;</span>
         const assetNumber = <span class="cstat-no" title="statement not covered" >`${assetTypePrefixes[type]}-${String(</span>
           currentSequence
@@ -2221,7 +2287,7 @@ async function <span class="fstat-no" title="function not covered" >seedDatabase
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T12:06:55.983Z
+                at 2025-07-21T01:43:14.893Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
