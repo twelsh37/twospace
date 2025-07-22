@@ -160,3 +160,12 @@ body {
   -ms-user-select: text;
   user-select: text;
 }
+
+/* Custom progress bar styling for slides */
+.slides-layout [role="progressbar"] {
+  background-color: var(--progress-color, #3b82f6) !important;
+}
+
+.slides-layout [role="progressbar"] > div {
+  background-color: var(--progress-color, #3b82f6) !important;
+}

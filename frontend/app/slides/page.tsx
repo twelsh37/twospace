@@ -1,7 +1,7 @@
 // frontend/app/slides/page.tsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -788,13 +788,13 @@ export default function SlidesPage() {
     },
   ];
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
+  }, [slides.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  }, [slides.length]);
 
   const toggleAutoPlay = () => {
     setIsAutoPlaying(!isAutoPlaying);
@@ -811,19 +811,26 @@ export default function SlidesPage() {
     return () => clearInterval(interval);
   }, [isAutoPlaying, slides.length]);
 
-  // Progress bar
+  // Progress bar - only run when auto-play is active
   useEffect(() => {
+    if (!isAutoPlaying) {
+      setProgress(0);
+      return;
+    }
+
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
+          // When progress reaches 100%, advance to next slide and reset
+          nextSlide();
           return 0;
         }
-        return prev + 0.5;
+        return prev + 100 / (8000 / 40); // 8 seconds = 8000ms, update every 40ms
       });
     }, 40); // Update every 40ms for smooth animation
 
     return () => clearInterval(timer);
-  }, []);
+  }, [isAutoPlaying, nextSlide]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -870,7 +877,17 @@ export default function SlidesPage() {
             </Button>
           </div>
         </div>
-        <Progress value={progress} className="h-1" />
+        <Progress
+          value={progress}
+          className="h-1 bg-gray-200"
+          style={
+            {
+              "--progress-color": `hsl(${220 + progress * 0.4}, 70%, ${
+                50 + progress * 0.3
+              }%)`,
+            } as React.CSSProperties
+          }
+        />
       </div>
 
       {/* Main Content */}
