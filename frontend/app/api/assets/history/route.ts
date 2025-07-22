@@ -1,5 +1,5 @@
-// frontend/app/page.test.tsx
-// Tests for main page
+// frontend/app/api/assets/history/route.ts
+// API route for fetching asset history
 
 /*
 MIT License
@@ -25,23 +25,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// Mock Next.js navigation
-jest.mock("next/navigation", () => ({
-  redirect: jest.fn(),
-}));
+import { NextResponse } from "next/server";
 
-import HomePage from "./page";
-import { redirect } from "next/navigation";
-
-describe("HomePage", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("redirects to dashboard", () => {
-    // Call the component function directly since it doesn't return JSX
-    HomePage();
-
-    expect(redirect).toHaveBeenCalledWith("/dashboard");
-  });
-});
+// Placeholder for asset history API route
+export async function GET() {
+  return NextResponse.json(
+    { error: "Asset history endpoint not yet implemented" },
+    { status: 501 }
+  );
+}

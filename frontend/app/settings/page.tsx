@@ -1,5 +1,5 @@
 // frontend/app/settings/page.tsx
-// Settings page for system-wide configuration (report cache duration, depreciation, tools)
+// Application settings page
 
 /*
 MIT License

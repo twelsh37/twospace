@@ -1,5 +1,5 @@
 // frontend/app/auth/login/page.tsx
-// Login page for Supabase authentication, rebuilt to match reference image exactly
+// Login page for user authentication
 
 /*
 MIT License

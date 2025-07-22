@@ -1,5 +1,5 @@
 // frontend/app/assets/page.tsx
-// Assets Management Page
+// Main assets management page
 
 /*
 MIT License

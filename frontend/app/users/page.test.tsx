@@ -1,5 +1,5 @@
 // frontend/app/users/page.test.tsx
-// Unit/functional tests for the users page
+// Tests for users page
 
 /*
 MIT License

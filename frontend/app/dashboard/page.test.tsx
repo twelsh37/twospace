@@ -1,5 +1,5 @@
 // frontend/app/dashboard/page.test.tsx
-// Unit/functional tests for the DashboardPage
+// Tests for dashboard page
 
 /*
 MIT License

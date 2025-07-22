@@ -1,10 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// frontend/app/reports/page.tsx
+// Reports management page
+
+/*
+MIT License
+
+Copyright (c) 2025 Tom Welsh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 "use client";
-// filepath: frontend/app/reports/page.tsx
-// Main Reports Page for IT Asset Management System
-// This file contains navigation and placeholders for all report types.
-// Uses Chart.js for graphs (Asset Inventory as example).
-// Includes Print, Email, Share, and Export buttons.
 
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { Bar, Line } from "react-chartjs-2";
@@ -242,13 +263,21 @@ function AssetInventoryReport({
   // Function to gather export data on demand
   function getExportData(): AssetInventoryExportData {
     const chart1 =
-      (chartTypeRef.current as any)?.toBase64Image?.() || undefined;
+      (
+        chartTypeRef.current as unknown as { toBase64Image?: () => string }
+      )?.toBase64Image?.() || undefined;
     const chart2 =
-      (chartStateRef.current as any)?.toBase64Image?.() || undefined;
+      (
+        chartStateRef.current as unknown as { toBase64Image?: () => string }
+      )?.toBase64Image?.() || undefined;
     const chart3 =
-      (chartBuildingRef.current as any)?.toBase64Image?.() || undefined;
+      (
+        chartBuildingRef.current as unknown as { toBase64Image?: () => string }
+      )?.toBase64Image?.() || undefined;
     const chart4 =
-      (chartReadyRef.current as any)?.toBase64Image?.() || undefined;
+      (
+        chartReadyRef.current as unknown as { toBase64Image?: () => string }
+      )?.toBase64Image?.() || undefined;
     return {
       chart1,
       chart2,
@@ -308,6 +337,7 @@ function AssetInventoryReport({
               <div className="w-full flex flex-col gap-4 items-center">
                 <div className="w-full max-w-xs mx-auto">
                   <Bar
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ref={chartTypeRef as any}
                     data={data}
                     options={options}
@@ -408,6 +438,7 @@ function AssetInventoryReport({
               <div className="w-full flex flex-col gap-4 items-center">
                 <div className="w-full max-w-xs mx-auto">
                   <Bar
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ref={chartStateRef as any}
                     data={stateData}
                     options={stateOptions}
@@ -511,6 +542,7 @@ function AssetInventoryReport({
               <div className="w-full flex flex-col gap-4 items-center">
                 <div className="w-full max-w-xs mx-auto">
                   <Bar
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ref={chartBuildingRef as any}
                     data={buildingData}
                     options={options}
@@ -613,6 +645,7 @@ function AssetInventoryReport({
               <div className="w-full flex flex-col gap-4 items-center">
                 <div className="w-full max-w-xs mx-auto">
                   <Bar
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     ref={chartReadyRef as any}
                     data={{
                       labels: Object.keys(byTypeInReadyToGo).sort(),
@@ -781,8 +814,8 @@ function LifecycleManagementReport({ onExport }: { onExport: () => void }) {
         const json = await res.json();
         if (!json.byYear) throw new Error(json.error || "No year data");
         setYearCounts(json.byYear);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch data");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -1001,8 +1034,8 @@ function FinancialReport({ onExport }: { onExport: () => void }) {
           throw new Error(json.error || "No data");
         setByType(json.byType);
         setByYear(json.byYear);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch data");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch data");
       } finally {
         setLoading(false);
       }
@@ -1043,7 +1076,7 @@ function FinancialReport({ onExport }: { onExport: () => void }) {
       title: { display: false },
       tooltip: {
         callbacks: {
-          label: (ctx: any) =>
+          label: (ctx: { parsed: { y: number } }) =>
             `£${ctx.parsed.y.toLocaleString(undefined, {
               maximumFractionDigits: 2,
             })}`,
@@ -1075,7 +1108,7 @@ function FinancialReport({ onExport }: { onExport: () => void }) {
       title: { display: false },
       tooltip: {
         callbacks: {
-          label: (ctx: any) =>
+          label: (ctx: { parsed: { y: number } }) =>
             `£${ctx.parsed.y.toLocaleString(undefined, {
               maximumFractionDigits: 2,
             })}`,

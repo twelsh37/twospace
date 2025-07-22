@@ -1,5 +1,5 @@
 // frontend/app/users/page.tsx
-// Users Management Page (SSR + Client Interactivity)
+// User management page
 
 /*
 MIT License
