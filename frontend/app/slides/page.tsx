@@ -878,13 +878,15 @@ export default function SlidesPage() {
           </div>
         </div>
         <Progress
-          value={progress}
+          value={isAutoPlaying ? progress : 0}
           className="h-1 bg-gray-200"
           style={
             {
-              "--progress-color": `hsl(${220 + progress * 0.4}, 70%, ${
-                50 + progress * 0.3
-              }%)`,
+              "--progress-color": isAutoPlaying
+                ? `hsl(${220 + progress * 0.4}, 70%, ${
+                    50 + progress * 0.3
+                  }%)`
+                : 'transparent',
             } as React.CSSProperties
           }
         />
