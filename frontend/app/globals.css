@@ -134,3 +134,29 @@ body {
 * {
   font-family: inherit;
 }
+
+/* Slide deck specific styles */
+.slides-layout {
+  overflow-x: hidden;
+}
+
+/* Smooth transitions for slide content */
+.slide-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Prevent text selection during swipe */
+.slides-layout * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in content areas */
+.slides-layout .content-selectable {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
