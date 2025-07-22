@@ -163,9 +163,11 @@ body {
 
 /* Custom progress bar styling for slides */
 .slides-layout [role="progressbar"] {
-  background-color: var(--progress-color, transparent) !important;
+  background-color: var(--progress-color, #f8fafc) !important;
+  border: 1px solid #e2e8f0;
 }
 
 .slides-layout [role="progressbar"] > div {
-  background-color: var(--progress-color, transparent) !important;
+  background-color: var(--progress-color, #f8fafc) !important;
+  transition: background-color 0.3s ease;
 }

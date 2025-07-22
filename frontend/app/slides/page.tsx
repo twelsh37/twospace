@@ -883,10 +883,8 @@ export default function SlidesPage() {
           style={
             {
               "--progress-color": isAutoPlaying
-                ? `hsl(${220 + progress * 0.4}, 70%, ${
-                    50 + progress * 0.3
-                  }%)`
-                : 'transparent',
+                ? `hsl(${220 + progress * 0.2}, 80%, ${85 - progress * 0.5}%)`
+                : "#f8fafc", // Light gray background color
             } as React.CSSProperties
           }
         />
