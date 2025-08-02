@@ -41,6 +41,7 @@ import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@/lib/supabase";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 
 export default function SettingsPage() {
   const [cacheDuration, setCacheDuration] = useState(30);
@@ -104,6 +105,7 @@ export default function SettingsPage() {
     setPasswordLoading(true);
     setPasswordSuccess(null);
     setPasswordError(null);
+
     // Validate passwords match before submitting
     if (newPassword !== confirmPassword) {
       setPasswordError("Passwords do not match.");
@@ -114,6 +116,18 @@ export default function SettingsPage() {
       }
       return;
     }
+
+    // Validate password requirements
+    const { validatePassword } = await import("@/lib/password-validation");
+    const validation = validatePassword(newPassword);
+    if (!validation.isValid) {
+      setPasswordError(
+        "Password does not meet requirements. Please check the requirements below."
+      );
+      setPasswordLoading(false);
+      return;
+    }
+
     try {
       const supabase = createClientComponentClient();
       // Supabase only requires new password, but you may want to verify current password client-side
@@ -489,12 +503,16 @@ export default function SettingsPage() {
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          minLength={6}
+                          minLength={12}
                           required
                           placeholder="Enter new password"
                           disabled={passwordLoading}
                           ref={newPasswordRef}
                         />
+                        {/* Password Strength Indicator */}
+                        {newPassword && (
+                          <PasswordStrengthIndicator password={newPassword} />
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1">
@@ -504,7 +522,7 @@ export default function SettingsPage() {
                           type="password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          minLength={6}
+                          minLength={12}
                           required
                           placeholder="Re-enter new password"
                           disabled={passwordLoading}
@@ -526,8 +544,8 @@ export default function SettingsPage() {
                           type="submit"
                           disabled={
                             passwordLoading ||
-                            newPassword.length < 6 ||
-                            confirmPassword.length < 6
+                            newPassword.length < 12 ||
+                            confirmPassword.length < 12
                           }
                         >
                           {passwordLoading ? "Updating..." : "Change Password"}
