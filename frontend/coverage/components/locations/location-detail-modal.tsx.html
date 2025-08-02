@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>0/18</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -175,7 +175,17 @@
 <a name='L110'></a><a href='#L110'>110</a>
 <a name='L111'></a><a href='#L111'>111</a>
 <a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,6 +213,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,12 +244,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -249,9 +256,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -315,15 +335,16 @@ SOFTWARE.
 &nbsp;
 // Modal for viewing location details
 &nbsp;
-import {
+<span class="cstat-no" title="statement not covered" >import {</span>
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from <span class="cstat-no" title="statement not covered" >"@/components/ui/dialog";</span>
-import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
-import { useEffect, useState } from <span class="cstat-no" title="statement not covered" >"react";</span>
+} from "@/components/ui/dialog";
+<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
+<span class="cstat-no" title="statement not covered" >import { useEffect, useState } from "react";</span>
+<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
 &nbsp;
 interface LocationDetailModalProps {
   locationId: string | null;
@@ -338,20 +359,29 @@ interface Location {
   isActive: boolean;
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >LocationDetailModal({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >L</span>ocationDetailModal(</span>{
   locationId,
   open,
   onOpenChange,
 }: LocationDetailModalProps) {
   const [location, setLocation] = <span class="cstat-no" title="statement not covered" >useState&lt;Location | null&gt;(null);</span>
   const [loading, setLoading] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
+  const { session } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!locationId || !open) <span class="cstat-no" title="statement not covered" >return;</span></span>
 <span class="cstat-no" title="statement not covered" >    setLoading(true);</span>
-    async function <span class="fstat-no" title="function not covered" >fetchLocation() {</span>
+    async function <span class="fstat-no" title="function not covered" >fetchLocation(</span>) {
 <span class="cstat-no" title="statement not covered" >      try {</span>
-        const res = <span class="cstat-no" title="statement not covered" >await fetch(`/api/locations/${locationId}`);</span>
+        // Add authorization header if session exists
+        const headers: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{</span>
+          "Content-Type": "application/json",
+        };
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (session?.access_token) {</span>
+<span class="cstat-no" title="statement not covered" >          headers["Authorization"] = `Bearer ${session.access_token}`;</span>
+        }
+&nbsp;
+        const res = <span class="cstat-no" title="statement not covered" >await fetch(`/api/locations/${locationId}`, { headers });</span>
         const json = <span class="cstat-no" title="statement not covered" >await res.json();</span>
 <span class="cstat-no" title="statement not covered" >        setLocation(json.data || null);</span>
       } catch {
@@ -361,9 +391,9 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
       }
     }
 <span class="cstat-no" title="statement not covered" >    fetchLocation();</span>
-  }, [locationId, open]);
+  }, [locationId, open, session]);
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Dialog open={open} onOpenChange={onOpenChange}&gt;
       &lt;DialogContent className="max-w-lg"&gt;
         &lt;DialogHeader&gt;
@@ -373,9 +403,9 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
           &lt;/DialogDescription&gt;
         &lt;/DialogHeader&gt;
         {loading ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >          &lt;div className="p-8 text-center"&gt;Loading...&lt;/div&gt;</span>
+          &lt;div className="p-8 text-center"&gt;Loading...&lt;/div&gt;
         ) : location ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >          &lt;div className="space-y-4"&gt;</span>
+          &lt;div className="space-y-4"&gt;
             &lt;div className="text-lg font-semibold"&gt;{location.name}&lt;/div&gt;
             &lt;div className="text-sm text-muted-foreground"&gt;
               {location.description || "No description."}
@@ -391,7 +421,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
           &lt;/div&gt;
         )}
         &lt;div className="flex justify-end pt-4"&gt;
-          &lt;Button variant="outline" onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nOpenChange(false)}&gt;</span>
+          &lt;Button variant="outline" onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >onOpenChange(false)}</span>&gt;
             Close
           &lt;/Button&gt;
         &lt;/div&gt;
@@ -406,7 +436,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

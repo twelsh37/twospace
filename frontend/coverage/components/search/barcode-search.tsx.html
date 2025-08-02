@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/21</span>
+                <span class='fraction'>0/33</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/35</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
@@ -407,7 +407,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -518,7 +518,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -577,9 +577,9 @@ SOFTWARE.
 // Allows users to scan asset barcodes to find and manage assets
 &nbsp;
 "use client";
-import React, { useState } from <span class="cstat-no" title="statement not covered" >"react";</span>
-import { BarcodeScanner } from <span class="cstat-no" title="statement not covered" >"@/components/ui/barcode-scanner";</span>
-import { Card, CardContent, CardHeader, CardTitle } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
+<span class="cstat-no" title="statement not covered" >import React, { useState } from "react";</span>
+<span class="cstat-no" title="statement not covered" >import { BarcodeScanner } from "@/components/ui/barcode-scanner";</span>
+<span class="cstat-no" title="statement not covered" >import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";</span>
 import { AssetType, AssetState } from "@/lib/types";
 &nbsp;
 interface Asset {
@@ -604,7 +604,7 @@ interface BarcodeSearchProps {
   onBarcodeScanned?: (barcode: string) =&gt; void;
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >BarcodeSearch({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >B</span>arcodeSearch(</span>{
   onAssetFound,
   onAssetNotFound,
   className = <span class="branch-0 cbranch-no" title="branch not covered" >"",</span>
@@ -615,7 +615,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   const [foundAsset, setFoundAsset] = <span class="cstat-no" title="statement not covered" >useState&lt;Asset | null&gt;(null);</span>
 &nbsp;
   // Handle barcode scan
-  const handleBarcodeScan = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async (b</span>arcode: string) =&gt; {</span>
+  const handleBarcodeScan = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>(barcode: string) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (onBarcodeScanned) <span class="cstat-no" title="statement not covered" >onBarcodeScanned(barcode);</span></span>
 <span class="cstat-no" title="statement not covered" >    setSearching(true);</span>
 <span class="cstat-no" title="statement not covered" >    setLastScanned(barcode);</span>
@@ -649,7 +649,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
     }
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Card className={className}&gt;
       &lt;CardHeader&gt;
         &lt;CardTitle className="flex items-center gap-2"&gt;
@@ -668,7 +668,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
         &lt;/div&gt;
 &nbsp;
         {/* Minimal Asset Details Card (shows immediately when asset is found) */}
-        {<span class="branch-0 cbranch-no" title="branch not covered" >foundAsset &amp;&amp; (</span>
+        {foundAsset &amp;&amp; (
           &lt;Card className="border-green-500 border mt-2"&gt;
             &lt;CardHeader&gt;
               &lt;CardTitle className="text-green-700 text-base flex items-center gap-2"&gt;
@@ -692,7 +692,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
         )}
 &nbsp;
         {/* Loading State */}
-        {<span class="branch-0 cbranch-no" title="branch not covered" >searching &amp;&amp; (</span>
+        {searching &amp;&amp; (
           &lt;div className="flex items-center justify-center p-4"&gt;
             &lt;div className="text-sm text-gray-500"&gt;Searching for asset...&lt;/div&gt;
           &lt;/div&gt;
@@ -739,12 +739,12 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
 }
 &nbsp;
 // Example usage component showing how to handle found assets
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >BarcodeSearchWithResults({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >B</span>arcodeSearchWithResults(</span>{
   onBarcodeScanned,
 }: {
   onBarcodeScanned?: (barcode: string) =&gt; void;
 }) {
-  const [, setFoundAsset] = <span class="cstat-no" title="statement not covered" >useState&lt;Asset | null&gt;(null); /</span>/ Only setter needed
+  const [, setFoundAsset] = <span class="cstat-no" title="statement not covered" >useState&lt;Asset | null&gt;(null);</span> // Only setter needed
   const [notFoundBarcode, setNotFoundBarcode] = <span class="cstat-no" title="statement not covered" >useState&lt;string | null&gt;(null);</span>
 &nbsp;
   // When an asset is found, set state and show minimal details (no navigation)
@@ -760,7 +760,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (onBarcodeScanned) <span class="cstat-no" title="statement not covered" >onBarcodeScanned(barcode);</span></span>
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;div className="space-y-6"&gt;
       &lt;BarcodeSearch
         onAssetFound={<span class="fstat-no" title="function not covered" >(a</span>sset) =&gt;
@@ -770,7 +770,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
         onBarcodeScanned={onBarcodeScanned}
       /&gt;
       {/* Remove the detailed foundAsset card here. Only show not found message if needed. */}
-      {<span class="branch-0 cbranch-no" title="branch not covered" >notFoundBarcode &amp;&amp; (</span>
+      {notFoundBarcode &amp;&amp; (
         &lt;Card&gt;
           &lt;CardContent className="pt-6"&gt;
             &lt;div className="text-center text-gray-500"&gt;
@@ -796,7 +796,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

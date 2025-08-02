@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/49</span>
+                <span class='fraction'>0/50</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/36</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/44</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -314,6 +314,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -322,7 +323,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -336,19 +336,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -359,6 +346,19 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -387,7 +387,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -537,19 +537,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 &nbsp;
-import { useEffect, useState } from <span class="cstat-no" title="statement not covered" >"react";</span>
-import {
+<span class="cstat-no" title="statement not covered" >import { useEffect, useState } from "react";</span>
+<span class="cstat-no" title="statement not covered" >import {</span>
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from <span class="cstat-no" title="statement not covered" >"@/components/ui/dialog";</span>
-import { Card, CardHeader, CardTitle, CardContent } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
-import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
+} from "@/components/ui/dialog";
+<span class="cstat-no" title="statement not covered" >import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";</span>
+<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
 import { User } from "@/lib/types";
 import { Asset } from "@/lib/types";
-import { useAuth } from <span class="cstat-no" title="statement not covered" >"@/lib/auth-context";</span>
+<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
 &nbsp;
 interface LocationAssignmentsModalProps {
   locationId: string | null;
@@ -557,7 +557,7 @@ interface LocationAssignmentsModalProps {
   onOpenChange: (open: boolean) =&gt; void;
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >LocationAssignmentsModal({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >L</span>ocationAssignmentsModal(</span>{
   locationId,
   open,
   onOpenChange,
@@ -572,10 +572,10 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   const ITEMS_PER_PAGE = <span class="cstat-no" title="statement not covered" >10;</span>
   const [userTotal, setUserTotal] = <span class="cstat-no" title="statement not covered" >useState(0);</span>
   const [assetTotal, setAssetTotal] = <span class="cstat-no" title="statement not covered" >useState(0);</span>
-  const { session } = <span class="cstat-no" title="statement not covered" >useAuth(); /</span>/ Get session from auth context
+  const { session } = <span class="cstat-no" title="statement not covered" >useAuth();</span> // Get session from auth context
 &nbsp;
   // Fetch assignments for the current page
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!open || !locationId) <span class="cstat-no" title="statement not covered" >return;</span></span>
 <span class="cstat-no" title="statement not covered" >    setLoading(true);</span>
 <span class="cstat-no" title="statement not covered" >    setError(null);</span>
@@ -596,14 +596,14 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
 <span class="cstat-no" title="statement not covered" >        setAssetTotal(data.assetTotal || 0);</span>
 <span class="cstat-no" title="statement not covered" >        setLoading(false);</span>
       })
-      .catch(<span class="fstat-no" title="function not covered" >() =&gt; {</span>
+      .catch(<span class="fstat-no" title="function not covered" >() =</span>&gt; {
 <span class="cstat-no" title="statement not covered" >        setError("Failed to load assignments");</span>
 <span class="cstat-no" title="statement not covered" >        setLoading(false);</span>
       });
   }, [open, locationId, userPage, assetPage, session]);
 &nbsp;
   // Reset pages when location changes
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    setUserPage(1);</span>
 <span class="cstat-no" title="statement not covered" >    setAssetPage(1);</span>
   }, [locationId, open]);
@@ -611,7 +611,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   const userTotalPages = <span class="cstat-no" title="statement not covered" >Math.max(1, Math.ceil(userTotal / ITEMS_PER_PAGE));</span>
   const assetTotalPages = <span class="cstat-no" title="statement not covered" >Math.max(1, Math.ceil(assetTotal / ITEMS_PER_PAGE));</span>
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Dialog open={open} onOpenChange={onOpenChange}&gt;
       &lt;DialogContent className="max-w-2xl"&gt;
         &lt;DialogHeader&gt;
@@ -621,9 +621,9 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
           &lt;/DialogDescription&gt;
         &lt;/DialogHeader&gt;
         {loading ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >          &lt;div className="p-4 text-center"&gt;Loading...&lt;/div&gt;</span>
+          &lt;div className="p-4 text-center"&gt;Loading...&lt;/div&gt;
         ) : error ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >          &lt;div className="p-4 text-center text-red-500"&gt;{error}&lt;/div&gt;</span>
+          &lt;div className="p-4 text-center text-red-500"&gt;{error}&lt;/div&gt;
         ) : (
           &lt;div className="space-y-6"&gt;
             {/* Users Card */}
@@ -633,11 +633,11 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
               &lt;/CardHeader&gt;
               &lt;CardContent&gt;
                 {loading ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                  &lt;div&gt;Loading users...&lt;/div&gt;</span>
+                  &lt;div&gt;Loading users...&lt;/div&gt;
                 ) : error ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                  &lt;div className="text-red-500"&gt;{error}&lt;/div&gt;</span>
+                  &lt;div className="text-red-500"&gt;{error}&lt;/div&gt;
                 ) : users.length === 0 ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                  &lt;div&gt;No users assigned to this location.&lt;/div&gt;</span>
+                  &lt;div&gt;No users assigned to this location.&lt;/div&gt;
                 ) : (
                   &lt;ul className="mb-2"&gt;
                     {users.map(<span class="fstat-no" title="function not covered" >(u</span>ser) =&gt; (
@@ -648,12 +648,12 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
                   &lt;/ul&gt;
                 )}
                 {/* Pagination controls for users */}
-                {<span class="branch-0 cbranch-no" title="branch not covered" >userTotalPages &gt; 1 &amp;&amp; (</span>
+                {userTotalPages &gt; 1 &amp;&amp; (
                   &lt;div className="flex items-center gap-2 justify-end mt-2"&gt;
                     &lt;Button
                       variant="outline"
                       size="sm"
-                      onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etUserPage(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; <span class="cstat-no" title="statement not covered" >Math.max(1, p - 1))}</span></span>
+                      onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setUserPage(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; <span class="cstat-no" title="statement not covered" >Math.max(1, p - 1))</span>}</span>
                       disabled={userPage === 1}
                     &gt;
                       Previous
@@ -664,7 +664,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
                     &lt;Button
                       variant="outline"
                       size="sm"
-                      onClick={<span class="fstat-no" title="function not covered" >() =&gt;</span>
+                      onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt;
 <span class="cstat-no" title="statement not covered" >                        setUserPage(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; <span class="cstat-no" title="statement not covered" >Math.min(userTotalPages, p + 1))</span></span>
                       }
                       disabled={userPage === userTotalPages}
@@ -682,11 +682,11 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
               &lt;/CardHeader&gt;
               &lt;CardContent&gt;
                 {loading ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                  &lt;div&gt;Loading assets...&lt;/div&gt;</span>
+                  &lt;div&gt;Loading assets...&lt;/div&gt;
                 ) : error ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                  &lt;div className="text-red-500"&gt;{error}&lt;/div&gt;</span>
+                  &lt;div className="text-red-500"&gt;{error}&lt;/div&gt;
                 ) : assets.length === 0 ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                  &lt;div&gt;No assets assigned to this location.&lt;/div&gt;</span>
+                  &lt;div&gt;No assets assigned to this location.&lt;/div&gt;
                 ) : (
                   &lt;ul className="mb-2"&gt;
                     {assets.map(<span class="fstat-no" title="function not covered" >(a</span>sset) =&gt; (
@@ -697,12 +697,12 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
                   &lt;/ul&gt;
                 )}
                 {/* Pagination controls for assets */}
-                {<span class="branch-0 cbranch-no" title="branch not covered" >assetTotalPages &gt; 1 &amp;&amp; (</span>
+                {assetTotalPages &gt; 1 &amp;&amp; (
                   &lt;div className="flex items-center gap-2 justify-end mt-2"&gt;
                     &lt;Button
                       variant="outline"
                       size="sm"
-                      onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etAssetPage(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; <span class="cstat-no" title="statement not covered" >Math.max(1, p - 1))}</span></span>
+                      onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setAssetPage(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; <span class="cstat-no" title="statement not covered" >Math.max(1, p - 1))</span>}</span>
                       disabled={assetPage === 1}
                     &gt;
                       Previous
@@ -713,7 +713,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
                     &lt;Button
                       variant="outline"
                       size="sm"
-                      onClick={<span class="fstat-no" title="function not covered" >() =&gt;</span>
+                      onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt;
 <span class="cstat-no" title="statement not covered" >                        setAssetPage(<span class="fstat-no" title="function not covered" >(p</span>) =&gt; <span class="cstat-no" title="statement not covered" >Math.min(assetTotalPages, p + 1))</span></span>
                       }
                       disabled={assetPage === assetTotalPages}
@@ -727,7 +727,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
           &lt;/div&gt;
         )}
         &lt;div className="flex justify-end pt-2"&gt;
-          &lt;Button variant="outline" onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nOpenChange(false)}&gt;</span>
+          &lt;Button variant="outline" onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >onOpenChange(false)}</span>&gt;
             Close
           &lt;/Button&gt;
         &lt;/div&gt;
@@ -742,7 +742,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

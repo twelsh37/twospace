@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/34</span>
+                <span class='fraction'>0/54</span>
             </div>
         
             
@@ -429,12 +429,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -763,15 +763,15 @@ SOFTWARE.
 &nbsp;
 // Database utility functions for Asset Management System
 &nbsp;
-import { eq, sql, and, isNull } from <span class="cstat-no" title="statement not covered" >"drizzle-orm";</span>
-import { db } from <span class="cstat-no" title="statement not covered" >"./index";</span>
-import {
+<span class="cstat-no" title="statement not covered" >import { eq, sql, and, isNull } from "drizzle-orm";</span>
+<span class="cstat-no" title="statement not covered" >import { db } from "./index";</span>
+<span class="cstat-no" title="statement not covered" >import {</span>
   assetsTable,
   assetSequencesTable,
   assetHistoryTable,
   type NewAssetHistory,
-} from <span class="cstat-no" title="statement not covered" >"./schema";</span>
-import { systemLogger, appLogger } from <span class="cstat-no" title="statement not covered" >"@/lib/logger";</span>
+} from "./schema";
+<span class="cstat-no" title="statement not covered" >import { systemLogger, appLogger } from "@/lib/logger";</span>
 &nbsp;
 // Asset number prefixes mapping
 const ASSET_NUMBER_PREFIXES = <span class="cstat-no" title="statement not covered" >{</span>
@@ -787,7 +787,7 @@ const ASSET_NUMBER_PREFIXES = <span class="cstat-no" title="statement not covere
  * @param assetType - The type of asset
  * @returns Promise&lt;string&gt; - The generated asset number in format XX-YYYYY
  */
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >generateAssetNumber(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >generateAssetNumber(</span>
   assetType: keyof typeof ASSET_NUMBER_PREFIXES
 ): Promise&lt;string&gt; {
   // Log function entry
@@ -809,7 +809,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >      throw new Error(`Asset sequence not found for type: ${assetType}`);</span>
     }
 &nbsp;
-    const sequenceNumber = <span class="cstat-no" title="statement not covered" >result[0].nextSequence - 1; /</span>/ We incremented it, so subtract 1 to get the actual number
+    const sequenceNumber = <span class="cstat-no" title="statement not covered" >result[0].nextSequence - 1;</span> // We incremented it, so subtract 1 to get the actual number
 &nbsp;
     // Format as XX-YYYYY (limit sequence to 5 digits to keep total length &lt;= 10)
     const formattedSequence = <span class="cstat-no" title="statement not covered" >(sequenceNumber % 100000)</span>
@@ -839,7 +839,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
  * @param previousState - Previous state (optional)
  * @param details - Additional details (optional)
  */
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >createAssetHistory(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >createAssetHistory(</span>
   assetId: string,
   newState: string,
   changedBy: string,
@@ -893,7 +893,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
  * @param filters - Optional filters
  * @returns Promise&lt;Asset[]&gt; - Array of active assets
  */
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getActiveAssets(f</span></span>ilters?: {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getActiveAssets(</span>filters?: {
   type?: string;
   state?: string;
   locationId?: string;
@@ -983,7 +983,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
  * Get asset counts by type and state
  * @returns Promise&lt;object&gt; - Asset statistics
  */
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getAssetStatistics() {</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getAssetStatistics(</span>) {
   // Log function entry
 <span class="cstat-no" title="statement not covered" >  appLogger.info("getAssetStatistics called");</span>
 <span class="cstat-no" title="statement not covered" >  try {</span>
@@ -1037,7 +1037,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
  * @param assetId - Asset ID to delete
  * @param deletedBy - User ID who deleted the asset
  */
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >softDeleteAsset(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >softDeleteAsset(</span>
   assetId: string,
   deletedBy: string
 ): Promise&lt;void&gt; {
@@ -1078,7 +1078,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

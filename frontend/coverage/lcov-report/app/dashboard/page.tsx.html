@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -194,12 +194,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,6 +207,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -216,8 +217,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -290,24 +290,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 &nbsp;
-import { DashboardStats } from <span class="cstat-no" title="statement not covered" >"@/components/dashboard/dashboard-stats";</span>
-import { RecentActivity } from <span class="cstat-no" title="statement not covered" >"@/components/dashboard/recent-activity";</span>
-import { AssetsByType } from <span class="cstat-no" title="statement not covered" >"@/components/dashboard/assets-by-type";</span>
-import { QuickActions } from <span class="cstat-no" title="statement not covered" >"@/components/dashboard/quick-actions";</span>
-import {
+<span class="cstat-no" title="statement not covered" >import { DashboardStats } from "@/components/dashboard/dashboard-stats";</span>
+<span class="cstat-no" title="statement not covered" >import { RecentActivity } from "@/components/dashboard/recent-activity";</span>
+<span class="cstat-no" title="statement not covered" >import { AssetsByType } from "@/components/dashboard/assets-by-type";</span>
+<span class="cstat-no" title="statement not covered" >import { QuickActions } from "@/components/dashboard/quick-actions";</span>
+<span class="cstat-no" title="statement not covered" >import {</span>
   BuildingAssetsCard,
   ReadyToGoAssetsCard,
-} from <span class="cstat-no" title="statement not covered" >"@/components/dashboard/building-assets-card";</span>
-import { getDashboardData } from <span class="cstat-no" title="statement not covered" >"@/lib/db/dashboard";</span>
-import { Card } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
+} from "@/components/dashboard/building-assets-card";
+<span class="cstat-no" title="statement not covered" >import { getDashboardData } from "@/lib/db/dashboard";</span>
+<span class="cstat-no" title="statement not covered" >import { Card } from "@/components/ui/card";</span>
 &nbsp;
-export default async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >DashboardPage() {</span></span>
+<span class="cstat-no" title="statement not covered" >export default a</span>sync function <span class="fstat-no" title="function not covered" >DashboardPage(</span>) {
   // Directly call the shared dashboard data function
   const data = <span class="cstat-no" title="statement not covered" >await getDashboardData();</span>
 &nbsp;
   // Handle case where data fetching fails
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!data) {</span>
-    return (
+<span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;div className="flex-1 space-y-4 p-4 pt-6 text-center md:p-8"&gt;
         &lt;h2 className="text-2xl font-bold text-red-600"&gt;
           Error: Could not load dashboard data.
@@ -317,7 +317,7 @@ export default async function <span class="cstat-no" title="statement not covere
     );
   }
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     // Mobile-first responsive dashboard layout
     &lt;Card className="m-2 md:m-4 p-0 bg-white shadow-lg"&gt;
       &lt;div className="flex-1 space-y-4 pt-4 md:pt-8 pb-2 md:pb-4 px-4 md:px-8"&gt;
@@ -370,7 +370,7 @@ export default async function <span class="cstat-no" title="statement not covere
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.831Z
+                at 2025-08-02T22:14:48.419Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
