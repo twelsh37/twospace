@@ -29,7 +29,7 @@ SOFTWARE.
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Eye } from "lucide-react";
-import { UserDetailModal } from "./user-detail-modal";
+import { useRouter } from "next/navigation";
 import { UserEditModal } from "./user-edit-modal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,9 +73,8 @@ export function UserTable({
   onPageChange,
   currentUserRole,
 }: UserTableProps) {
+  const router = useRouter();
   // Only manage UI state (modals, etc.)
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -85,8 +84,7 @@ export function UserTable({
   // Remove useEffect and all fetching logic
 
   const handleUserClick = (userId: string) => {
-    setSelectedUserId(userId);
-    setModalOpen(true);
+    router.push(`/users/${userId}`);
   };
 
   const handleEditClick = (userId: string) => {
@@ -149,11 +147,6 @@ export function UserTable({
   return (
     <ErrorBoundary>
       <div className="w-full">
-        <UserDetailModal
-          userId={selectedUserId}
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-        />
         <UserEditModal
           userId={editUserId}
           open={editModalOpen}
@@ -255,11 +248,6 @@ export function UserTable({
         </div>
         {/* Table layout for desktop/tablet */}
         <div className="hidden md:block">
-          <UserDetailModal
-            userId={selectedUserId}
-            open={modalOpen}
-            onOpenChange={setModalOpen}
-          />
           <UserEditModal
             userId={editUserId}
             open={editModalOpen}

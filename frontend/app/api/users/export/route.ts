@@ -36,6 +36,7 @@ import {
 } from "@/lib/server/exportUtils";
 import { systemLogger, appLogger } from "@/lib/logger";
 import { Readable } from "stream";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 // Define columns for the users export (match table columns)
 const userColumns = [
@@ -50,6 +51,16 @@ const userColumns = [
 export async function POST(request: NextRequest) {
   // Log the start of the POST request
   appLogger.info("POST /api/users/export called");
+
+  // Require any authenticated user (ADMIN or USER) for exporting users
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   try {
     // Accept 'format' in request body (default to 'pdf' for backward compatibility)
     const {
@@ -138,7 +149,33 @@ export async function POST(request: NextRequest) {
     // Debug logging
     console.log("Exporting users:", exportRows);
     console.log("User columns:", userColumns);
-    const filters = { department, role };
+
+    // Resolve department name for display in PDF filters
+    let displayDepartment = department;
+    if (department !== "all") {
+      try {
+        const departmentResult = await db
+          .select({ name: departmentsTable.name })
+          .from(departmentsTable)
+          .where(eq(departmentsTable.id, department))
+          .limit(1);
+
+        if (departmentResult.length > 0) {
+          displayDepartment = departmentResult[0].name;
+        } else {
+          // If department not found, show "Unknown Department"
+          displayDepartment = "Unknown Department";
+        }
+      } catch (error) {
+        console.log("Failed to resolve department name:", error);
+        // Keep the UUID if resolution fails
+      }
+    } else {
+      // Show "All Departments" instead of "all"
+      displayDepartment = "All Departments";
+    }
+
+    const filters = { department: displayDepartment, role };
     if (format === "csv") {
       // Log CSV export
       appLogger.info(
@@ -199,6 +236,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET(req: Request) {
   try {
+    // Require any authenticated user (ADMIN or USER) for exporting users
+    const authResult = await requireUser(req as NextRequest);
+    if (authResult.error || !authResult.data.user) {
+      return NextResponse.json(
+        { error: authResult.error?.message || "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const department = searchParams.get("department") || "all";
     const role = searchParams.get("role") || "all";

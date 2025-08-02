@@ -71,7 +71,7 @@ export default function LoginPage() {
     // Outer container: centers card, sets background
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       {/* Responsive Card: smaller on mobile, larger on desktop, less vertical padding */}
-      <Card className="w-full max-w-sm md:max-w-4xl h-auto md:h-[500px] my-2 flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <Card className="relative w-full max-w-sm md:max-w-4xl h-auto md:h-[500px] my-2 flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Logo section: much larger for desktop, balanced layout */}
         <div className="flex items-center justify-center bg-white md:h-full w-full md:w-1/2 md:order-none order-first">
           {/* Logo container: very large for desktop, object-contain, balanced */}
@@ -179,6 +179,12 @@ export default function LoginPage() {
               </form>
             </CardContent>
           </div>
+        </div>
+        {/* Version indicator - positioned at bottom right of card */}
+        <div className="absolute bottom-2 right-4 md:bottom-4 md:right-6">
+          <span className="text-xs text-gray-400 font-mono">
+            v1.0.0
+          </span>
         </div>
       </Card>
     </div>

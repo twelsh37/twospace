@@ -35,6 +35,7 @@ import { Activity } from "lucide-react";
 import { AssetDetailModal } from "@/components/assets/asset-detail-modal";
 import { Asset as DetailedAsset } from "@/components/search/search-results-modal";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { useAuth } from "@/lib/auth-context";
 
 type RecentActivityProps = {
   data: {
@@ -51,6 +52,7 @@ type RecentActivityProps = {
 };
 
 export function RecentActivity({ data }: RecentActivityProps) {
+  const { session } = useAuth();
   const [selectedAsset, setSelectedAsset] = useState<DetailedAsset | null>(
     null
   );
@@ -63,7 +65,15 @@ export function RecentActivity({ data }: RecentActivityProps) {
     setSelectedAsset(null);
 
     try {
-      const response = await fetch(`/api/assets/${assetId}`);
+      // Attach Authorization header if access token is available
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      const response = await fetch(`/api/assets/${assetId}`, {
+        headers,
+      });
       if (response.ok) {
         const result = await response.json();
         setSelectedAsset(result.data);

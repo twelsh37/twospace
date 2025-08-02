@@ -89,8 +89,8 @@ export function LocationTable({
     string | null
   >(null);
 
-  // Get authenticated user's role
-  const { userRole } = useAuth();
+  // Get authenticated user's role and session
+  const { userRole, session } = useAuth();
   const currentUserRole = userRole || "USER";
   const isUser = currentUserRole === "USER";
 
@@ -99,15 +99,26 @@ export function LocationTable({
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      if (filters.location && filters.location !== "all") {
+      if (filters.location && filters.location !== "ALL") {
         params.set("locationId", filters.location);
       }
-      if (filters.isActive && filters.isActive !== "all") {
+      if (filters.isActive && filters.isActive !== "ALL") {
         params.set("isActive", filters.isActive);
       }
       params.set("page", page.toString());
       params.set("limit", "10");
-      const response = await fetch(`/api/locations?${params.toString()}`);
+
+      // Add authorization header if session exists
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      const response = await fetch(`/api/locations?${params.toString()}`, {
+        headers,
+      });
       if (!response.ok) throw new Error("Failed to fetch locations");
       const result = await response.json();
       setLocations(result.data || []);
@@ -118,7 +129,7 @@ export function LocationTable({
     } finally {
       setIsLoading(false);
     }
-  }, [filters, page]);
+  }, [filters, page, session]);
 
   useEffect(() => {
     fetchLocations();
@@ -143,7 +154,18 @@ export function LocationTable({
     if (!deleteLocationId) return;
     setDeleting(true);
     try {
-      await fetch(`/api/locations/${deleteLocationId}`, { method: "DELETE" });
+      // Add authorization header if session exists
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      await fetch(`/api/locations/${deleteLocationId}`, {
+        method: "DELETE",
+        headers,
+      });
       setDeleteModalOpen(false);
       setDeleteLocationId(null);
       // Refresh the data after deletion

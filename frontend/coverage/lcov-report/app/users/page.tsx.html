@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/34</span>
+                <span class='fraction'>0/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/21</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -214,7 +214,17 @@
 <a name='L149'></a><a href='#L149'>149</a>
 <a name='L150'></a><a href='#L150'>150</a>
 <a name='L151'></a><a href='#L151'>151</a>
-<a name='L152'></a><a href='#L152'>152</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -342,6 +352,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -356,7 +376,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -366,7 +386,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// frontend/app/users/page.tsx
-// Users Management Page (SSR + Client Interactivity)
+// User management page
 &nbsp;
 /*
 MIT License
@@ -392,11 +412,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 &nbsp;
-import { db, usersTable, departmentsTable, locationsTable } from <span class="cstat-no" title="statement not covered" >"@/lib/db";</span>
-import { eq, and, count } from <span class="cstat-no" title="statement not covered" >"drizzle-orm";</span>
-import UsersClientPage from <span class="cstat-no" title="statement not covered" >"@/components/users/users-client-page";</span>
+<span class="cstat-no" title="statement not covered" >import { db, usersTable, departmentsTable, locationsTable } from "@/lib/db";</span>
+<span class="cstat-no" title="statement not covered" >import { eq, and, count } from "drizzle-orm";</span>
+<span class="cstat-no" title="statement not covered" >import UsersClientPage from "@/components/users/users-client-page";</span>
 &nbsp;
-export default async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >UsersPage({</span></span>
+<span class="cstat-no" title="statement not covered" >export default a</span>sync function <span class="fstat-no" title="function not covered" >UsersPage(</span>{
   searchParams,
 }: {
   searchParams: Promise&lt;Record&lt;string, undefined | string | string[]&gt;&gt;;
@@ -486,10 +506,20 @@ export default async function <span class="cstat-no" title="statement not covere
   }
 &nbsp;
   // Fetch all departments for filter dropdown
-  const departments = <span class="cstat-no" title="statement not covered" >await db</span>
+  const departmentsResult = <span class="cstat-no" title="statement not covered" >await db</span>
     .select({ id: departmentsTable.id, name: departmentsTable.name })
     .from(departmentsTable)
     .orderBy(departmentsTable.name);
+&nbsp;
+  // Deduplicate by name, but keep id (similar to departments API route)
+  const seen = <span class="cstat-no" title="statement not covered" >new Set&lt;string&gt;();</span>
+  const departments = <span class="cstat-no" title="statement not covered" >departmentsResult</span>
+    .filter(<span class="fstat-no" title="function not covered" >(r</span>ow) =&gt; {
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!row.name || seen.has(row.name.toUpperCase())) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >      seen.add(row.name.toUpperCase());</span>
+<span class="cstat-no" title="statement not covered" >      return true;</span>
+    })
+    .map(<span class="fstat-no" title="function not covered" >(r</span>ow) =&gt; <span class="cstat-no" title="statement not covered" >({ ...row, name: row.name.toUpperCase() }))</span>;
 &nbsp;
   // Prepare filters object for the filter component
   const filters = <span class="cstat-no" title="statement not covered" >{</span>
@@ -507,7 +537,7 @@ export default async function <span class="cstat-no" title="statement not covere
     hasPrevPage: page &gt; 1,
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;UsersClientPage
       users={users}
       departments={departments}
@@ -523,7 +553,7 @@ export default async function <span class="cstat-no" title="statement not covere
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.831Z
+                at 2025-08-02T22:14:48.419Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

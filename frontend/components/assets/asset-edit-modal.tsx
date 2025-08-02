@@ -60,7 +60,15 @@ export function AssetEditModal({
     setError(null);
     async function fetchAsset() {
       try {
-        const res = await fetch(`/api/assets/${assetNumber}`);
+        // Attach Authorization header if access token is available
+        const headers: Record<string, string> = {};
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch(`/api/assets/${assetNumber}`, {
+          headers,
+        });
         const json = await res.json();
         setAsset(json.data || null);
         setForm(json.data || {});
@@ -73,7 +81,7 @@ export function AssetEditModal({
       }
     }
     fetchAsset();
-  }, [assetNumber, open]);
+  }, [assetNumber, open, session?.access_token]);
 
   // Track if form is dirty
   const isDirty =

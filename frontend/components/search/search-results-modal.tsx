@@ -36,8 +36,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Asset as BaseAsset, User, Location } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { UserDetailModal } from "@/components/users/user-detail-modal";
+
+import { useRouter } from "next/navigation";
 
 // Extend Asset type to include search API fields
 export type Asset = BaseAsset & {
@@ -76,13 +76,10 @@ export function SearchResultsModal({
       results.users.length > 0 ||
       results.locations.length > 0);
 
-  // State for user detail modal
-  const [userModalOpen, setUserModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleUserClick = (userId: string) => {
-    setSelectedUserId(userId);
-    setUserModalOpen(true);
+    router.push(`/users/${userId}`);
   };
 
   return (
@@ -237,12 +234,6 @@ export function SearchResultsModal({
             </TabsContent>
           </Tabs>
         )}
-        {/* User Detail Modal for search results */}
-        <UserDetailModal
-          userId={selectedUserId}
-          open={userModalOpen}
-          onOpenChange={setUserModalOpen}
-        />
       </DialogContent>
     </Dialog>
   );

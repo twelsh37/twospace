@@ -29,13 +29,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, usersTable, departmentsTable, locationsTable } from "@/lib/db";
 import { eq, and, count } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
-import { requireAuth, requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireAdmin, requireUser } from "@/lib/supabase-auth-helpers";
 
 // GET /api/users - returns paginated users
 export async function GET(request: NextRequest) {
-  // Require authentication for listing users (both ADMIN and USER roles allowed)
-  const user = await requireAuth(request);
-  if (user instanceof NextResponse) return user; // Not authenticated
+  // Require any authenticated user (ADMIN or USER) for viewing users
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
   appLogger.info(`GET /api/users called. URL: ${request.url}`);
   const start = Date.now();
   try {

@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>0/33</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>0/32</span>
             </div>
         
             
@@ -168,7 +168,19 @@
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
 <a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -245,7 +257,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -269,7 +293,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,16 +325,16 @@ SOFTWARE.
 &nbsp;
 "use client";
 &nbsp;
-import { useEffect } from <span class="cstat-no" title="statement not covered" >"react";</span>
-import { useRouter } from <span class="cstat-no" title="statement not covered" >"next/navigation";</span>
-import { useAuth } from <span class="cstat-no" title="statement not covered" >"@/lib/auth-context";</span>
+<span class="cstat-no" title="statement not covered" >import { useEffect } from "react";</span>
+<span class="cstat-no" title="statement not covered" >import { useRouter } from "next/navigation";</span>
+<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
 &nbsp;
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >ProtectedRoute({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >P</span>rotectedRoute(</span>{
   children,
   requireAdmin = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
 }: ProtectedRouteProps) {
@@ -328,7 +352,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
     requireAdmin
   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!loading) {</span>
 <span class="cstat-no" title="statement not covered" >      console.log("ProtectedRoute: Not loading, checking auth...");</span>
 <span class="cstat-no" title="statement not covered" >      if (!user) {</span>
@@ -347,10 +371,22 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
     }
   }, [user, loading, router, requireAdmin, session, userRole]);
 &nbsp;
+  // Add a timeout fallback for loading state
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+    const timeoutId = <span class="cstat-no" title="statement not covered" >setTimeout(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (loading) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log("ProtectedRoute: Loading timeout, redirecting to login");</span>
+<span class="cstat-no" title="statement not covered" >        router.push("/auth/login");</span>
+      }
+    }, 10000); // 10 second timeout
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >clearTimeout(timeoutId);</span></span>
+  }, [loading, router]);
+&nbsp;
   // Show loading state while checking authentication
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (loading) {</span>
 <span class="cstat-no" title="statement not covered" >    console.log("ProtectedRoute: Showing loading spinner");</span>
-    return (
+<span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;div className="min-h-screen flex items-center justify-center"&gt;
         &lt;div className="text-center"&gt;
           &lt;div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"&gt;&lt;/div&gt;
@@ -374,7 +410,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  console.log("ProtectedRoute: Rendering children");</span>
-  return &lt;&gt;{children}&lt;/&gt;;
+<span class="cstat-no" title="statement not covered" >  return &lt;&gt;{children}&lt;/&gt;;</span>
 }
 &nbsp;
 // Reasoning: This update simplifies the ProtectedRoute component by checking the admin role from user metadata instead of making a database call. This matches how the backend API routes check for admin roles and eliminates the potential for authentication issues that were causing the infinite loading spinner.
@@ -385,7 +421,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

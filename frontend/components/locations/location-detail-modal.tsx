@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 interface LocationDetailModalProps {
   locationId: string | null;
@@ -56,13 +57,22 @@ export function LocationDetailModal({
 }: LocationDetailModalProps) {
   const [location, setLocation] = useState<Location | null>(null);
   const [loading, setLoading] = useState(false);
+  const { session } = useAuth();
 
   useEffect(() => {
     if (!locationId || !open) return;
     setLoading(true);
     async function fetchLocation() {
       try {
-        const res = await fetch(`/api/locations/${locationId}`);
+        // Add authorization header if session exists
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch(`/api/locations/${locationId}`, { headers });
         const json = await res.json();
         setLocation(json.data || null);
       } catch {
@@ -72,7 +82,7 @@ export function LocationDetailModal({
       }
     }
     fetchLocation();
-  }, [locationId, open]);
+  }, [locationId, open, session]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

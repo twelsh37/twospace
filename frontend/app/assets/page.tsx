@@ -60,12 +60,18 @@ function AssetsPageContent() {
   const searchParams = useSearchParams();
 
   // Controlled filter state
-  // Use optional chaining to avoid errors if searchParams is null
-  const [filters, setFilters] = useState<FilterState>(() => ({
-    type: "ALL", // Use uppercase 'ALL' for consistency
-    state: "ALL",
-    status: "ALL",
-  }));
+  // Initialize filters from URL parameters immediately to avoid flashing
+  const [filters, setFilters] = useState<FilterState>(() => {
+    // Use optional chaining to avoid errors if searchParams is null
+    return {
+      type: (searchParams?.get("type")?.toUpperCase() as AssetType) || "ALL",
+      state: (searchParams?.get("state")?.toUpperCase() as AssetState) || "ALL",
+      status: searchParams?.get("status")?.toUpperCase() || "ALL",
+    };
+  });
+
+  // Add loading state to prevent visual flashing
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // Keep filters in sync with URL query params
   useEffect(() => {
@@ -74,6 +80,8 @@ function AssetsPageContent() {
       state: (searchParams?.get("state")?.toUpperCase() as AssetState) || "ALL",
       status: searchParams?.get("status")?.toUpperCase() || "ALL",
     });
+    // Set initializing to false after first load
+    setIsInitializing(false);
   }, [searchParams]);
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -213,45 +221,59 @@ function AssetsPageContent() {
             onClearFilters={handleClearFilters}
           />
           <div className="mt-4">
-            <Suspense fallback={<AssetsLoadingSkeleton />}>
-              {filters.status === "HOLDING" ? (
-                <div>
-                  <div className="mb-2 text-blue-700 font-semibold text-center">
-                    Showing assets in{" "}
-                    <span className="underline">pending (holding)</span> status,
-                    awaiting asseting.
+            {isInitializing ? (
+              <AssetsLoadingSkeleton />
+            ) : (
+              <Suspense fallback={<AssetsLoadingSkeleton />}>
+                {filters.status === "HOLDING" && userRole === "ADMIN" ? (
+                  <div>
+                    <div className="mb-2 text-blue-700 font-semibold text-center">
+                      Showing assets in{" "}
+                      <span className="underline">pending (holding)</span>{" "}
+                      status, awaiting asseting.
+                    </div>
+                    <HoldingAssetsTable />
                   </div>
-                  <HoldingAssetsTable />
-                </div>
-              ) : (
-                // Pass refreshKey as a prop to force AssetTable to reload after add
-                <AssetTable
-                  key={refreshKey}
-                  queryString={(() => {
-                    const params = new URLSearchParams(
-                      searchParams?.toString() ?? ""
-                    );
-                    if (filters.status === "ALL") {
-                      params.delete("status");
-                    } else if (filters.status) {
-                      params.set("status", filters.status);
-                    }
-                    if (filters.type === "ALL") {
-                      params.delete("type");
-                    } else if (filters.type) {
-                      params.set("type", filters.type);
-                    }
-                    if (filters.state === "ALL") {
-                      params.delete("state");
-                    } else if (filters.state) {
-                      params.set("state", filters.state);
-                    }
-                    return params.toString();
-                  })()}
-                  onPageChange={handlePageChange}
-                />
-              )}
-            </Suspense>
+                ) : filters.status === "HOLDING" && userRole !== "ADMIN" ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-600 font-semibold mb-2">
+                      Access Denied
+                    </div>
+                    <p className="text-gray-600">
+                      Only administrators can view holding assets.
+                    </p>
+                  </div>
+                ) : (
+                  // Pass refreshKey as a prop to force AssetTable to reload after add
+                  <AssetTable
+                    key={refreshKey}
+                    queryString={(() => {
+                      const params = new URLSearchParams();
+
+                      // Add current page if it exists
+                      const currentPage = searchParams?.get("page");
+                      if (currentPage) {
+                        params.set("page", currentPage);
+                      }
+
+                      // Add filter parameters based on current filter state
+                      if (filters.status !== "ALL") {
+                        params.set("status", filters.status);
+                      }
+                      if (filters.type !== "ALL") {
+                        params.set("type", filters.type);
+                      }
+                      if (filters.state !== "ALL") {
+                        params.set("state", filters.state);
+                      }
+
+                      return params.toString();
+                    })()}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </Suspense>
+            )}
           </div>
         </CardContent>
       </Card>

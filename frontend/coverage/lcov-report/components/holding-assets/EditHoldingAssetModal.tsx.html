@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/43</span>
+                <span class='fraction'>0/44</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/30</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/43</span>
+                <span class='fraction'>0/44</span>
             </div>
         
             
@@ -408,7 +408,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -513,13 +513,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 &nbsp;
-import React, { useState } from <span class="cstat-no" title="statement not covered" >"react";</span>
-import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
-import { supabase } from <span class="cstat-no" title="statement not covered" >"@/lib/supabase";</span>
+<span class="cstat-no" title="statement not covered" >import React, { useState } from "react";</span>
+<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
+<span class="cstat-no" title="statement not covered" >import { supabase } from "@/lib/supabase";</span>
 &nbsp;
 // Helper to parse asset type from asset number prefix (returns enum value)
 // Only validates prefix after first two characters are entered
-function <span class="fstat-no" title="function not covered" >getAssetTypeEnumFromNumber(a</span>ssetNumber: string): string | null {
+function <span class="fstat-no" title="function not covered" >getAssetTypeEnumFromNumber(</span>assetNumber: string): string | null {
   // Don't validate until at least 2 characters are entered
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (assetNumber.length &lt; 2) {</span>
 <span class="cstat-no" title="statement not covered" >    return null;</span>
@@ -550,7 +550,7 @@ interface HoldingAsset {
   supplier?: string;
 }
 &nbsp;
-export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >EditHoldingAssetModal({</span></span>
+<span class="cstat-no" title="statement not covered" >export default function <span class="fstat-no" title="function not covered" >E</span>ditHoldingAssetModal(</span>{
   asset,
   onClose,
   onSuccess,
@@ -572,7 +572,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   const assetTypeEnum = <span class="cstat-no" title="statement not covered" >getAssetTypeEnumFromNumber(assetNumber);</span>
 &nbsp;
   // Handler for assigning asset number (shows confirmation dialog)
-  const handleAssign = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+  const handleAssign = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!assetNumber || !assetTypeEnum) {</span>
 <span class="cstat-no" title="statement not covered" >      setError(</span>
         "Please enter a valid asset number (prefix 01-05). Type is required."
@@ -584,7 +584,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   };
 &nbsp;
   // Handler for confirming the move
-  const handleConfirm = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async () =&gt; {</span></span>
+  const handleConfirm = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    setLoading(true);</span>
 <span class="cstat-no" title="statement not covered" >    setError("");</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
@@ -620,7 +620,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     }
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;div className="modal"&gt;
       &lt;h2 className="text-lg font-bold mb-2"&gt;Assign Asset Number&lt;/h2&gt;
       &lt;div className="mb-2"&gt;
@@ -629,7 +629,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
       &lt;div className="mb-2"&gt;
         Description: &lt;b&gt;{asset.description}&lt;/b&gt;
       &lt;/div&gt;
-      {<span class="branch-0 cbranch-no" title="branch not covered" >asset.supplier </span>&amp;&amp; (
+      {asset.supplier &amp;&amp; (
         &lt;div className="mb-2"&gt;
           Supplier: &lt;b&gt;{asset.supplier}&lt;/b&gt;
         &lt;/div&gt;
@@ -644,17 +644,17 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         /&gt;
       &lt;/div&gt;
       {/* Only show type validation after first two characters are entered */}
-      {<span class="branch-0 cbranch-no" title="branch not covered" >assetNumber.length &gt;= 2 &amp;&amp; (</span>
+      {assetNumber.length &gt;= 2 &amp;&amp; (
         &lt;div className="mb-2"&gt;
           &lt;span&gt;Type:&amp;nbsp;&lt;/span&gt;
           &lt;b&gt;
-            {<span class="branch-0 cbranch-no" title="branch not covered" >assetTypeEnum || (</span>
+            {assetTypeEnum || (
               &lt;span className="text-red-500"&gt;Unknown (check prefix)&lt;/span&gt;
             )}
           &lt;/b&gt;
         &lt;/div&gt;
       )}
-      {<span class="branch-0 cbranch-no" title="branch not covered" >error &amp;&amp; &lt;</span>div className="text-red-500 mb-2"&gt;{error}&lt;/div&gt;}
+      {error &amp;&amp; &lt;div className="text-red-500 mb-2"&gt;{error}&lt;/div&gt;}
       &lt;div className="flex gap-2 mt-4"&gt;
         &lt;Button onClick={handleAssign} disabled={loading}&gt;
           Assign Asset Number
@@ -664,7 +664,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
         &lt;/Button&gt;
       &lt;/div&gt;
       {/* Confirmation Dialog */}
-      {<span class="branch-0 cbranch-no" title="branch not covered" >confirm &amp;&amp; (</span>
+      {confirm &amp;&amp; (
         &lt;div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"&gt;
           &lt;div className="bg-white p-6 rounded shadow-lg max-w-sm w-full"&gt;
             &lt;h3 className="font-bold mb-2"&gt;Confirm Asset Promotion&lt;/h3&gt;
@@ -685,14 +685,14 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                 Confirm
               &lt;/Button&gt;
               &lt;Button
-                onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etConfirm(false)}</span>
+                onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setConfirm(false)}</span>
                 variant="secondary"
                 disabled={loading}
               &gt;
                 Back
               &lt;/Button&gt;
             &lt;/div&gt;
-            {<span class="branch-0 cbranch-no" title="branch not covered" >loading &amp;&amp; &lt;</span>div className="mt-2 text-sm"&gt;Processing...&lt;/div&gt;}
+            {loading &amp;&amp; &lt;div className="mt-2 text-sm"&gt;Processing...&lt;/div&gt;}
           &lt;/div&gt;
         &lt;/div&gt;
       )}
@@ -706,7 +706,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.831Z
+                at 2025-08-02T22:14:48.419Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

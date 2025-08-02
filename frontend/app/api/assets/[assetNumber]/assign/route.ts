@@ -29,7 +29,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { assetsTable, usersTable, assetHistoryTable } from "@/lib/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 import { appLogger, systemLogger } from "@/lib/logger";
 
 /**
@@ -43,8 +43,8 @@ export async function POST(
   appLogger.info("POST /api/assets/[assetNumber]/assign called");
 
   try {
-    // Check authentication and admin role
-    const authResult = await requireAdmin(request);
+    // Check authentication (both admin and user roles can assign assets)
+    const authResult = await requireUser(request);
     if (authResult.error || !authResult.data.user) {
       appLogger.warn("Unauthorized access attempt to assign asset");
       return NextResponse.json(
@@ -145,18 +145,37 @@ export async function POST(
       );
     }
 
-    // Log the assignment in asset history
-    await db.insert(assetHistoryTable).values({
-      assetId: asset.id,
-      previousState: asset.state,
-      newState: "ISSUED",
-      changedBy: user.id,
-      changeReason: `Asset assigned to user ${userId}`,
-      details: {
-        assignedTo: userId,
-        assignmentType: "INDIVIDUAL",
-      },
-    });
+    // Get the database user ID for the user making the assignment
+    const dbUserResult = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, user.email || ""))
+      .limit(1);
+
+    const dbUserId = dbUserResult.length > 0 ? dbUserResult[0].id : null;
+
+    // Log the assignment in asset history (only if we have a valid database user ID)
+    if (dbUserId) {
+      await db.insert(assetHistoryTable).values({
+        assetId: asset.id,
+        previousState: asset.state,
+        newState: "ISSUED",
+        changedBy: dbUserId,
+        changeReason: `Asset assigned to user ${userId}`,
+        details: {
+          assignedTo: userId,
+          assignmentType: "INDIVIDUAL",
+        },
+      });
+    } else {
+      appLogger.warn(
+        "Could not find database user ID for asset history logging",
+        {
+          supabaseUserId: user.id,
+          userEmail: user.email,
+        }
+      );
+    }
 
     appLogger.info("Asset assigned successfully", {
       assetNumber,

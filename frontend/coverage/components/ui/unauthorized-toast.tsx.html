@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/26</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -258,7 +258,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// frontend/components/ui/unauthorized-toast.tsx
@@ -289,7 +289,7 @@ SOFTWARE.
 &nbsp;
 // Reusable Unauthorized Access Toast and hook for feature gating
 &nbsp;
-import React, { useEffect, useState } from <span class="cstat-no" title="statement not covered" >"react";</span>
+<span class="cstat-no" title="statement not covered" >import React, { useEffect, useState } from "react";</span>
 &nbsp;
 interface UnauthorizedToastProps {
   open: boolean;
@@ -304,26 +304,26 @@ export const <span class="cstat-no" title="statement not covered" >UnauthorizedT
 }) =&gt; {
   const [visible, setVisible] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
     let fadeInTimeout: NodeJS.Timeout;
     let fadeOutTimeout: NodeJS.Timeout;
     let closeTimeout: NodeJS.Timeout;
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (open) {</span>
 <span class="cstat-no" title="statement not covered" >      setVisible(true);</span>
       // Fade in over 1.5s
-<span class="cstat-no" title="statement not covered" >      fadeInTimeout = setTimeout(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >      fadeInTimeout = setTimeout(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        setVisible(true);</span>
       }, 10);
       // Fade out after 3s visible (1.5s fade in + 3s visible = 4.5s)
-<span class="cstat-no" title="statement not covered" >      fadeOutTimeout = setTimeout(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >      fadeOutTimeout = setTimeout(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        setVisible(false);</span>
       }, 4500);
       // Close after 1.5s fade out (total 6s)
-<span class="cstat-no" title="statement not covered" >      closeTimeout = setTimeout(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >      closeTimeout = setTimeout(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        onClose();</span>
       }, 6000);
     }
-<span class="cstat-no" title="statement not covered" >    return <span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >    return <span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      clearTimeout(fadeInTimeout);</span>
 <span class="cstat-no" title="statement not covered" >      clearTimeout(fadeOutTimeout);</span>
 <span class="cstat-no" title="statement not covered" >      clearTimeout(closeTimeout);</span>
@@ -353,11 +353,11 @@ export const <span class="cstat-no" title="statement not covered" >UnauthorizedT
 };
 &nbsp;
 // Hook to show the unauthorized toast
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >useUnauthorizedToast(): [() =&gt; void, React.ReactElement] {</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >u</span>seUnauthorizedToast(</span>): [() =&gt; void, React.ReactElement] {
   const [open, setOpen] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
-  const showToast = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etOpen(true);</span></span>
-  const handleClose = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etOpen(false);</span></span>
-  const toast = &lt;UnauthorizedToast open={open} onClose={handleClose} /&gt;;
+  const showToast = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setOpen(true);</span></span>
+  const handleClose = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setOpen(false);</span></span>
+  const toast = <span class="cstat-no" title="statement not covered" >&lt;UnauthorizedToast open={open} onClose={handleClose} /&gt;;</span>
 <span class="cstat-no" title="statement not covered" >  return [showToast, toast];</span>
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -367,7 +367,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

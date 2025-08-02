@@ -29,19 +29,45 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { settingsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 // GET: Return the current reportCacheDuration (in minutes) and depreciationSettings
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for viewing settings
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info("GET /api/settings called");
   try {
     const settings = await db.select().from(settingsTable).limit(1);
     if (!settings.length) {
-      appLogger.warn("Settings not found in GET /api/settings");
-      return NextResponse.json(
-        { error: "Settings not found" },
-        { status: 404 }
+      appLogger.warn(
+        "Settings not found in GET /api/settings, creating default settings"
       );
+      // Create default settings if none exist
+      const defaultSettings = await db
+        .insert(settingsTable)
+        .values({
+          reportCacheDuration: 30,
+          depreciationSettings: {
+            method: "straight",
+            years: 4,
+            decliningPercents: [50, 25, 12.5, 12.5],
+          },
+        })
+        .returning();
+
+      appLogger.info("Created default settings successfully");
+      return NextResponse.json({
+        reportCacheDuration: defaultSettings[0].reportCacheDuration,
+        depreciationSettings: defaultSettings[0].depreciationSettings || null,
+      });
     }
     appLogger.info("Fetched settings successfully");
     // Always include depreciationSettings in the response
@@ -64,6 +90,15 @@ export async function GET() {
 
 // PUT: Update the reportCacheDuration and/or depreciationSettings
 export async function PUT(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for updating settings
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // Log the start of the PUT request
   appLogger.info("PUT /api/settings called");
   try {

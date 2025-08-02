@@ -25,12 +25,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { departmentsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for viewing departments
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info("GET /api/departments called");
   try {

@@ -41,6 +41,7 @@ import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@/lib/supabase";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 
 export default function SettingsPage() {
   const [cacheDuration, setCacheDuration] = useState(30);
@@ -104,6 +105,7 @@ export default function SettingsPage() {
     setPasswordLoading(true);
     setPasswordSuccess(null);
     setPasswordError(null);
+
     // Validate passwords match before submitting
     if (newPassword !== confirmPassword) {
       setPasswordError("Passwords do not match.");
@@ -114,6 +116,18 @@ export default function SettingsPage() {
       }
       return;
     }
+
+    // Validate password requirements
+    const { validatePassword } = await import("@/lib/password-validation");
+    const validation = validatePassword(newPassword);
+    if (!validation.isValid) {
+      setPasswordError(
+        "Password does not meet requirements. Please check the requirements below."
+      );
+      setPasswordLoading(false);
+      return;
+    }
+
     try {
       const supabase = createClientComponentClient();
       // Supabase only requires new password, but you may want to verify current password client-side
@@ -140,13 +154,46 @@ export default function SettingsPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/settings");
+        // Get the current session for authentication
+        const supabase = createClientComponentClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session) {
+          setError("Not authenticated");
+          return;
+        }
+
+        const res = await fetch("/api/settings", {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+        if (!res.ok) {
+          // If settings don't exist, use default values
+          if (res.status === 404) {
+            setCacheDuration(30);
+            setInitialValue(30);
+            setDepreciationMethod("straight");
+            setDepreciationYears(4);
+            setDecliningPercents([50, 25, 12.5, 12.5]);
+            return;
+          }
+          // For other errors, show the error message
+          const errorData = await res.json();
+          setError(errorData.error || "Failed to load settings");
+          return;
+        }
+
         const json = await res.json();
         if (json.reportCacheDuration) {
           setCacheDuration(json.reportCacheDuration);
           setInitialValue(json.reportCacheDuration);
         } else {
-          setError("Failed to load settings");
+          // Use default values if reportCacheDuration is not present
+          setCacheDuration(30);
+          setInitialValue(30);
         }
         // Load depreciation settings if present
         if (json.depreciationSettings) {
@@ -173,9 +220,23 @@ export default function SettingsPage() {
     setError(null);
     setSuccess(false);
     try {
+      // Get the current session for authentication
+      const supabase = createClientComponentClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        setError("Not authenticated");
+        return;
+      }
+
       const res = await fetch("/api/settings", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           reportCacheDuration: cacheDuration,
           depreciationSettings: {
@@ -226,19 +287,19 @@ export default function SettingsPage() {
       {/* The main settings card is left-aligned with 8px (p-2) horizontal padding */}
       {/* Top padding reduced to py-4 for less space above the card */}
       <div className="flex-1 flex flex-col min-h-[80vh] bg-gray-50 py-4 px-2 md:px-0">
-        <div className="w-full max-w-5xl p-8">
+        <div className="w-full max-w-7xl p-8">
           {/* Main background card for the whole settings page, left-aligned with 32px (p-8) padding */}
           <Card className="w-full shadow-2xl border border-gray-300 bg-white p-0">
             <CardHeader className="pt-6 pb-2">
               <CardTitle className="text-2xl md:text-3xl">Settings</CardTitle>
             </CardHeader>
             <CardContent className="pb-8">
-              {/* First row: Reporting, Depreciation, Tools (3-column grid on desktop) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              {/* First row: 4 widgets per row (Reporting, Depreciation, Tools, Reset Password) */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 {/* --- Reporting Section Card --- */}
                 <Card className="shadow-lg border border-gray-200">
                   <CardHeader>
-                    <CardTitle className="text-xl md:text-2xl">
+                    <CardTitle className="text-lg md:text-xl">
                       Reporting
                     </CardTitle>
                   </CardHeader>
@@ -252,7 +313,7 @@ export default function SettingsPage() {
                       <div className="flex flex-col gap-3 mb-6">
                         <label
                           htmlFor="cacheDuration"
-                          className="font-medium text-sm md:text-base"
+                          className="font-medium text-sm"
                         >
                           Report Cache Duration (minutes):
                         </label>
@@ -265,40 +326,39 @@ export default function SettingsPage() {
                           onChange={(e) =>
                             setCacheDuration(Number(e.target.value))
                           }
-                          className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                           disabled={saving}
                         />
                       </div>
                       {/* Error and Success Messages */}
                       {error && (
-                        <p className="text-red-600 mb-4 text-sm md:text-base">
-                          {error}
-                        </p>
+                        <p className="text-red-600 mb-4 text-sm">{error}</p>
                       )}
                       {success && (
-                        <p className="text-green-600 mb-4 text-sm md:text-base">
+                        <p className="text-green-600 mb-4 text-sm">
                           Settings saved!
                         </p>
                       )}
                     </form>
                   </CardContent>
                 </Card>
+
                 {/* --- Depreciation Section Card --- */}
                 <Card className="shadow-lg border border-gray-200">
                   <CardHeader>
-                    <CardTitle className="text-xl md:text-2xl">
+                    <CardTitle className="text-lg md:text-xl">
                       Depreciation
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col gap-4 md:gap-5">
+                    <div className="flex flex-col gap-4">
                       {/* Depreciation Method Dropdown Row */}
                       <div className="flex flex-col gap-3">
                         <label
                           htmlFor="depreciationMethod"
-                          className="font-medium text-sm md:text-base"
+                          className="font-medium text-sm"
                         >
-                          Depreciation Method:
+                          Method:
                         </label>
                         <select
                           id="depreciationMethod"
@@ -308,7 +368,7 @@ export default function SettingsPage() {
                               e.target.value as "straight" | "declining"
                             )
                           }
-                          className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="straight">Straight line</option>
                           <option value="declining">Declining balance</option>
@@ -320,7 +380,7 @@ export default function SettingsPage() {
                           <div className="flex flex-col gap-3">
                             <label
                               htmlFor="straightYears"
-                              className="font-medium text-sm md:text-base"
+                              className="font-medium text-sm"
                             >
                               Years:
                             </label>
@@ -337,13 +397,13 @@ export default function SettingsPage() {
                                 );
                                 setDepreciationYears(val);
                               }}
-                              className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
                             />
                           </div>
                           <div className="flex flex-col gap-3">
                             <label
                               htmlFor="straightPercent"
-                              className="font-medium text-sm md:text-base"
+                              className="font-medium text-sm"
                             >
                               Percentage per year:
                             </label>
@@ -353,7 +413,7 @@ export default function SettingsPage() {
                                 type="number"
                                 value={straightLinePercent}
                                 readOnly
-                                className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md bg-gray-50 text-right pr-8"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-50 text-right pr-8"
                               />
                               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
                                 %
@@ -368,7 +428,7 @@ export default function SettingsPage() {
                           <div className="flex flex-col gap-3 mb-2">
                             <label
                               htmlFor="decliningYears"
-                              className="font-medium text-sm md:text-base"
+                              className="font-medium text-sm"
                             >
                               Years:
                             </label>
@@ -385,7 +445,7 @@ export default function SettingsPage() {
                                 );
                                 handleDecliningYearsChange(val);
                               }}
-                              className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
                             />
                           </div>
                           <div className="w-full">
@@ -398,7 +458,7 @@ export default function SettingsPage() {
                                   >
                                     <label
                                       htmlFor={`decliningYear${idx + 1}`}
-                                      className="font-medium text-sm md:text-base"
+                                      className="font-medium text-sm"
                                     >
                                       Year {idx + 1}:
                                     </label>
@@ -415,7 +475,7 @@ export default function SettingsPage() {
                                             Number(e.target.value)
                                           )
                                         }
-                                        className="w-full px-3 py-2 text-base md:text-sm border border-gray-300 rounded-md bg-gray-50 text-right pr-8"
+                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-50 text-right pr-8"
                                       />
                                       <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
                                         %
@@ -425,7 +485,7 @@ export default function SettingsPage() {
                                 )
                               )}
                               <div
-                                className={`mt-2 font-medium text-sm md:text-base ${
+                                className={`mt-2 font-medium text-sm ${
                                   decliningWarning
                                     ? "text-red-600"
                                     : "text-green-600"
@@ -441,93 +501,106 @@ export default function SettingsPage() {
                     </div>
                   </CardContent>
                 </Card>
+
                 {/* --- Tools Section Card --- */}
                 <Card className="shadow-lg border border-gray-200">
                   <CardHeader>
-                    <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
-                      <FaBarcode className="text-lg md:text-xl" /> Tools
+                    <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                      <FaBarcode className="text-base md:text-lg" /> Tools
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="mb-4">
-                      <strong className="text-sm md:text-base">
-                        Barcode Scanner Test
-                      </strong>
-                      <p className="mt-2 text-sm md:text-base text-gray-600">
-                        Test your barcode scanner and verify it works with the
-                        system. Useful for setup, troubleshooting, and training.
-                      </p>
+                  <CardContent className="flex flex-col h-full">
+                    <div className="flex-1">
+                      <div className="mb-4">
+                        <strong className="text-sm">
+                          Barcode Scanner Test
+                        </strong>
+                        <p className="mt-2 text-sm text-gray-600">
+                          Test your barcode scanner and verify it works with the
+                          system. Useful for setup, troubleshooting, and
+                          training.
+                        </p>
+                      </div>
                     </div>
-                    <Link href="/barcode-test">
-                      <button
-                        className="bg-blue-600 hover:bg-blue-700 text-white border-none rounded-md px-4 md:px-5 py-2 md:py-2.5 font-semibold text-sm md:text-base cursor-pointer flex items-center gap-2 transition-colors duration-200"
-                        aria-label="Go to Barcode Test"
-                        title="Go to Barcode Test"
-                      >
-                        <FaBarcode /> Go to Barcode Test
-                      </button>
-                    </Link>
+                    <div className="flex justify-end mt-4">
+                      <Link href="/barcode-test">
+                        <button
+                          className="bg-blue-600 hover:bg-blue-700 text-white border-none rounded-md px-4 py-2 font-semibold text-sm cursor-pointer flex items-center gap-2 transition-colors duration-200"
+                          aria-label="Go to Barcode Test"
+                          title="Go to Barcode Test"
+                        >
+                          <FaBarcode /> Go to Barcode Test
+                        </button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
-              </div>
-              {/* Second row: Reset Password card and Save button, bottom-aligned */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                {/* Reset Password card in first column */}
-                <Card className="shadow-lg border border-gray-200 md:col-span-1">
+
+                {/* --- Reset Password Section Card --- */}
+                <Card className="shadow-lg border border-gray-200">
                   <CardHeader>
-                    <CardTitle className="text-xl md:text-2xl">
+                    <CardTitle className="text-lg md:text-xl">
                       Reset Password
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <form className="space-y-4" onSubmit={handlePasswordChange}>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">
-                          New Password
-                        </label>
-                        <Input
-                          type="password"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          minLength={6}
-                          required
-                          placeholder="Enter new password"
-                          disabled={passwordLoading}
-                          ref={newPasswordRef}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">
-                          Confirm New Password
-                        </label>
-                        <Input
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          minLength={6}
-                          required
-                          placeholder="Re-enter new password"
-                          disabled={passwordLoading}
-                        />
-                      </div>
-                      {/* Show error if passwords do not match or other error occurs */}
-                      {passwordError && (
-                        <div className="text-red-600 text-sm">
-                          {passwordError}
+                  <CardContent className="flex flex-col h-full">
+                    <form
+                      className="flex flex-col h-full"
+                      onSubmit={handlePasswordChange}
+                    >
+                      <div className="flex-1 space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            New Password
+                          </label>
+                          <Input
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            minLength={12}
+                            required
+                            placeholder="Enter new password"
+                            disabled={passwordLoading}
+                            ref={newPasswordRef}
+                          />
+                          {/* Password Strength Indicator */}
+                          {newPassword && (
+                            <PasswordStrengthIndicator password={newPassword} />
+                          )}
                         </div>
-                      )}
-                      {passwordSuccess && (
-                        <div className="text-green-600 text-sm">
-                          {passwordSuccess}
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            Confirm New Password
+                          </label>
+                          <Input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            minLength={12}
+                            required
+                            placeholder="Re-enter new password"
+                            disabled={passwordLoading}
+                          />
                         </div>
-                      )}
-                      <div className="flex justify-end">
+                        {/* Show error if passwords do not match or other error occurs */}
+                        {passwordError && (
+                          <div className="text-red-600 text-sm">
+                            {passwordError}
+                          </div>
+                        )}
+                        {passwordSuccess && (
+                          <div className="text-green-600 text-sm">
+                            {passwordSuccess}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex justify-end mt-4">
                         <Button
                           type="submit"
                           disabled={
                             passwordLoading ||
-                            newPassword.length < 6 ||
-                            confirmPassword.length < 6
+                            newPassword.length < 12 ||
+                            confirmPassword.length < 12
                           }
                         >
                           {passwordLoading ? "Updating..." : "Change Password"}
@@ -536,25 +609,24 @@ export default function SettingsPage() {
                     </form>
                   </CardContent>
                 </Card>
-                {/* Spacer column for alignment */}
-                <div className="hidden md:block" />
-                {/* Save button, bottom-aligned with Reset Password card */}
-                <div className="flex flex-col justify-end items-end">
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={!isChanged || saving}
-                    className={`min-w-[120px] px-6 py-2.5 text-base font-bold text-white border-none rounded-md cursor-pointer transition-all duration-200 text-center shadow-lg ${
-                      isChanged && !saving
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                    aria-label="Save settings"
-                    title="Save settings"
-                  >
-                    {saving ? "Saving..." : "Save"}
-                  </button>
-                </div>
+              </div>
+
+              {/* Second row: Save button, right-aligned with the last card */}
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={!isChanged || saving}
+                  className={`min-w-[120px] px-6 py-2.5 text-base font-bold text-white border-none rounded-md cursor-pointer transition-all duration-200 text-center shadow-lg ${
+                    isChanged && !saving
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }`}
+                  aria-label="Save settings"
+                  title="Save settings"
+                >
+                  {saving ? "Saving..." : "Save"}
+                </button>
               </div>
             </CardContent>
           </Card>

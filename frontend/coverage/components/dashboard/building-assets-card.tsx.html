@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -289,7 +289,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -328,7 +328,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -386,10 +386,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 &nbsp;
-import { Card, CardContent, CardHeader, CardTitle } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
-import { Rocket } from <span class="cstat-no" title="statement not covered" >"lucide-react";</span>
-import { Badge } from <span class="cstat-no" title="statement not covered" >"@/components/ui/badge";</span>
-import { ASSET_TYPE_LABELS } from <span class="cstat-no" title="statement not covered" >"@/lib/constants";</span>
+<span class="cstat-no" title="statement not covered" >import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";</span>
+<span class="cstat-no" title="statement not covered" >import { Rocket } from "lucide-react";</span>
+<span class="cstat-no" title="statement not covered" >import { Badge } from "@/components/ui/badge";</span>
+<span class="cstat-no" title="statement not covered" >import { ASSET_TYPE_LABELS } from "@/lib/constants";</span>
 // Client-only variants (deprecated) are now in building-assets-card.client.tsx
 &nbsp;
 const TYPE_COLOR_MAP: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{</span>
@@ -416,11 +416,11 @@ const SINGULAR_TO_PLURAL: Record&lt;string, string&gt; = <span class="cstat-no" 
   Tablet: "Tablets",
 };
 &nbsp;
-function <span class="fstat-no" title="function not covered" >normalizeType(t</span>ype: string): string {
+function <span class="fstat-no" title="function not covered" >normalizeType(</span>type: string): string {
 <span class="cstat-no" title="statement not covered" >  return SINGULAR_TO_PLURAL[type] || type;</span>
 }
 &nbsp;
-function <span class="fstat-no" title="function not covered" >getTypeCountMap(d</span>ata: { type: string; count: number }[]) {
+function <span class="fstat-no" title="function not covered" >getTypeCountMap(</span>data: { type: string; count: number }[]) {
   const map: Record&lt;string, number&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
 <span class="cstat-no" title="statement not covered" >  for (const item of data) {</span>
     const normalizedType = <span class="cstat-no" title="statement not covered" >normalizeType(item.type);</span>
@@ -429,7 +429,7 @@ function <span class="fstat-no" title="function not covered" >getTypeCountMap(d<
 <span class="cstat-no" title="statement not covered" >  return map;</span>
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >BuildingAssetsCard({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >B</span>uildingAssetsCard(</span>{
   buildingByType,
 }: {
   buildingByType: { type: string; count: number }[];
@@ -437,7 +437,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   const typeCountMap = <span class="cstat-no" title="statement not covered" >getTypeCountMap(buildingByType);</span>
   // Render each badge and its number in a flex column, all in a flex row
   const types = <span class="cstat-no" title="statement not covered" >["DESKTOP", "LAPTOP", "MOBILE_PHONE", "TABLET"];</span>
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Card&gt;
       &lt;CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"&gt;
         &lt;CardTitle className="text-sm font-medium flex items-center gap-2"&gt;
@@ -470,13 +470,13 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
   );
 }
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >ReadyToGoAssetsCard({</span></span>
+<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >R</span>eadyToGoAssetsCard(</span>{
   readyToGoByType,
 }: {
   readyToGoByType: { type: string; count: number }[];
 }) {
   const typeCountMap = <span class="cstat-no" title="statement not covered" >getTypeCountMap(readyToGoByType);</span>
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;Card&gt;
       &lt;CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"&gt;
         &lt;CardTitle className="text-sm font-medium flex items-center gap-2"&gt;
@@ -514,7 +514,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

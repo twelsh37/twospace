@@ -47,6 +47,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { ExportModal } from "@/components/ui/export-modal";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { useAuth } from "@/lib/auth-context";
 
 // Register Chart.js components
 ChartJS.register(
@@ -100,6 +101,9 @@ function AssetInventoryReport({
 }: {
   onExport: (data: AssetInventoryExportData) => void;
 }) {
+  // Get authentication context
+  const { session } = useAuth();
+
   // State for summary data
   const [assetCounts, setAssetCounts] = useState<{ [type: string]: number }>(
     {}
@@ -141,7 +145,17 @@ function AssetInventoryReport({
   useEffect(() => {
     async function fetchSummary() {
       try {
-        const res = await fetch("/api/reports/asset-inventory/summary");
+        // Add authorization header if session exists
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch("/api/reports/asset-inventory/summary", {
+          headers,
+        });
         const json = await res.json();
         if (!json.byType || !json.byState)
           throw new Error(json.error || "Failed to fetch summary");
@@ -154,8 +168,12 @@ function AssetInventoryReport({
         console.error("Error fetching summary:", err);
       }
     }
-    fetchSummary();
-  }, []);
+
+    // Only fetch if we have a session
+    if (session) {
+      fetchSummary();
+    }
+  }, [session]);
 
   // Prepare chart and table data for asset type
   const labels = Object.keys(assetCounts).sort();
@@ -782,6 +800,9 @@ function AssetInventoryReport({
 
 // --- Lifecycle Management Report: Distribution of Assets by Year ---
 function LifecycleManagementReport({ onExport }: { onExport: () => void }) {
+  // Get authentication context
+  const { session } = useAuth();
+
   // State for year data
   const [yearCounts, setYearCounts] = React.useState<{
     [year: string]: number;
@@ -810,7 +831,17 @@ function LifecycleManagementReport({ onExport }: { onExport: () => void }) {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/reports/asset-inventory/summary");
+        // Add authorization header if session exists
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch("/api/reports/asset-inventory/summary", {
+          headers,
+        });
         const json = await res.json();
         if (!json.byYear) throw new Error(json.error || "No year data");
         setYearCounts(json.byYear);
@@ -820,8 +851,12 @@ function LifecycleManagementReport({ onExport }: { onExport: () => void }) {
         setLoading(false);
       }
     }
-    fetchYearSummary();
-  }, []);
+
+    // Only fetch if we have a session
+    if (session) {
+      fetchYearSummary();
+    }
+  }, [session]);
 
   // Prepare data for the bar chart
   const years = Object.keys(yearCounts).sort();
@@ -1002,6 +1037,9 @@ function LifecycleManagementReport({ onExport }: { onExport: () => void }) {
 
 // --- Financial Report: Asset Value by Type and Over Years ---
 function FinancialReport({ onExport }: { onExport: () => void }) {
+  // Get authentication context
+  const { session } = useAuth();
+
   // State for API data
   const [byType, setByType] = useState<{ [type: string]: number }>({});
   const [byYear, setByYear] = useState<{ [year: string]: number }>({});
@@ -1028,7 +1066,15 @@ function FinancialReport({ onExport }: { onExport: () => void }) {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/reports/financial/summary");
+        // Add authorization header if session exists
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch("/api/reports/financial/summary", { headers });
         const json = await res.json();
         if (!json.byType || !json.byYear)
           throw new Error(json.error || "No data");
@@ -1040,8 +1086,12 @@ function FinancialReport({ onExport }: { onExport: () => void }) {
         setLoading(false);
       }
     }
-    fetchSummary();
-  }, []);
+
+    // Only fetch if we have a session
+    if (session) {
+      fetchSummary();
+    }
+  }, [session]);
   // Prepare data for bar chart (value by type)
   const typeLabels = Object.keys(byType).sort();
   const barData = {
@@ -1429,41 +1479,43 @@ function ReportsPageContent() {
   }
 
   // Handler to actually export the report as PDF
-  async function handleExport(format: "pdf") {
+  async function handleExport(format: "pdf" | "csv") {
     setExportLoading(true);
     try {
       let apiUrl = "";
       let body: Record<string, unknown> = { format };
-      let filename = "report.pdf";
+      let filename = format === "pdf" ? "report.pdf" : "report.csv";
+      
       if (exportReport === "Asset Inventory") {
-        apiUrl = "/api/reports/pdf";
-        filename = "asset-inventory-report.pdf";
+        apiUrl = format === "pdf" ? "/api/reports/pdf" : "/api/reports/export";
+        filename = format === "pdf" ? "asset-inventory-report.pdf" : "asset-inventory-report.csv";
         // Attach chart images and table data
         if (assetInventoryExportData) {
           body = { ...assetInventoryExportData, format };
         }
       } else if (exportReport === "Lifecycle Management") {
-        alert("PDF export for Lifecycle Management is not yet implemented.");
+        alert(`${format.toUpperCase()} export for Lifecycle Management is not yet implemented.`);
         setExportLoading(false);
         setExportModalOpen(false);
         return;
       } else if (exportReport === "Financial") {
-        alert("PDF export for Financial is not yet implemented.");
+        alert(`${format.toUpperCase()} export for Financial is not yet implemented.`);
         setExportLoading(false);
         setExportModalOpen(false);
         return;
       } else {
-        alert(`PDF export for ${exportReport} is not yet implemented.`);
+        alert(`${format.toUpperCase()} export for ${exportReport} is not yet implemented.`);
         setExportLoading(false);
         setExportModalOpen(false);
         return;
       }
+      
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("Failed to export PDF");
+      if (!res.ok) throw new Error(`Failed to export ${format.toUpperCase()}`);
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1475,7 +1527,7 @@ function ReportsPageContent() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       alert(
-        `Failed to export ${exportReport} as PDF. Please try again.\n` +
+        `Failed to export ${exportReport} as ${format.toUpperCase()}. Please try again.\n` +
           (err instanceof Error ? err.message : String(err))
       );
     } finally {

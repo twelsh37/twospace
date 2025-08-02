@@ -29,7 +29,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq, isNull, and } from "drizzle-orm";
 import { db, assetsTable, locationsTable } from "@/lib/db";
 import { appLogger } from "@/lib/logger";
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 // Define standard CORS headers
 const corsHeaders = {
@@ -46,8 +46,8 @@ export async function GET(request: NextRequest) {
   appLogger.info("GET /api/assets/available called");
 
   try {
-    // Verify admin access
-    const authResult = await requireAdmin(request);
+    // Verify user access (both admin and user roles can access)
+    const authResult = await requireUser(request);
     if (authResult.error || !authResult.data.user) {
       appLogger.warn("Unauthorized access attempt to /api/assets/available");
       return NextResponse.json(

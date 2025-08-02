@@ -36,6 +36,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useUnauthorizedToast } from "@/components/ui/unauthorized-toast";
+import { ExportModal } from "@/components/ui/export-modal";
+import { showSuccessToast, showErrorToast } from "@/lib/toast";
 
 interface User {
   id: string;
@@ -74,7 +76,9 @@ export default function UsersClientPage({
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState(initialFilters);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const { userRole } = useAuth();
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const { userRole, session } = useAuth();
   const [showUnauthorized, unauthorizedToast] = useUnauthorizedToast();
 
   // Handle filter changes by updating the URL (triggers SSR)
@@ -115,6 +119,68 @@ export default function UsersClientPage({
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  // Export handler for PDF or CSV
+  const handleExport = async (format: "pdf" | "csv") => {
+    setExportLoading(true);
+    try {
+      // Prepare headers with authentication
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      // Add Authorization header if session exists
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      // Send selected format and filters to API
+      const res = await fetch("/api/users/export", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          department: filters.department === "ALL" ? "all" : filters.department,
+          role: filters.role === "ALL" ? "all" : filters.role,
+          format,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(
+          `Failed to export ${format.toUpperCase()}: ${errorText}`
+        );
+      }
+
+      const blob = await res.blob();
+      // Set filename and extension based on format
+      const filename =
+        format === "csv" ? "users-report.csv" : "users-report.pdf";
+      // Download the file
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Show success toast
+      showSuccessToast(
+        `Users exported successfully as ${format.toUpperCase()}`
+      );
+    } catch (error) {
+      console.error("Export error:", error);
+      // Show error toast instead of browser alert
+      showErrorToast(
+        `Failed to export users as ${format.toUpperCase()}. Please try again.`
+      );
+    } finally {
+      setExportLoading(false);
+      setExportModalOpen(false);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col pt-6 pb-2 md:pb-4 px-4 md:px-8">
       <Card
@@ -148,7 +214,11 @@ export default function UsersClientPage({
               </p>
             </div>
             <div className="flex items-center space-x-5">
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setExportModalOpen(true)}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Export
               </Button>
@@ -192,6 +262,17 @@ export default function UsersClientPage({
           </div>
         </CardContent>
       </Card>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        onExport={handleExport}
+        loading={exportLoading}
+        title="Export Users"
+        pdfOnly={false}
+      />
+
       {unauthorizedToast}
     </div>
   );

@@ -109,8 +109,15 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
   const fetchAssets = async () => {
     setIsLoading(true);
     try {
+      // Attach Authorization header if access token is available
+      const headers: Record<string, string> = {};
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`/api/assets?${queryString}`, {
         cache: "no-store",
+        headers,
       });
       if (!response.ok) {
         throw new Error("Failed to fetch assets");
@@ -461,12 +468,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleEditClick(asset.assetNumber)}
-                            disabled={isUser}
-                            title={
-                              isUser
-                                ? "You do not have permission to edit assets."
-                                : "Edit Asset"
-                            }
+                            title="Edit Asset"
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Asset
@@ -529,12 +531,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleEditClick(asset.assetNumber)}
-                        disabled={isUser}
-                        title={
-                          isUser
-                            ? "You do not have permission to edit assets."
-                            : "Edit Asset"
-                        }
+                        title="Edit Asset"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Asset

@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">43.41% </span>
+                <span class="strong">43.84% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>56/129</span>
+                <span class='fraction'>57/130</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">36.17% </span>
+                <span class="strong">37.83% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>17/47</span>
+                <span class='fraction'>28/74</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.8% </span>
+                <span class="strong">45.23% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>56/125</span>
+                <span class='fraction'>57/126</span>
             </div>
         
             
@@ -651,7 +651,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -906,7 +906,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1192,12 +1192,12 @@ export function AssignAssetsDrawer({
 &nbsp;
   // Fetch available assets when drawer opens
   useEffect(() =&gt; {
-    if (!isOpen || !session?.access_token) {
+    if (!isOpen || !session<span class="branch-0 cbranch-no" title="branch not covered" >?.a</span>ccess_token) {
       console.log(
         "AssignAssetsDrawer: Skipping fetch - isOpen:",
         isOpen,
         "hasToken:",
-        !!session?.access_token
+        !!session<span class="branch-0 cbranch-no" title="branch not covered" >?.a</span>ccess_token
       );
       return;
     }
@@ -1209,7 +1209,7 @@ export function AssignAssetsDrawer({
       ")"
     );
     async function fetchAvailableAssets() {
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (!session?.access_token) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!session<span class="branch-0 cbranch-no" title="branch not covered" >?.a</span>ccess_token) {
 <span class="cstat-no" title="statement not covered" >        console.error(</span>
           "AssignAssetsDrawer: No session or access token available"
         );
@@ -1323,7 +1323,7 @@ export function AssignAssetsDrawer({
 <span class="cstat-no" title="statement not covered" >    e.dataTransfer.effectAllowed = "move";</span>
 &nbsp;
     // Add visual feedback to dragged element
-    const target = <span class="cstat-no" title="statement not covered" >e.target </span>as HTMLElement;
+    const target = <span class="cstat-no" title="statement not covered" >e.target as HTMLElement;</span>
 <span class="cstat-no" title="statement not covered" >    target.style.opacity = "0.5";</span>
 <span class="cstat-no" title="statement not covered" >    target.style.transform = "scale(0.95)";</span>
   };
@@ -1333,7 +1333,7 @@ export function AssignAssetsDrawer({
 <span class="cstat-no" title="statement not covered" >    setDraggedAsset(null);</span>
 &nbsp;
     // Reset visual feedback
-    const target = <span class="cstat-no" title="statement not covered" >e.target </span>as HTMLElement;
+    const target = <span class="cstat-no" title="statement not covered" >e.target as HTMLElement;</span>
 <span class="cstat-no" title="statement not covered" >    target.style.opacity = "1";</span>
 <span class="cstat-no" title="statement not covered" >    target.style.transform = "scale(1)";</span>
   };
@@ -1350,7 +1350,7 @@ export function AssignAssetsDrawer({
   };
 &nbsp;
   // Clear selection
-  const clearSelection = <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+  const clearSelection = <span class="fstat-no" title="function not covered" >() =</span>&gt; {
 <span class="cstat-no" title="statement not covered" >    setSelectedAssets(new Set());</span>
 <span class="cstat-no" title="statement not covered" >    setIsSelectMode(false);</span>
   };
@@ -1362,7 +1362,7 @@ export function AssignAssetsDrawer({
   }, [refreshTrigger]);
 &nbsp;
   // Handle drop on assigned area
-  const handleDrop = <span class="fstat-no" title="function not covered" >async (e</span>: React.DragEvent) =&gt; {
+  const handleDrop = <span class="fstat-no" title="function not covered" >async </span>(e: React.DragEvent) =&gt; {
 <span class="cstat-no" title="statement not covered" >    e.preventDefault();</span>
 <span class="cstat-no" title="statement not covered" >    setIsDragOver(false);</span>
 &nbsp;
@@ -1382,7 +1382,7 @@ export function AssignAssetsDrawer({
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (response.ok) {</span>
         // Show success animation
-<span class="cstat-no" title="statement not covered" >        setAssignedAssets(<span class="fstat-no" title="function not covered" >(p</span>rev) =&gt; <span class="cstat-no" title="statement not covered" >[...prev, draggedAsset.id]);</span></span>
+<span class="cstat-no" title="statement not covered" >        setAssignedAssets(<span class="fstat-no" title="function not covered" >(p</span>rev) =&gt; <span class="cstat-no" title="statement not covered" >[...prev, draggedAsset.id])</span>;</span>
 &nbsp;
         // Remove asset from available list
 <span class="cstat-no" title="statement not covered" >        setAvailableAssets(<span class="fstat-no" title="function not covered" >(p</span>rev) =&gt;</span>
@@ -1393,7 +1393,7 @@ export function AssignAssetsDrawer({
 <span class="cstat-no" title="statement not covered" >        onAssetAssigned?.();</span>
 &nbsp;
         // Clear success animation after 2 seconds
-<span class="cstat-no" title="statement not covered" >        setTimeout(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >        setTimeout(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >          setAssignedAssets(<span class="fstat-no" title="function not covered" >(p</span>rev) =&gt;</span>
 <span class="cstat-no" title="statement not covered" >            prev.filter(<span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >id !== draggedAsset.id)</span></span>
           );
@@ -1426,7 +1426,7 @@ export function AssignAssetsDrawer({
         &lt;div className="flex items-center gap-4"&gt;
           &lt;h2 className="text-lg font-semibold"&gt;Assign Assets&lt;/h2&gt;
           {isSelectMode &amp;&amp; (
-            &lt;div className="flex items-center gap-2"&gt;
+<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;div className="flex items-center gap-2"&gt;</span>
               &lt;span className="text-sm text-gray-600"&gt;
                 {selectedAssets.size} selected
               &lt;/span&gt;
@@ -1443,12 +1443,12 @@ export function AssignAssetsDrawer({
         &lt;/div&gt;
         &lt;div className="flex items-center gap-2"&gt;
           &lt;Button
-            variant={isSelectMode ? <span class="branch-0 cbranch-no" title="branch not covered" >"default" : "</span>outline"}
+            variant={isSelectMode ? <span class="branch-0 cbranch-no" title="branch not covered" >"default" </span>: "outline"}
             size="sm"
-            onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etIsSelectMode(!isSelectMode)}</span>
+            onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setIsSelectMode(!isSelectMode)}</span>
             className="h-8 px-3 text-sm"
           &gt;
-            {isSelectMode ? <span class="branch-0 cbranch-no" title="branch not covered" >"Exit Select" : "</span>Multi-Select"}
+            {isSelectMode ? <span class="branch-0 cbranch-no" title="branch not covered" >"Exit Select" </span>: "Multi-Select"}
           &lt;/Button&gt;
           &lt;Button
             variant="ghost"
@@ -1515,7 +1515,7 @@ export function AssignAssetsDrawer({
                               }`}
                             &gt;
                               &lt;div className="flex items-center gap-2"&gt;
-                                {<span class="branch-0 cbranch-no" title="branch not covered" >isSelectMode &amp;&amp; (</span>
+                                {isSelectMode &amp;&amp; (
                                   &lt;input
                                     type="checkbox"
                                     checked={selectedAssets.has(asset.id)}
@@ -1538,14 +1538,14 @@ export function AssignAssetsDrawer({
                                     {asset.description}
                                   &lt;/div&gt;
                                 &lt;/div&gt;
-                                {<span class="branch-0 cbranch-no" title="branch not covered" >assignedAssets.includes(asset.id) &amp;&amp; (</span>
+                                {assignedAssets.includes(asset.id) &amp;&amp; (
                                   &lt;Check className="h-3 w-3 text-green-600 animate-pulse flex-shrink-0" /&gt;
                                 )}
                               &lt;/div&gt;
                             &lt;/div&gt;
                           ))}
                           {categoryAssets.length &gt; 4 &amp;&amp; (
-                            &lt;div className="text-xs text-muted-foreground text-center py-1 bg-gray-50 rounded"&gt;
+<span class="branch-1 cbranch-no" title="branch not covered" >                            &lt;div className="text-xs text-muted-foreground text-center py-1 bg-gray-50 rounded"&gt;</span>
                               +{categoryAssets.length - 4} more
                             &lt;/div&gt;
                           )}
@@ -1579,7 +1579,7 @@ export function AssignAssetsDrawer({
               &gt;
                 &lt;div
                   className={`text-lg font-medium mb-2 transition-colors ${
-                    isDragOver ? <span class="branch-0 cbranch-no" title="branch not covered" >"text-blue-600" : "</span>text-gray-600"
+                    isDragOver ? <span class="branch-0 cbranch-no" title="branch not covered" >"text-blue-600" </span>: "text-gray-600"
                   }`}
                 &gt;
                   {isDragOver
@@ -1589,8 +1589,8 @@ export function AssignAssetsDrawer({
                 &lt;div className="text-sm text-muted-foreground"&gt;
                   Drag assets from the grid above to assign them to this user
                 &lt;/div&gt;
-                {isDragOver &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >draggedAsset &amp;&amp; (</span>
-                  &lt;div className="mt-2 text-sm text-blue-600 font-medium"&gt;
+                {isDragOver &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >draggedAsset </span>&amp;&amp; (
+<span class="branch-2 cbranch-no" title="branch not covered" >                  &lt;div className="mt-2 text-sm text-blue-600 font-medium"&gt;</span>
                     Assigning: {draggedAsset.assetNumber}
                   &lt;/div&gt;
                 )}
@@ -1609,7 +1609,7 @@ export function AssignAssetsDrawer({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

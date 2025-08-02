@@ -34,50 +34,52 @@ import { NextRequest, NextResponse } from "next/server";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Helper: Extract Supabase session from request (Authorization header or cookies)
+// Helper: Extract Supabase session from request (for API routes)
 export async function getSupabaseUserFromRequest(req: NextRequest) {
-  console.log("=== AUTH DEBUG ===");
-  console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+  try {
+    // Get the access token from the Authorization header (Bearer token)
+    const authHeader = req.headers.get("authorization");
+    console.log("Authorization header:", authHeader);
 
-  // Try to get the access token from the Authorization header (Bearer)
-  const authHeader = req.headers.get("authorization");
-  console.log("Authorization header:", authHeader);
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("No valid Authorization header found");
+      return null;
+    }
 
-  let accessToken = null;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    accessToken = authHeader.replace("Bearer ", "");
+    const accessToken = authHeader.replace("Bearer ", "");
     console.log("Extracted access token from header");
-  } else {
-    // Fallback: Try to get from cookies (if using cookie-based auth)
-    const cookie = req.cookies.get("sb-access-token")?.value;
-    console.log("Cookie value:", cookie);
-    if (cookie) accessToken = cookie;
-  }
 
-  console.log("Final access token:", accessToken ? "Present" : "Missing");
-  if (!accessToken) {
-    console.log("No access token found");
+    // Create a Supabase client with the access token
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
+
+    // Get the user using the access token
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(accessToken);
+
+    if (error) {
+      console.log("Error getting user:", error.message);
+      return null;
+    }
+
+    if (!user) {
+      console.log("No user found");
+      return null;
+    }
+
+    console.log("Authentication successful for user:", user.email);
+    return user;
+  } catch (error) {
+    console.log("Error in getSupabaseUserFromRequest:", error);
     return null;
   }
-
-  // Create a Supabase client with the access token
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
-  });
-
-  // Get the user session
-  console.log("Calling supabase.auth.getUser");
-  const { data, error } = await supabase.auth.getUser(accessToken);
-  console.log("Supabase response - error:", error);
-  console.log("Supabase response - user:", data?.user ? "Present" : "Missing");
-
-  if (error || !data?.user) {
-    console.log("Authentication failed");
-    return null;
-  }
-
-  console.log("Authentication successful for user:", data.user.email);
-  return data.user;
 }
 
 // Middleware: Require authentication
@@ -89,7 +91,39 @@ export async function requireAuth(req: NextRequest) {
   return user;
 }
 
-// Middleware: Require ADMIN role
+// Middleware: Require any authenticated user (ADMIN or USER)
+export async function requireUser(req: NextRequest) {
+  const user = await getSupabaseUserFromRequest(req);
+  if (!user) {
+    return { data: { user: null }, error: { message: "Not authenticated" } };
+  }
+
+  // Check role from Supabase Auth metadata
+  const role = user.user_metadata?.role;
+  console.log("User role from metadata:", role);
+  console.log("User email:", user.email);
+
+  // Check if user has ADMIN or USER role in metadata
+  if (role === "ADMIN" || role === "USER") {
+    console.log("User is authenticated with role:", role);
+    return { data: { user }, error: null };
+  }
+
+  // Fallback: Check if user is admin based on email (for backward compatibility)
+  if (
+    user.email === "tom.welsh@gtrailway.com" ||
+    user.email === "tom.welsh@theaiaa.com"
+  ) {
+    console.log("User is ADMIN based on email fallback");
+    return { data: { user }, error: null };
+  }
+
+  // Default to USER role for backward compatibility
+  console.log("User has no role, defaulting to USER");
+  return { data: { user }, error: null };
+}
+
+// Middleware: Require ADMIN role only
 export async function requireAdmin(req: NextRequest) {
   const user = await getSupabaseUserFromRequest(req);
   if (!user) {
@@ -126,11 +160,19 @@ export async function requireAdmin(req: NextRequest) {
 /*
 USAGE IN API ROUTES:
 
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+// For routes that require any authenticated user (ADMIN or USER)
+import { requireUser } from "@/lib/supabase-auth-helpers";
+export async function GET(req: NextRequest) {
+  const user = await requireUser(req);
+  if (user.error) return NextResponse.json(user.error, { status: 401 });
+  // ... proceed with user logic
+}
 
+// For routes that require ADMIN role only
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
 export async function POST(req: NextRequest) {
   const user = await requireAdmin(req);
-  if (user instanceof NextResponse) return user; // Not authorized
-  // ...proceed with admin logic
+  if (user.error) return NextResponse.json(user.error, { status: 403 });
+  // ... proceed with admin logic
 }
 */

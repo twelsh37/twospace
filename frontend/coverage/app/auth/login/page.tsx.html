@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/34</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/34</span>
             </div>
         
             
@@ -318,7 +318,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -436,7 +436,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// frontend/app/auth/login/page.tsx
-// Login page for Supabase authentication, rebuilt to match reference image exactly
+// Login page for user authentication
 &nbsp;
 /*
 MIT License
@@ -464,19 +464,19 @@ SOFTWARE.
 &nbsp;
 "use client";
 &nbsp;
-import React, { useState } from <span class="cstat-no" title="statement not covered" >"react";</span>
-import { useRouter } from <span class="cstat-no" title="statement not covered" >"next/navigation";</span>
-import Link from <span class="cstat-no" title="statement not covered" >"next/link";</span>
-import { useAuth } from <span class="cstat-no" title="statement not covered" >"@/lib/auth-context";</span>
-import { Button } from <span class="cstat-no" title="statement not covered" >"@/components/ui/button";</span>
-import { Input } from <span class="cstat-no" title="statement not covered" >"@/components/ui/input";</span>
-import { Card, CardHeader, CardTitle, CardContent } from <span class="cstat-no" title="statement not covered" >"@/components/ui/card";</span>
-import { Label } from <span class="cstat-no" title="statement not covered" >"@/components/ui/label";</span>
-import { Alert, AlertDescription } from <span class="cstat-no" title="statement not covered" >"@/components/ui/alert";</span>
-import { Eye, EyeOff, Lock, Mail } from <span class="cstat-no" title="statement not covered" >"lucide-react";</span>
-import Image from <span class="cstat-no" title="statement not covered" >"next/image";</span>
+<span class="cstat-no" title="statement not covered" >import React, { useState } from "react";</span>
+<span class="cstat-no" title="statement not covered" >import { useRouter } from "next/navigation";</span>
+<span class="cstat-no" title="statement not covered" >import Link from "next/link";</span>
+<span class="cstat-no" title="statement not covered" >import { useAuth } from "@/lib/auth-context";</span>
+<span class="cstat-no" title="statement not covered" >import { Button } from "@/components/ui/button";</span>
+<span class="cstat-no" title="statement not covered" >import { Input } from "@/components/ui/input";</span>
+<span class="cstat-no" title="statement not covered" >import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";</span>
+<span class="cstat-no" title="statement not covered" >import { Label } from "@/components/ui/label";</span>
+<span class="cstat-no" title="statement not covered" >import { Alert, AlertDescription } from "@/components/ui/alert";</span>
+<span class="cstat-no" title="statement not covered" >import { Eye, EyeOff, Lock, Mail } from "lucide-react";</span>
+<span class="cstat-no" title="statement not covered" >import Image from "next/image";</span>
 &nbsp;
-export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >LoginPage() {</span></span>
+<span class="cstat-no" title="statement not covered" >export default function <span class="fstat-no" title="function not covered" >L</span>oginPage(</span>) {
   const [email, setEmail] = <span class="cstat-no" title="statement not covered" >useState("");</span>
   const [password, setPassword] = <span class="cstat-no" title="statement not covered" >useState("");</span>
   const [showPassword, setShowPassword] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
@@ -485,7 +485,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   const { signIn } = <span class="cstat-no" title="statement not covered" >useAuth();</span>
   const router = <span class="cstat-no" title="statement not covered" >useRouter();</span>
 &nbsp;
-  const handleSubmit = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async (e</span>: React.FormEvent) =&gt; {</span>
+  const handleSubmit = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>(e: React.FormEvent) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    e.preventDefault();</span>
 <span class="cstat-no" title="statement not covered" >    setLoading(true);</span>
 <span class="cstat-no" title="statement not covered" >    setError(null);</span>
@@ -504,7 +504,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
     }
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     // Outer container: centers card, sets background
     &lt;div className="min-h-screen flex items-center justify-center bg-gray-50"&gt;
       {/* Responsive Card: smaller on mobile, larger on desktop, less vertical padding */}
@@ -538,7 +538,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             &lt;CardContent&gt;
               &lt;form onSubmit={handleSubmit} className="space-y-4 md:space-y-6"&gt;
                 {/* Error alert if login fails */}
-                {<span class="branch-0 cbranch-no" title="branch not covered" >error &amp;&amp; (</span>
+                {error &amp;&amp; (
                   &lt;Alert variant="destructive"&gt;
                     &lt;AlertDescription&gt;{error}&lt;/AlertDescription&gt;
                   &lt;/Alert&gt;
@@ -579,11 +579,11 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                     /&gt;
                     &lt;button
                       type="button"
-                      onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etShowPassword(!showPassword)}</span>
+                      onClick={<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >setShowPassword(!showPassword)}</span>
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     &gt;
                       {showPassword ? (
-<span class="branch-0 cbranch-no" title="branch not covered" >                        &lt;EyeOff className="h-4 w-4" /&gt;</span>
+                        &lt;EyeOff className="h-4 w-4" /&gt;
                       ) : (
                         &lt;Eye className="h-4 w-4" /&gt;
                       )}
@@ -628,7 +628,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
