@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
       } else {
         setSuccess(true);
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -91,12 +91,12 @@ export default function ForgotPasswordPage() {
                 </svg>
               </div>
               <p className="text-gray-600">
-                We've sent a password reset link to <strong>{email}</strong>.
+                We&apos;ve sent a password reset link to <strong>{email}</strong>.
                 Please check your email and click the link to reset your
                 password.
               </p>
               <div className="text-sm text-gray-500">
-                <p>Didn't receive the email? Check your spam folder or</p>
+                <p>Didn&apos;t receive the email? Check your spam folder or</p>
                 <button
                   onClick={() => {
                     setSuccess(false);
@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
         <CardHeader>
           <CardTitle className="text-center">Forgot Your Password?</CardTitle>
           <p className="text-center text-gray-600 text-sm">
-            Enter your email address and we'll send you a link to reset your
+            Enter your email address and we&apos;ll send you a link to reset your
             password.
           </p>
         </CardHeader>

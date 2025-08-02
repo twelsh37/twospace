@@ -36,7 +36,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Asset as BaseAsset, User, Location } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 // Extend Asset type to include search API fields

@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     const newPassword = generateSecurePassword();
 
     // Update the user's password using Supabase Admin API
-    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
       email, // This should be the user's ID, but we can also use email
       { password: newPassword }
     );

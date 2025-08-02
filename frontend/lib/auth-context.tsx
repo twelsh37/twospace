@@ -239,7 +239,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabaseClient.auth, router, pathname, hasHandledInvalidToken]);
+  }, [router, pathname, hasHandledInvalidToken]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabaseClient.auth.signInWithPassword({

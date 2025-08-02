@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/lib/auth-context";
+
 import { createClientComponentClient } from "@/lib/supabase";
 
 interface AdminPasswordResetProps {
@@ -49,7 +49,7 @@ export function AdminPasswordReset({
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { session } = useAuth();
+
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();

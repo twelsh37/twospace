@@ -81,7 +81,7 @@ export function AssetEditModal({
       }
     }
     fetchAsset();
-  }, [assetNumber, open]);
+  }, [assetNumber, open, session?.access_token]);
 
   // Track if form is dirty
   const isDirty =

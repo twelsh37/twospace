@@ -32,7 +32,6 @@ import {
   getPasswordStrength,
   getPasswordStrengthText,
   getPasswordStrengthColor,
-  type PasswordValidationResult,
 } from "@/lib/password-validation";
 
 interface PasswordStrengthIndicatorProps {

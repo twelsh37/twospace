@@ -57,8 +57,8 @@ export default function ResetPasswordPage() {
       } = await supabase.auth.getSession();
       if (!session) {
         // If no session, check if we have access_token and refresh_token in URL
-        const accessToken = searchParams.get("access_token");
-        const refreshToken = searchParams.get("refresh_token");
+        const accessToken = searchParams?.get("access_token");
+        const refreshToken = searchParams?.get("refresh_token");
 
         if (accessToken && refreshToken) {
           // Set the session from URL parameters
@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
           router.push("/auth/login");
         }, 3000);
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);

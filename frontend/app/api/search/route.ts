@@ -33,7 +33,7 @@ import {
   locationsTable,
   assetHistoryTable,
 } from "@/lib/db/schema";
-import { ilike, or, eq, desc, sql } from "drizzle-orm";
+import { ilike, or, eq, desc } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
 import { requireUser } from "@/lib/supabase-auth-helpers";

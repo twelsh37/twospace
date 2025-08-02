@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import {
   assetsTable,
@@ -144,7 +144,7 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ assetNumber: string }> }
 ) {
   // Log the start of the PATCH request
@@ -158,7 +158,6 @@ export async function PATCH(
       { status: 401 }
     );
   }
-  const user = authResult.data.user;
 
   try {
     // Access assetNumber from params (await needed in Next.js 15)
@@ -230,7 +229,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ assetNumber: string }> }
 ) {
   // Log the start of the DELETE request
@@ -244,7 +243,6 @@ export async function DELETE(
       { status: 401 }
     );
   }
-  const user = authResult.data.user;
 
   try {
     // Access assetNumber from params (await needed in Next.js 15)

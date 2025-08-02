@@ -48,7 +48,7 @@ jest.mock("./dialog", () => ({
 
 // Mock the button component
 jest.mock("./button", () => ({
-  Button: ({ children, onClick, disabled }: any) => (
+  Button: ({ children, onClick, disabled }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean }) => (
     <button data-testid="export-button" onClick={onClick} disabled={disabled}>
       {children}
     </button>

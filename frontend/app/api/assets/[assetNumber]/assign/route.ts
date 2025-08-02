@@ -149,7 +149,7 @@ export async function POST(
     const dbUserResult = await db
       .select({ id: usersTable.id })
       .from(usersTable)
-      .where(eq(usersTable.email, user.email))
+      .where(eq(usersTable.email, user.email || ""))
       .limit(1);
 
     const dbUserId = dbUserResult.length > 0 ? dbUserResult[0].id : null;

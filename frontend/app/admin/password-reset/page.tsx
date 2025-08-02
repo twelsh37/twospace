@@ -73,9 +73,9 @@ export default function AdminPasswordResetPage() {
                       email:
                     </p>
                     <code className="bg-gray-100 p-2 rounded text-sm block">
-                      const {resetPassword} = useAuth();
+                      const &#123;resetPassword&#125; = useAuth();
                       <br />
-                      await resetPassword("user@example.com");
+                      await resetPassword(&quot;user@example.com&quot;);
                     </code>
                   </div>
 
@@ -95,7 +95,7 @@ export default function AdminPasswordResetPage() {
                     </h3>
                     <ul className="text-gray-600 text-sm space-y-1">
                       <li>
-                        • Only admin users can reset other users' passwords
+                        • Only admin users can reset other users&apos; passwords
                       </li>
                       <li>
                         • New passwords are generated securely with 12

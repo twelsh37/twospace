@@ -1479,41 +1479,43 @@ function ReportsPageContent() {
   }
 
   // Handler to actually export the report as PDF
-  async function handleExport(format: "pdf") {
+  async function handleExport(format: "pdf" | "csv") {
     setExportLoading(true);
     try {
       let apiUrl = "";
       let body: Record<string, unknown> = { format };
-      let filename = "report.pdf";
+      let filename = format === "pdf" ? "report.pdf" : "report.csv";
+      
       if (exportReport === "Asset Inventory") {
-        apiUrl = "/api/reports/pdf";
-        filename = "asset-inventory-report.pdf";
+        apiUrl = format === "pdf" ? "/api/reports/pdf" : "/api/reports/export";
+        filename = format === "pdf" ? "asset-inventory-report.pdf" : "asset-inventory-report.csv";
         // Attach chart images and table data
         if (assetInventoryExportData) {
           body = { ...assetInventoryExportData, format };
         }
       } else if (exportReport === "Lifecycle Management") {
-        alert("PDF export for Lifecycle Management is not yet implemented.");
+        alert(`${format.toUpperCase()} export for Lifecycle Management is not yet implemented.`);
         setExportLoading(false);
         setExportModalOpen(false);
         return;
       } else if (exportReport === "Financial") {
-        alert("PDF export for Financial is not yet implemented.");
+        alert(`${format.toUpperCase()} export for Financial is not yet implemented.`);
         setExportLoading(false);
         setExportModalOpen(false);
         return;
       } else {
-        alert(`PDF export for ${exportReport} is not yet implemented.`);
+        alert(`${format.toUpperCase()} export for ${exportReport} is not yet implemented.`);
         setExportLoading(false);
         setExportModalOpen(false);
         return;
       }
+      
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("Failed to export PDF");
+      if (!res.ok) throw new Error(`Failed to export ${format.toUpperCase()}`);
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1525,7 +1527,7 @@ function ReportsPageContent() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       alert(
-        `Failed to export ${exportReport} as PDF. Please try again.\n` +
+        `Failed to export ${exportReport} as ${format.toUpperCase()}. Please try again.\n` +
           (err instanceof Error ? err.message : String(err))
       );
     } finally {

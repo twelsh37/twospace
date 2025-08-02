@@ -37,8 +37,9 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Check, GripVertical, X, Plus, ArrowLeft } from "lucide-react";
+import { GripVertical, X, Plus, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { DispositionDialog } from "@/components/ui/disposition-dialog";
 
 interface User {
   id: string;
@@ -93,9 +94,9 @@ const ASSET_CATEGORIES = {
 } as const;
 
 interface UserDetailsPageProps {
-  params: {
+  params: Promise<{
     userId: string;
-  };
+  }>;
 }
 
 export default function UserDetailsPage({ params }: UserDetailsPageProps) {
@@ -112,6 +113,13 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
     null
   );
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // Asset reclamation state
+  const [showReclaimMode, setShowReclaimMode] = useState(false);
+  const [isReclaiming, setIsReclaiming] = useState(false);
+  const [reclaimSuccess, setReclaimSuccess] = useState<string | null>(null);
+  const [showDispositionDialog, setShowDispositionDialog] = useState(false);
+  const [pendingUnassignment, setPendingUnassignment] = useState<Asset | null>(null);
 
   // Get auth context for API calls
   const { session } = useAuth();
@@ -180,7 +188,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
         console.log("Fetching available assets...");
         const response = await fetch("/api/assets/available", {
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${session?.access_token}`,
           },
         });
 
@@ -296,15 +304,8 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
 
       const results = await Promise.allSettled(assignmentPromises);
       const successfulAssignments = results
-        .filter(
-          (
-            result
-          ): result is PromiseFulfilledResult<{
-            asset: { assetNumber: string };
-            success: boolean;
-          }> => result.status === "fulfilled" && result.value.success
-        )
-        .map((result) => result.value.asset);
+        .filter((result) => result.status === "fulfilled" && result.value.success)
+        .map((result) => (result as PromiseFulfilledResult<{ asset: { assetNumber: string }; success: boolean }>).value.asset);
 
       if (successfulAssignments.length > 0) {
         // Add a small delay to ensure database is updated
@@ -406,6 +407,96 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
     setIsDragOver(false);
   };
 
+  // Asset reclamation functions
+  const handleReclaimAssets = () => {
+    setShowReclaimMode(!showReclaimMode);
+    setReclaimSuccess(null);
+  };
+
+  const handleAssetUnassignment = async (asset: Asset, disposition: "RESTOCK" | "RECYCLE" = "RESTOCK") => {
+    if (!session?.access_token) return;
+
+    setIsReclaiming(true);
+    try {
+      const response = await fetch(`/api/assets/${asset.assetNumber}/unassign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          userId: userId,
+          disposition: disposition,
+        }),
+      });
+
+      if (response.ok) {
+        await response.json();
+        setReclaimSuccess(`Asset ${asset.assetNumber} unassigned successfully (${disposition.toLowerCase()})`);
+        
+        // Refresh user assets
+        setTimeout(async () => {
+          const assetsRes = await fetch(`/api/users/${userId}/assets`, {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+          if (assetsRes.ok) {
+            const assetsJson = await assetsRes.json();
+            if (assetsJson.success && assetsJson.assets) {
+              setUserAssets(assetsJson.assets);
+            }
+          }
+        }, 500);
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setReclaimSuccess(null);
+        }, 3000);
+      } else {
+        console.error("Failed to unassign asset:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error unassigning asset:", error);
+    } finally {
+      setIsReclaiming(false);
+    }
+  };
+
+  const handleUnassignmentDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    try {
+      const assetData = e.dataTransfer.getData("text/plain");
+      if (!assetData) return;
+
+      const assetsToUnassign = JSON.parse(assetData);
+      
+      if (assetsToUnassign.length === 1) {
+        // Single asset - show disposition dialog
+        setPendingUnassignment(assetsToUnassign[0]);
+        setShowDispositionDialog(true);
+      } else {
+        // Multiple assets - default to RESTOCK
+        for (const asset of assetsToUnassign) {
+          await handleAssetUnassignment(asset, "RESTOCK");
+        }
+        // TODO: Add batch disposition dialog for multiple assets
+      }
+    } catch (error) {
+      console.error("Error processing dropped assets for unassignment:", error);
+    }
+  };
+
+  const handleDispositionConfirm = (disposition: "RESTOCK" | "RECYCLE") => {
+    if (pendingUnassignment) {
+      handleAssetUnassignment(pendingUnassignment, disposition);
+      setPendingUnassignment(null);
+    }
+    setShowDispositionDialog(false);
+  };
+
   // Group available assets by type
   const assetsByType = availableAssets.reduce((acc, asset) => {
     if (!acc[asset.type]) {
@@ -471,17 +562,34 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
               Assign Assets
             </Button>
           )}
+          {userAssets.length > 0 && !showAssignMode && (
+            <Button 
+              variant="outline" 
+              onClick={handleReclaimAssets}
+              className="bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Reclaim Assets
+            </Button>
+          )}
           <Button variant="outline" onClick={() => router.back()}>
             Close
           </Button>
         </div>
       </div>
 
-      {/* Success Message */}
+      {/* Success Messages */}
       {assignmentSuccess && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-6">
           <div className="text-green-800 text-sm font-medium">
             ✅ {assignmentSuccess}
+          </div>
+        </div>
+      )}
+      {reclaimSuccess && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-6">
+          <div className="text-orange-800 text-sm font-medium">
+            ✅ {reclaimSuccess}
           </div>
         </div>
       )}
@@ -537,7 +645,14 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                     {userAssets.map((asset, idx) => (
                       <tr
                         key={asset.assetNumber}
-                        className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                        className={`${idx % 2 === 0 ? "bg-gray-50" : "bg-white"} ${
+                          showReclaimMode ? "cursor-grab hover:bg-gray-100" : ""
+                        }`}
+                        draggable={showReclaimMode}
+                        onDragStart={showReclaimMode ? (e) => {
+                          e.dataTransfer.setData("text/plain", JSON.stringify([asset]));
+                          e.dataTransfer.effectAllowed = "move";
+                        } : undefined}
                       >
                         <td className="p-2 font-medium">{asset.assetNumber}</td>
                         <td className="p-2">{asset.type}</td>
@@ -708,6 +823,74 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Asset Reclamation Section */}
+      {showReclaimMode && (
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Reclaim Assets</CardTitle>
+                <CardDescription>
+                  Drag assets from the user&apos;s assigned assets to unassign them
+                </CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowReclaimMode(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Reclamation Drop Zone */}
+            <div
+              className={`p-6 border-2 border-dashed rounded-lg transition-all duration-200 ${
+                isDragOver
+                  ? "border-orange-400 bg-orange-50 shadow-lg"
+                  : "border-orange-300 bg-orange-50"
+              }`}
+              onDrop={handleUnassignmentDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+            >
+              <div className="text-center">
+                <div
+                  className={`text-lg font-medium mb-2 transition-colors ${
+                    isDragOver ? "text-orange-600" : "text-orange-600"
+                  }`}
+                >
+                  {isDragOver
+                    ? "Drop to unassign assets"
+                    : "Drop assets here to unassign"}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Drag assets from the assigned assets table above to unassign them from this user
+                </div>
+                {isReclaiming && (
+                  <div className="mt-2 flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
+                    <span className="text-sm text-orange-600">
+                      Unassigning assets...
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Disposition Dialog */}
+      <DispositionDialog
+        open={showDispositionDialog}
+        onOpenChange={setShowDispositionDialog}
+        onConfirm={handleDispositionConfirm}
+        assetNumber={pendingUnassignment?.assetNumber || ""}
+        userName={user?.name || ""}
+      />
     </div>
   );
 }
