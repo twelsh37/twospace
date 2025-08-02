@@ -47,11 +47,27 @@ export async function GET(request: NextRequest) {
   try {
     const settings = await db.select().from(settingsTable).limit(1);
     if (!settings.length) {
-      appLogger.warn("Settings not found in GET /api/settings");
-      return NextResponse.json(
-        { error: "Settings not found" },
-        { status: 404 }
+      appLogger.warn(
+        "Settings not found in GET /api/settings, creating default settings"
       );
+      // Create default settings if none exist
+      const defaultSettings = await db
+        .insert(settingsTable)
+        .values({
+          reportCacheDuration: 30,
+          depreciationSettings: {
+            method: "straight",
+            years: 4,
+            decliningPercents: [50, 25, 12.5, 12.5],
+          },
+        })
+        .returning();
+
+      appLogger.info("Created default settings successfully");
+      return NextResponse.json({
+        reportCacheDuration: defaultSettings[0].reportCacheDuration,
+        depreciationSettings: defaultSettings[0].depreciationSettings || null,
+      });
     }
     appLogger.info("Fetched settings successfully");
     // Always include depreciationSettings in the response
