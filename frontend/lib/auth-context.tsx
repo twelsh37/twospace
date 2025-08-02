@@ -48,12 +48,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Create a single Supabase client instance for the auth context
+const supabaseClient = createClientComponentClient();
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<"ADMIN" | "USER" | null>(null);
-  const supabase = createClientComponentClient();
   const router = useRouter();
   const pathname = usePathname();
   // Used to prevent repeated sign-outs in a single render cycle
@@ -110,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setHasHandledInvalidToken(true);
       console.log("Auth: Handling invalid refresh token");
       // Sign out to clear tokens
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
       // Only redirect if not already on login page
       if (pathname && !pathname.startsWith("/auth/login")) {
         router.replace("/auth/login");
@@ -130,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const {
           data: { session },
-        } = await supabase.auth.getSession();
+        } = await supabaseClient.auth.getSession();
         clearTimeout(timeoutId);
 
         console.log(
@@ -181,12 +183,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log(
         "Auth: Auth state change event:",
         event,
         session ? "Session present" : "No session"
       );
+
+      // Clear state first for sign out events
+      if (event === "SIGNED_OUT") {
+        console.log("Auth: Clearing state for sign out event");
+        setUser(null);
+        setSession(null);
+        setUserRole(null);
+        setLoading(false);
+        return;
+      }
+
+      // Update state for other events
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -201,7 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!session && !hasHandledInvalidToken) {
         // Try to fetch session to see if error is thrown
         try {
-          await supabase.auth.getSession();
+          await supabaseClient.auth.getSession();
         } catch (error: unknown) {
           // Type guard for error object
           if (
@@ -225,10 +239,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth, router, pathname, hasHandledInvalidToken]);
+  }, [supabaseClient.auth, router, pathname, hasHandledInvalidToken]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabaseClient.auth.signInWithPassword({
       email,
       password,
     });
@@ -240,7 +254,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     userData: Record<string, unknown>
   ) => {
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabaseClient.auth.signUp({
       email,
       password,
       options: {
@@ -253,18 +267,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     console.log("Auth: Signing out user...");
     try {
-      await supabase.auth.signOut();
+      // Clear local state immediately
+      setUser(null);
+      setSession(null);
+      setUserRole(null);
+      setLoading(false);
+
+      // Clear any stored auth data
+      if (typeof window !== "undefined") {
+        // Clear localStorage
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith("sb-")) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // Clear sessionStorage
+        Object.keys(sessionStorage).forEach((key) => {
+          if (key.startsWith("sb-")) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      }
+
+      // Sign out from Supabase
+      await supabaseClient.auth.signOut();
       console.log("Auth: Sign out successful, redirecting to login");
       router.replace("/auth/login");
     } catch (error) {
       console.error("Auth: Error during sign out:", error);
-      // Still redirect to login even if there's an error
+      // Still clear state and redirect even if there's an error
+      setUser(null);
+      setSession(null);
+      setUserRole(null);
+      setLoading(false);
       router.replace("/auth/login");
     }
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
     return { error };
