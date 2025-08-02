@@ -35,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
 export type LocationFilterState = {
   location: string; // Use 'ALL' for all locations
@@ -59,12 +60,21 @@ export function LocationFilters({
   onClearFilters,
 }: Props) {
   const [locations, setLocations] = useState<LocationOption[]>([]);
+  const { session } = useAuth();
 
   useEffect(() => {
     // Fetch unique locations from the API
     async function fetchLocations() {
       try {
-        const res = await fetch("/api/locations");
+        // Add authorization header if session exists
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch("/api/locations", { headers });
         const json = await res.json();
         if (json.data && Array.isArray(json.data)) {
           const validLocations = json.data.filter(
@@ -83,7 +93,7 @@ export function LocationFilters({
       }
     }
     fetchLocations();
-  }, []);
+  }, [session]);
 
   return (
     <div className="flex flex-wrap items-center gap-4 pb-4">

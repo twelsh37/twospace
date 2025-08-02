@@ -48,10 +48,26 @@ export async function getSupabaseUserFromRequest(req: NextRequest) {
     accessToken = authHeader.replace("Bearer ", "");
     console.log("Extracted access token from header");
   } else {
-    // Fallback: Try to get from cookies (if using cookie-based auth)
-    const cookie = req.cookies.get("sb-access-token")?.value;
-    console.log("Cookie value:", cookie);
-    if (cookie) accessToken = cookie;
+    // Fallback: Try to get from Supabase session cookie
+    // Look for the Supabase auth token cookie (format: sb-{project-ref}-auth-token)
+    const cookies = req.cookies.getAll();
+    const supabaseCookie = cookies.find(
+      (cookie) =>
+        cookie.name.startsWith("sb-") && cookie.name.endsWith("-auth-token")
+    );
+    console.log("Supabase cookie found:", supabaseCookie?.name);
+
+    if (supabaseCookie?.value) {
+      try {
+        // The cookie value is base64 encoded JSON containing the session
+        const decoded = Buffer.from(supabaseCookie.value, "base64").toString();
+        const session = JSON.parse(decoded);
+        accessToken = session.access_token;
+        console.log("Extracted access token from Supabase cookie");
+      } catch (error) {
+        console.log("Failed to parse Supabase cookie:", error);
+      }
+    }
   }
 
   console.log("Final access token:", accessToken ? "Present" : "Missing");

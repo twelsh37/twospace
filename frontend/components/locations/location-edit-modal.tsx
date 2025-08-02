@@ -43,6 +43,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 interface LocationEditModalProps {
   locationId: string | null;
@@ -69,6 +70,7 @@ export function LocationEditModal({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useAuth();
 
   useEffect(() => {
     if (!locationId || !open) return;
@@ -76,7 +78,15 @@ export function LocationEditModal({
     setError(null);
     async function fetchLocation() {
       try {
-        const res = await fetch(`/api/locations/${locationId}`);
+        // Add authorization header if session exists
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch(`/api/locations/${locationId}`, { headers });
         const json = await res.json();
         setLocation(json.data || null);
         setForm(json.data || {});
@@ -89,7 +99,7 @@ export function LocationEditModal({
       }
     }
     fetchLocation();
-  }, [locationId, open]);
+  }, [locationId, open, session]);
 
   const isDirty =
     location &&
@@ -109,9 +119,17 @@ export function LocationEditModal({
     setSaving(true);
     setError(null);
     try {
+      // Add authorization header if session exists
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch(`/api/locations/${locationId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error("Failed to update location");
