@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.72% </span>
+                <span class="strong">80.51% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>36/43</span>
+                <span class='fraction'>62/77</span>
             </div>
         
             
@@ -324,6 +324,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -332,9 +333,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -628,7 +628,7 @@ export async function getDashboardData() {
         .select({ count: count() })
         .from(holdingAssetsTable)
         .where(eq(holdingAssetsTable.status, "pending"));
-      const pendingHoldingCount = pendingHoldingResult[0]?.count || 0;
+      const pendingHoldingCount = pendingHoldingResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.count </span>|| 0;
 &nbsp;
       // --- Canonical state mapping for dashboard cards ---
       // Map all possible state variants (case, spelling) to canonical dashboard states
@@ -696,7 +696,7 @@ export async function getDashboardData() {
       ];
       const buildingTypeCounts: Record&lt;string, number&gt; = {};
       for (const row of buildingResults) {
-        const type = (row.type || <span class="branch-1 cbranch-no" title="branch not covered" >""</span>).toUpperCase();
+        const type = (row.type || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>.toUpperCase();
         buildingTypeCounts[type] = (buildingTypeCounts[type] || 0) + 1;
       }
       const buildingByType = ALL_TYPES.map((type) =&gt; ({
@@ -711,7 +711,7 @@ export async function getDashboardData() {
         .where(eq(assetsTable.state, "READY_TO_GO"));
       const readyToGoTypeCounts: Record&lt;string, number&gt; = {};
       for (const row of readyToGoResults) {
-        const type = (row.type || <span class="branch-1 cbranch-no" title="branch not covered" >""</span>).toUpperCase();
+        const type = (row.type || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>.toUpperCase();
         readyToGoTypeCounts[type] = (readyToGoTypeCounts[type] || 0) + 1;
       }
       const readyToGoByType = ALL_TYPES.map((type) =&gt; ({
@@ -721,10 +721,10 @@ export async function getDashboardData() {
 &nbsp;
       // Format the results
       const dashboardData = {
-        totalAssets: totalAssetsResult[0]?.value || 0,
-        totalValue: parseFloat(totalValueResult[0]?.value || "0"),
-        totalUsers: totalUsersResult[0]?.value || 0,
-        totalLocations: totalLocationsResult[0]?.value || 0,
+        totalAssets: totalAssetsResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| 0,
+        totalValue: parseFloat(totalValueResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| "0"),
+        totalUsers: totalUsersResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| 0,
+        totalLocations: totalLocationsResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| 0,
         assetsByState,
         assetsByType: assetsByTypeResult,
         recentActivity: recentActivityResult.map((activity) =&gt; ({
@@ -743,9 +743,9 @@ export async function getDashboardData() {
 &nbsp;
       // After all queries, log summary counts
       appLogger.info("Dashboard data fetched", {
-        totalAssets: totalAssetsResult[0]?.value || 0,
-        totalUsers: totalUsersResult[0]?.value || 0,
-        totalLocations: totalLocationsResult[0]?.value || 0,
+        totalAssets: totalAssetsResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| 0,
+        totalUsers: totalUsersResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| 0,
+        totalLocations: totalLocationsResult[0]<span class="branch-1 cbranch-no" title="branch not covered" >?.value </span>|| 0,
         pendingHoldingCount,
       });
       return dashboardData;
@@ -766,7 +766,7 @@ export async function getDashboardData() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

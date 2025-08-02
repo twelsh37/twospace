@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -116,7 +116,11 @@
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
 <a name='L53'></a><a href='#L53'>53</a>
-<a name='L54'></a><a href='#L54'>54</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -158,10 +162,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -198,23 +206,27 @@ SOFTWARE.
 &nbsp;
 "use client";
 &nbsp;
-import React from <span class="cstat-no" title="statement not covered" >"react";</span>
-import { usePathname } from <span class="cstat-no" title="statement not covered" >"next/navigation";</span>
-import { LayoutWrapper } from <span class="cstat-no" title="statement not covered" >"@/components/layout/layout-wrapper";</span>
-import { ProtectedRoute } from <span class="cstat-no" title="statement not covered" >"@/components/auth/protected-route";</span>
+<span class="cstat-no" title="statement not covered" >import React from "react";</span>
+<span class="cstat-no" title="statement not covered" >import { usePathname } from "next/navigation";</span>
+<span class="cstat-no" title="statement not covered" >import { LayoutWrapper } from "@/components/layout/layout-wrapper";</span>
+<span class="cstat-no" title="statement not covered" >import { ProtectedRoute } from "@/components/auth/protected-route";</span>
 &nbsp;
 interface ClientLayoutProps {
   children: React.ReactNode;
 }
 &nbsp;
-export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >ClientLayout({</span></span> children }: ClientLayoutProps) {
+<span class="cstat-no" title="statement not covered" >export default function <span class="fstat-no" title="function not covered" >C</span>lientLayout(</span>{ children }: ClientLayoutProps) {
   const pathname = <span class="cstat-no" title="statement not covered" >usePathname();</span>
   // Standalone login page (no layout, no sidebar, no app chrome)
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (pathname?.startsWith("/auth/login")) {</span>
-    return &lt;&gt;{children}&lt;/&gt;;
+<span class="cstat-no" title="statement not covered" >    return &lt;&gt;{children}&lt;/&gt;;</span>
+  }
+  // Debug page bypass (temporary)
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (pathname?.startsWith("/debug-auth")) {</span>
+<span class="cstat-no" title="statement not covered" >    return &lt;&gt;{children}&lt;/&gt;;</span>
   }
   // Protect all other routes and show app layout
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;ProtectedRoute&gt;
       &lt;LayoutWrapper&gt;{children}&lt;/LayoutWrapper&gt;
     &lt;/ProtectedRoute&gt;
@@ -229,7 +241,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.831Z
+                at 2025-08-02T22:14:48.419Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.72% </span>
+                <span class="strong">75.38% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>48/66</span>
+                <span class='fraction'>49/65</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.6% </span>
+                <span class="strong">84% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>19/23</span>
+                <span class='fraction'>21/25</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.19% </span>
+                <span class="strong">75.8% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>46/62</span>
+                <span class='fraction'>47/62</span>
             </div>
         
             
@@ -252,17 +252,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24x</span>
-<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7860x</span>
-<span class="cline-any cline-yes">7860x</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-yes">8218x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -287,15 +287,15 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">38x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">63x</span>
-<span class="cline-any cline-yes">63x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -307,7 +307,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
@@ -342,7 +342,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -368,7 +368,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -511,7 +511,7 @@ export function exportToCSV(data: Record&lt;string, unknown&gt;[], filename: str
   const csvRows = [
     keys.join(","),
     ...data.map((row) =&gt;
-      keys.map((k) =&gt; JSON.stringify(row[k] ?? <span class="branch-1 cbranch-no" title="branch not covered" >"")).j</span>oin(",")
+      keys.map((k) =&gt; JSON.stringify(row[k] ?? <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>).join(",")
     ),
   ];
   const csvString = csvRows.join("\n");
@@ -531,13 +531,13 @@ export function exportToCSV(data: Record&lt;string, unknown&gt;[], filename: str
  * @param data Array of objects to export
  * @param filename Name of the file to save (should end with .xlsx)
  */
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >exportToXLSX(</span></span>
+export async function <span class="fstat-no" title="function not covered" >exportToXLSX(</span>
   data: Record&lt;string, unknown&gt;[],
   filename: string
 ) {
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!data || data.length === 0) <span class="cstat-no" title="statement not covered" >return;</span></span>
   // Dynamically import xlsx to avoid bundling if not used
-  const XLSX = <span class="cstat-no" title="statement not covered" >await <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >import("</span>xlsx");</span></span>
+  const XLSX = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >await import("</span>xlsx");</span>
   const worksheet = <span class="cstat-no" title="statement not covered" >XLSX.utils.json_to_sheet(data);</span>
   const workbook = <span class="cstat-no" title="statement not covered" >XLSX.utils.book_new();</span>
 <span class="cstat-no" title="statement not covered" >  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");</span>
@@ -559,7 +559,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.831Z
+                at 2025-08-02T22:14:48.419Z
             </div>
         <script src="../prettify.js"></script>
         <script>

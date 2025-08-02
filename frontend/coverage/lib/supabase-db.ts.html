@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/137</span>
+                <span class='fraction'>0/261</span>
             </div>
         
             
@@ -1353,7 +1353,7 @@ SOFTWARE.
 &nbsp;
 // Database utility functions for Supabase integration
 &nbsp;
-import { supabase } from <span class="cstat-no" title="statement not covered" >"./supabase";</span>
+<span class="cstat-no" title="statement not covered" >import { supabase } from "./supabase";</span>
 import type { Database } from "./supabase";
 &nbsp;
 type Tables = Database["public"]["Tables"];
@@ -1392,7 +1392,7 @@ type Department = { id: string; name: string };
 // USERS
 // =============================================================================
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getUsers(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getUsers(</span>
   page = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span>
   limit = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span>
   filters?: {
@@ -1463,7 +1463,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >          departmentName = user.departments[0]?.name || "";</span>
         } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (user.departments &amp;&amp; typeof user.departments === "object") {</span>
           // Explicitly type user.departments as Department
-          const dept = <span class="cstat-no" title="statement not covered" >user.departments </span>as Department;
+          const dept = <span class="cstat-no" title="statement not covered" >user.departments as Department;</span>
 <span class="cstat-no" title="statement not covered" >          departmentId = dept.id || "";</span>
 <span class="cstat-no" title="statement not covered" >          departmentName = dept.name || "";</span>
         }
@@ -1489,7 +1489,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
   };
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getUserById(u</span></span>serId: string) {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getUserById(</span>userId: string) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("users")
     .select(
@@ -1539,7 +1539,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
   };
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getUserByEmployeeId(e</span></span>mployeeId: string) {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getUserByEmployeeId(</span>employeeId: string) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("users")
     .select(
@@ -1589,7 +1589,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
   };
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >createUser(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >createUser(</span>
   userData: Omit&lt;UsersInsert, "id" | "created_at" | "updated_at"&gt;
 ) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
@@ -1603,7 +1603,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return { user: data };</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >updateUser(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >updateUser(</span>
   userId: string,
   updates: Partial&lt;UsersUpdate&gt;
 ) {
@@ -1619,7 +1619,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return { data };</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getNextEmployeeId() {</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getNextEmployeeId(</span>) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("users")
     .select("employee_id")
@@ -1627,7 +1627,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
     .limit(1)
     .single();
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (error &amp;&amp; error.code !== "PGRST116") <span class="cstat-no" title="statement not covered" >throw error; /</span></span>/ PGRST116 = no rows returned
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (error &amp;&amp; error.code !== "PGRST116") <span class="cstat-no" title="statement not covered" >throw error; </span></span>// PGRST116 = no rows returned
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!data) {</span>
 <span class="cstat-no" title="statement not covered" >    return { nextEmployeeId: "EMP000001" };</span>
@@ -1648,7 +1648,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 // ASSETS
 // =============================================================================
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getAssets(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getAssets(</span>
   page = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span>
   limit = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span>
   filters?: {
@@ -1708,7 +1708,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     data:
-      data?.map(<span class="fstat-no" title="function not covered" >(a</span>sset) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+      data?.map(<span class="fstat-no" title="function not covered" >(a</span>sset) =&gt; <span class="cstat-no" title="statement not covered" >({</span>
         id: asset.id,
         assetNumber: asset.asset_number,
         type: asset.type,
@@ -1740,7 +1740,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
   };
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getAssetById(a</span></span>ssetId: string) {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getAssetById(</span>assetId: string) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("assets")
     .select(
@@ -1799,7 +1799,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
   };
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >createAsset(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >createAsset(</span>
   assetData: Omit&lt;AssetsInsert, "id" | "created_at" | "updated_at"&gt;
 ) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
@@ -1813,7 +1813,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return { asset: data };</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >updateAsset(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >updateAsset(</span>
   assetId: string,
   updates: Partial&lt;AssetsUpdate&gt;
 ) {
@@ -1829,7 +1829,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return { data };</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >deleteAsset(a</span></span>ssetId: string) {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >deleteAsset(</span>assetId: string) {
   const { error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("assets")
     .update({ deleted_at: new Date().toISOString() })
@@ -1844,7 +1844,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 // LOCATIONS &amp; DEPARTMENTS
 // =============================================================================
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getLocations() {</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getLocations(</span>) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("locations")
     .select("id, name, is_active")
@@ -1856,7 +1856,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return { locations: data || [] };</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getDepartments() {</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getDepartments(</span>) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("departments")
     .select("name")
@@ -1871,7 +1871,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 // ASSET HISTORY
 // =============================================================================
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >createAssetHistory(</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >createAssetHistory(</span>
   historyData: Omit&lt;AssetHistoryInsert, "id" | "created_at"&gt;
 ) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
@@ -1889,7 +1889,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 // SETTINGS
 // =============================================================================
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getSettings() {</span></span>
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >getSettings(</span>) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("settings")
     .select("*")
@@ -1901,7 +1901,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 <span class="cstat-no" title="statement not covered" >  return data;</span>
 }
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >updateSettings(u</span></span>pdates: Partial&lt;SettingsUpdate&gt;) {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >updateSettings(</span>updates: Partial&lt;SettingsUpdate&gt;) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("settings")
     .update(updates)
@@ -1917,7 +1917,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 // SEARCH
 // =============================================================================
 &nbsp;
-export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >searchAssets(q</span></span>uery: string) {
+<span class="cstat-no" title="statement not covered" >export a</span>sync function <span class="fstat-no" title="function not covered" >searchAssets(</span>query: string) {
   const { data, error } = <span class="cstat-no" title="statement not covered" >await supabase</span>
     .from("assets")
     .select(
@@ -1941,7 +1941,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  return {</span>
     data:
-      data?.map(<span class="fstat-no" title="function not covered" >(a</span>sset) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+      data?.map(<span class="fstat-no" title="function not covered" >(a</span>sset) =&gt; <span class="cstat-no" title="statement not covered" >({</span>
         id: asset.id,
         assetNumber: asset.asset_number,
         type: asset.type,
@@ -1963,7 +1963,7 @@ export async function <span class="cstat-no" title="statement not covered" ><spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-21T01:43:14.893Z
+                at 2025-08-02T22:14:48.492Z
             </div>
         <script src="../prettify.js"></script>
         <script>
