@@ -59,7 +59,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const { user, userRole, signOut } = useAuth();
+  const { user, userRole, signOut, session } = useAuth();
   const router = useRouter();
 
   // Get user display info
@@ -77,32 +77,50 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
         avatar: "",
       };
 
-  const handleSearch = useCallback(async (query: string) => {
-    if (query.trim().length < 2) {
-      setResults(null);
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      const response = await fetch(
-        `/api/search?q=${encodeURIComponent(query)}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setResults(data.data);
-        setIsModalOpen(true);
-      } else {
-        console.error("Search failed");
+  const handleSearch = useCallback(
+    async (query: string) => {
+      if (query.trim().length < 2) {
         setResults(null);
+        return;
       }
-    } catch (error) {
-      console.error("An error occurred during search:", error);
-      setResults(null);
-    } finally {
-      setIsSearching(false);
-    }
-  }, []);
+
+      if (!session?.access_token) {
+        console.error("No access token available for search");
+        return;
+      }
+
+      console.log(
+        "Searching with authorization header:",
+        `Bearer ${session.access_token.substring(0, 20)}...`
+      );
+
+      setIsSearching(true);
+      try {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(query)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setResults(data.data);
+          setIsModalOpen(true);
+        } else {
+          console.error("Search failed");
+          setResults(null);
+        }
+      } catch (error) {
+        console.error("An error occurred during search:", error);
+        setResults(null);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [session]
+  );
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
