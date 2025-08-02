@@ -43,7 +43,7 @@ import { createAssetHistory, generateAssetNumber } from "@/lib/db/utils";
 import type { NewAsset } from "@/lib/db/schema";
 import { settingsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireAdmin, requireUser } from "@/lib/supabase-auth-helpers";
 import { usersTable } from "@/lib/db/schema";
 
 // Define standard CORS headers for reusability
@@ -103,6 +103,15 @@ async function getDatabaseUserId(supabaseUser: {
  * Retrieve assets with optional filtering, searching, and pagination
  */
 export async function GET(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for viewing assets
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401, headers: corsHeaders }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info(`GET /api/assets called. URL: ${request.url}`);
   // Support /api/assets/next-asset-number?type=TYPE

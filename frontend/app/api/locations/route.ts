@@ -29,7 +29,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, locationsTable } from "@/lib/db";
 import { eq, ilike, and } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireAdmin, requireUser } from "@/lib/supabase-auth-helpers";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +41,15 @@ const corsHeaders = {
 };
 
 export async function GET(req: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for viewing locations
+  const authResult = await requireUser(req);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401, headers: corsHeaders }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info("GET /api/locations called");
   try {

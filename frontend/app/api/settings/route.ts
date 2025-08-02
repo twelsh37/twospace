@@ -29,9 +29,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { settingsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 // GET: Return the current reportCacheDuration (in minutes) and depreciationSettings
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for viewing settings
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info("GET /api/settings called");
   try {
@@ -64,6 +74,15 @@ export async function GET() {
 
 // PUT: Update the reportCacheDuration and/or depreciationSettings
 export async function PUT(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for updating settings
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // Log the start of the PUT request
   appLogger.info("PUT /api/settings called");
   try {

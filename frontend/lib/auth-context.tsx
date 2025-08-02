@@ -117,13 +117,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Get initial session with error handling
+    // Get initial session with error handling and timeout
     const getInitialSession = async () => {
       console.log("Auth: Getting initial session...");
+
+      // Add timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        console.log("Auth: Session fetch timeout, setting loading to false");
+        setLoading(false);
+      }, 5000); // 5 second timeout
+
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
+        clearTimeout(timeoutId);
+
         console.log(
           "Auth: Initial session result:",
           session ? "Session found" : "No session"
@@ -139,6 +148,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
         console.log("Auth: Loading set to false");
       } catch (error: unknown) {
+        clearTimeout(timeoutId);
+
         // Type guard for error object
         if (
           typeof error === "object" &&
@@ -240,8 +251,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    router.replace("/auth/login");
+    console.log("Auth: Signing out user...");
+    try {
+      await supabase.auth.signOut();
+      console.log("Auth: Sign out successful, redirecting to login");
+      router.replace("/auth/login");
+    } catch (error) {
+      console.error("Auth: Error during sign out:", error);
+      // Still redirect to login even if there's an error
+      router.replace("/auth/login");
+    }
   };
 
   const resetPassword = async (email: string) => {

@@ -72,6 +72,18 @@ export function ProtectedRoute({
     }
   }, [user, loading, router, requireAdmin, session, userRole]);
 
+  // Add a timeout fallback for loading state
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.log("ProtectedRoute: Loading timeout, redirecting to login");
+        router.push("/auth/login");
+      }
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeoutId);
+  }, [loading, router]);
+
   // Show loading state while checking authentication
   if (loading) {
     console.log("ProtectedRoute: Showing loading spinner");

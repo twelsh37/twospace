@@ -29,6 +29,7 @@ THE SOFTWARE.
 import React from "react";
 import { AdminPasswordReset } from "@/components/admin/admin-password-reset";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 export default function AdminPasswordResetPage() {
   const handleSuccess = (newPassword: string) => {
@@ -42,9 +43,10 @@ export default function AdminPasswordResetPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Admin Password Reset</h1>
+    <ProtectedRoute requireAdmin={true}>
+      <div className="container mx-auto py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8">Admin Password Reset</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Password Reset Form */}
@@ -125,6 +127,6 @@ export default function AdminPasswordResetPage() {
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

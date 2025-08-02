@@ -1,5 +1,5 @@
 // frontend/app/debug-auth/page.tsx
-// Debug authentication page
+// Debug page for authentication testing
 
 /*
 MIT License
@@ -31,129 +31,189 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-const DebugAuthPage: React.FC = () => {
-  const { user, session, loading, userRole } = useAuth();
-  const [cookies, setCookies] = useState<string[]>([]);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+export default function DebugAuthPage() {
+  const { user, session, loading, userRole, signIn, signOut } = useAuth();
+  const [testResults, setTestResults] = useState<string[]>([]);
+  const [isTesting, setIsTesting] = useState(false);
 
-  useEffect(() => {
-    // Get all cookies
-    const allCookies = document.cookie
-      .split(";")
-      .map((cookie) => cookie.trim());
-    setCookies(allCookies);
+  const addTestResult = (result: string) => {
+    setTestResults((prev) => [
+      ...prev,
+      `${new Date().toISOString()}: ${result}`,
+    ]);
+  };
 
-    // Get access token from session
-    if (session?.access_token) {
-      setAccessToken(session.access_token);
+  const testAuthAPI = async () => {
+    try {
+      const res = await fetch("/api/test-auth");
+      const data = await res.json();
+      addTestResult(`Auth API: ${res.status} - ${JSON.stringify(data)}`);
+    } catch (error) {
+      addTestResult(`Auth API Error: ${error}`);
     }
-  }, [session]);
-
-  const clearAllCookies = () => {
-    const cookies = document.cookie.split(";");
-    cookies.forEach((cookie) => {
-      const [name] = cookie.split("=");
-      const trimmedName = name.trim();
-      document.cookie = `${trimmedName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    });
-    window.location.reload();
   };
 
   const testHoldingAssetsAPI = async () => {
     try {
-      const res = await fetch("/api/holding-assets", {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      });
-
+      const res = await fetch("/api/holding-assets");
       const data = await res.json();
-      alert(
-        `API Response Status: ${res.status}\nData: ${JSON.stringify(
-          data,
-          null,
-          2
-        )}`
+      addTestResult(
+        `Holding Assets API: ${res.status} - ${JSON.stringify(data)}`
       );
     } catch (error) {
-      alert(`API Error: ${error}`);
+      addTestResult(`Holding Assets API Error: ${error}`);
     }
   };
 
+  const testLogout = async () => {
+    addTestResult("Testing logout functionality...");
+    try {
+      await signOut();
+      addTestResult("Logout successful");
+    } catch (error) {
+      addTestResult(`Logout error: ${error}`);
+    }
+  };
+
+  const testDashboardAPI = async () => {
+    try {
+      const res = await fetch("/api/dashboard");
+      const data = await res.json();
+      addTestResult(`Dashboard API: ${res.status} - ${JSON.stringify(data)}`);
+    } catch (error) {
+      addTestResult(`Dashboard API Error: ${error}`);
+    }
+  };
+
+  const runAllTests = async () => {
+    setIsTesting(true);
+    setTestResults([]);
+
+    addTestResult("Starting authentication tests...");
+
+    // Test environment variables
+    addTestResult(
+      `NEXT_PUBLIC_SUPABASE_URL: ${
+        process.env.NEXT_PUBLIC_SUPABASE_URL ? "Set" : "Missing"
+      }`
+    );
+    addTestResult(
+      `NEXT_PUBLIC_SUPABASE_ANON_KEY: ${
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Set" : "Missing"
+      }`
+    );
+
+    // Test auth state
+    addTestResult(`Loading: ${loading}`);
+    addTestResult(`User: ${user ? "Present" : "None"}`);
+    addTestResult(`Session: ${session ? "Present" : "None"}`);
+    addTestResult(`User Role: ${userRole || "None"}`);
+
+    // Test APIs
+    await testAuthAPI();
+    await testDashboardAPI();
+    await testHoldingAssetsAPI();
+
+    addTestResult("Tests completed.");
+    setIsTesting(false);
+  };
+
   return (
-    <div className="container mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">Authentication Debug</h1>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Auth State</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p>
-            <strong>Loading:</strong> {loading ? "Yes" : "No"}
-          </p>
-          <p>
-            <strong>User:</strong> {user ? user.email : "None"}
-          </p>
-          <p>
-            <strong>User Role:</strong> {userRole || "None"}
-          </p>
-          <p>
-            <strong>Session:</strong> {session ? "Present" : "None"}
-          </p>
-          <p>
-            <strong>Access Token:</strong>{" "}
-            {accessToken ? `${accessToken.substring(0, 20)}...` : "None"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>User Metadata</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto">
-            {JSON.stringify(user?.user_metadata, null, 2)}
-          </pre>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Session Data</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <pre className="bg-gray-100 p-2 rounded text-xs overflow-auto">
-            {JSON.stringify(session, null, 2)}
-          </pre>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Browser Cookies</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
-            {cookies.map((cookie, index) => (
-              <div key={index} className="text-xs bg-gray-100 p-1 rounded">
-                {cookie}
+    <div className="container mx-auto py-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Authentication Debug Page</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-semibold mb-2">Current Auth State</h3>
+                <div className="space-y-2 text-sm">
+                  <div>
+                    <Badge variant={loading ? "destructive" : "default"}>
+                      Loading: {loading ? "Yes" : "No"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge variant={user ? "default" : "secondary"}>
+                      User: {user ? "Present" : "None"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge variant={session ? "default" : "secondary"}>
+                      Session: {session ? "Present" : "None"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge variant={userRole ? "default" : "secondary"}>
+                      Role: {userRole || "None"}
+                    </Badge>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
-      <div className="flex gap-2">
-        <Button onClick={clearAllCookies} variant="destructive">
-          Clear All Cookies
-        </Button>
-        <Button onClick={testHoldingAssetsAPI}>Test Holding Assets API</Button>
+              <div>
+                <h3 className="font-semibold mb-2">User Details</h3>
+                <div className="text-sm space-y-1">
+                  {user ? (
+                    <>
+                      <div>
+                        <strong>Email:</strong> {user.email}
+                      </div>
+                      <div>
+                        <strong>ID:</strong> {user.id}
+                      </div>
+                      <div>
+                        <strong>Role:</strong> {userRole}
+                      </div>
+                      <div>
+                        <strong>Metadata:</strong>{" "}
+                        {JSON.stringify(user.user_metadata)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-500">No user logged in</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button onClick={runAllTests} disabled={isTesting}>
+                {isTesting ? "Running Tests..." : "Run All Tests"}
+              </Button>
+              <Button onClick={testAuthAPI} variant="outline">
+                Test Auth API
+              </Button>
+              <Button onClick={testDashboardAPI} variant="outline">
+                Test Dashboard API
+              </Button>
+              <Button onClick={testHoldingAssetsAPI} variant="outline">
+                Test Holding Assets API
+              </Button>
+              <Button onClick={testLogout} variant="destructive">
+                Test Logout
+              </Button>
+            </div>
+
+            {testResults.length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-2">Test Results</h3>
+                <div className="bg-gray-100 p-4 rounded text-sm max-h-96 overflow-y-auto">
+                  {testResults.map((result, index) => (
+                    <div key={index} className="mb-1">
+                      {result}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default DebugAuthPage;
+}

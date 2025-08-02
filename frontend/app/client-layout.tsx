@@ -42,6 +42,10 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   if (pathname?.startsWith("/auth/login")) {
     return <>{children}</>;
   }
+  // Debug page bypass (temporary)
+  if (pathname?.startsWith("/debug-auth")) {
+    return <>{children}</>;
+  }
   // Protect all other routes and show app layout
   return (
     <ProtectedRoute>

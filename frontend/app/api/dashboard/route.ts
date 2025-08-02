@@ -25,15 +25,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getDashboardData } from "@/lib/db/dashboard";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 /**
  * GET /api/dashboard
  * Retrieves all the necessary statistics for the dashboard in a single request.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for viewing dashboard
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // TEST: Write a test log entry to verify logging works
   appLogger.info("TEST LOG: /api/dashboard GET handler invoked");
   // Log the start of the dashboard data request

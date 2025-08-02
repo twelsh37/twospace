@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/lib/auth-context";
 
 export type FilterKey = "type" | "state" | "status";
 
@@ -82,6 +83,9 @@ export function AssetFilters({
   onFilterChange,
   onClearFilters,
 }: AssetFiltersProps) {
+  const { userRole } = useAuth();
+  const isAdmin = userRole === "ADMIN";
+
   // Always show the Clear Filters button for better UX
   return (
     <div className="flex flex-col space-y-4">
@@ -132,7 +136,7 @@ export function AssetFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Statuses</SelectItem>
-              <SelectItem value="HOLDING">Holding</SelectItem>
+              {isAdmin && <SelectItem value="HOLDING">Holding</SelectItem>}
               <SelectItem value="ACTIVE">Active</SelectItem>
               <SelectItem value="STOCK">Stock</SelectItem>
               <SelectItem value="RECYCLED">Recycled</SelectItem>

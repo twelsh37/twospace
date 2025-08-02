@@ -45,6 +45,7 @@ import {
   type SearchResults,
 } from "@/components/search/search-results-modal";
 import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface HeaderProps {
@@ -56,8 +57,10 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const { user, userRole, signOut } = useAuth();
+  const router = useRouter();
 
   // Get user display info
   const userDisplay = user
@@ -154,7 +157,7 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
           </Button>
 
           {/* User Menu - Mobile friendly */}
-          <DropdownMenu>
+          <DropdownMenu open={isUserMenuOpen} onOpenChange={setIsUserMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -216,7 +219,18 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
               <DropdownMenuItem
                 className="text-destructive text-sm md:text-base"
-                onClick={() => signOut()}
+                onClick={async () => {
+                  console.log("Header: Logout button clicked");
+                  setIsUserMenuOpen(false); // Close the dropdown
+                  try {
+                    // Call the auth context signOut
+                    await signOut();
+                  } catch (error) {
+                    console.error("Header: Error during logout:", error);
+                    // Fallback: redirect to login page directly
+                    router.push("/auth/login");
+                  }
+                }}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>

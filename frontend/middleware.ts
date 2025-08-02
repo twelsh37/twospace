@@ -51,7 +51,7 @@ const ALLOWED_ASSET_PARAMS = [
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // Rewrite root path to /dashboard
+  // Rewrite root path to /dashboard only if not going to auth pages
   if (pathname === "/") {
     const dashboardUrl = new URL("/dashboard", request.url);
     return NextResponse.rewrite(dashboardUrl);

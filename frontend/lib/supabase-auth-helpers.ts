@@ -89,7 +89,39 @@ export async function requireAuth(req: NextRequest) {
   return user;
 }
 
-// Middleware: Require ADMIN role
+// Middleware: Require any authenticated user (ADMIN or USER)
+export async function requireUser(req: NextRequest) {
+  const user = await getSupabaseUserFromRequest(req);
+  if (!user) {
+    return { data: { user: null }, error: { message: "Not authenticated" } };
+  }
+
+  // Check role from Supabase Auth metadata
+  const role = user.user_metadata?.role;
+  console.log("User role from metadata:", role);
+  console.log("User email:", user.email);
+
+  // Check if user has ADMIN or USER role in metadata
+  if (role === "ADMIN" || role === "USER") {
+    console.log("User is authenticated with role:", role);
+    return { data: { user }, error: null };
+  }
+
+  // Fallback: Check if user is admin based on email (for backward compatibility)
+  if (
+    user.email === "tom.welsh@gtrailway.com" ||
+    user.email === "tom.welsh@theaiaa.com"
+  ) {
+    console.log("User is ADMIN based on email fallback");
+    return { data: { user }, error: null };
+  }
+
+  // Default to USER role for backward compatibility
+  console.log("User has no role, defaulting to USER");
+  return { data: { user }, error: null };
+}
+
+// Middleware: Require ADMIN role only
 export async function requireAdmin(req: NextRequest) {
   const user = await getSupabaseUserFromRequest(req);
   if (!user) {
@@ -126,11 +158,19 @@ export async function requireAdmin(req: NextRequest) {
 /*
 USAGE IN API ROUTES:
 
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+// For routes that require any authenticated user (ADMIN or USER)
+import { requireUser } from "@/lib/supabase-auth-helpers";
+export async function GET(req: NextRequest) {
+  const user = await requireUser(req);
+  if (user.error) return NextResponse.json(user.error, { status: 401 });
+  // ... proceed with user logic
+}
 
+// For routes that require ADMIN role only
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
 export async function POST(req: NextRequest) {
   const user = await requireAdmin(req);
-  if (user instanceof NextResponse) return user; // Not authorized
-  // ...proceed with admin logic
+  if (user.error) return NextResponse.json(user.error, { status: 403 });
+  // ... proceed with admin logic
 }
 */

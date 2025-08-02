@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import {
   assetsTable,
@@ -37,12 +37,22 @@ import {
 import { ilike, or, eq, desc, sql } from "drizzle-orm";
 import { getTableColumns } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 /**
  * GET /api/search?q={query}
  * Searches for assets, users, and locations based on the query.
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  // Require any authenticated user (ADMIN or USER) for searching
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authenticated" },
+      { status: 401 }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info("GET /api/search called");
   try {

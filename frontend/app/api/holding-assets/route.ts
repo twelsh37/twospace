@@ -29,16 +29,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { holdingAssetsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
-import { requireAuth } from "@/lib/supabase-auth-helpers";
+import { requireAdmin } from "@/lib/supabase-auth-helpers";
 
 export async function GET(req: NextRequest) {
+  // Require ADMIN role for viewing holding assets
+  const authResult = await requireAdmin(req);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authorized" },
+      { status: 403 }
+    );
+  }
+
   // Log the start of the GET request
   appLogger.info("GET /api/holding-assets called");
 
   try {
     // Require authentication
-    const user = await requireAuth(req);
-    if (user instanceof NextResponse) return user; // Not authenticated
+    const user = authResult.data.user;
 
     appLogger.info(`Fetching holding assets for user: ${user.email}`);
 
