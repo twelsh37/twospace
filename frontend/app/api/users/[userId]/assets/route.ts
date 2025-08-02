@@ -30,7 +30,7 @@ import { eq, and, isNull } from "drizzle-orm";
 import { db, assetsTable, usersTable } from "@/lib/db";
 import { createAssetHistory } from "@/lib/db/utils";
 import { appLogger } from "@/lib/logger";
-import { requireAdmin } from "@/lib/supabase-auth-helpers";
+import { requireUser } from "@/lib/supabase-auth-helpers";
 
 // Define standard CORS headers
 const corsHeaders = {
@@ -51,8 +51,8 @@ export async function POST(
   appLogger.info(`POST /api/users/${userId}/assets called`);
 
   try {
-    // Verify admin access
-    const authResult = await requireAdmin(request);
+    // Verify user access (both admin and user roles can access)
+    const authResult = await requireUser(request);
     if (authResult.error || !authResult.data.user) {
       appLogger.warn("Unauthorized access attempt to assign assets");
       return NextResponse.json(
@@ -193,8 +193,8 @@ export async function GET(
   appLogger.info(`GET /api/users/${userId}/assets called`);
 
   try {
-    // Verify admin access
-    const authResult = await requireAdmin(request);
+    // Verify user access (both admin and user roles can access)
+    const authResult = await requireUser(request);
     if (authResult.error || !authResult.data.user) {
       appLogger.warn("Unauthorized access attempt to get user assets");
       return NextResponse.json(
