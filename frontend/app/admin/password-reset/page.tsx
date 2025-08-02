@@ -48,82 +48,88 @@ export default function AdminPasswordResetPage() {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">Admin Password Reset</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Password Reset Form */}
-          <div>
-            <AdminPasswordReset
-              onSuccess={handleSuccess}
-              onError={handleError}
-            />
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Password Reset Form */}
+            <div>
+              <AdminPasswordReset
+                onSuccess={handleSuccess}
+                onError={handleError}
+              />
+            </div>
 
-          {/* Instructions */}
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>How to Reset User Passwords</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    Method 1: User-Initiated Reset
-                  </h3>
-                  <p className="text-gray-600 mb-2">
-                    Users can reset their own passwords by requesting a reset
-                    email:
-                  </p>
-                  <code className="bg-gray-100 p-2 rounded text-sm block">
-                    const {resetPassword} = useAuth();
-                    <br />
-                    await resetPassword("user@example.com");
-                  </code>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    Method 2: Admin-Initiated Reset
-                  </h3>
-                  <p className="text-gray-600 mb-2">
-                    Admins can reset passwords directly using the form on the
-                    left. This generates a new secure password.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">Security Notes</h3>
-                  <ul className="text-gray-600 text-sm space-y-1">
-                    <li>• Only admin users can reset other users' passwords</li>
-                    <li>
-                      • New passwords are generated securely with 12 characters
-                    </li>
-                    <li>
-                      • Passwords include uppercase, lowercase, numbers, and
-                      symbols
-                    </li>
-                    <li>
-                      • Provide the new password to the user through a secure
-                      channel
-                    </li>
-                    <li>
-                      • Users should change their password after first login
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    Environment Setup
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Make sure you have the{" "}
-                    <code className="bg-gray-100 px-1 rounded">
-                      SUPABASE_SERVICE_ROLE_KEY
+            {/* Instructions */}
+            <div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>How to Reset User Passwords</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Method 1: User-Initiated Reset
+                    </h3>
+                    <p className="text-gray-600 mb-2">
+                      Users can reset their own passwords by requesting a reset
+                      email:
+                    </p>
+                    <code className="bg-gray-100 p-2 rounded text-sm block">
+                      const {resetPassword} = useAuth();
+                      <br />
+                      await resetPassword("user@example.com");
                     </code>
-                    environment variable set for admin operations.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Method 2: Admin-Initiated Reset
+                    </h3>
+                    <p className="text-gray-600 mb-2">
+                      Admins can reset passwords directly using the form on the
+                      left. This generates a new secure password.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Security Notes
+                    </h3>
+                    <ul className="text-gray-600 text-sm space-y-1">
+                      <li>
+                        • Only admin users can reset other users' passwords
+                      </li>
+                      <li>
+                        • New passwords are generated securely with 12
+                        characters
+                      </li>
+                      <li>
+                        • Passwords include uppercase, lowercase, numbers, and
+                        symbols
+                      </li>
+                      <li>
+                        • Provide the new password to the user through a secure
+                        channel
+                      </li>
+                      <li>
+                        • Users should change their password after first login
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Environment Setup
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Make sure you have the{" "}
+                      <code className="bg-gray-100 px-1 rounded">
+                        SUPABASE_SERVICE_ROLE_KEY
+                      </code>
+                      environment variable set for admin operations.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

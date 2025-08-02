@@ -496,8 +496,8 @@ export async function POST(request: NextRequest) {
  * Bulk update assets (e.g., state transitions, bulk operations)
  */
 export async function PUT(request: NextRequest) {
-  // Require ADMIN for bulk asset updates
-  const authResult = await requireAdmin(request);
+  // Require any authenticated user (ADMIN or USER) for asset operations
+  const authResult = await requireUser(request);
   if (authResult.error || !authResult.data.user) {
     return NextResponse.json(
       { error: authResult.error?.message || "Not authorized" },

@@ -26,10 +26,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useCallback } from "react";
 import { AssetDetail } from "@/components/assets/asset-detail";
 import { AssetStateTransition } from "@/components/assets/asset-state-transition";
 import { AssetHistory } from "@/components/assets/asset-history";
+import { AssetEditModal } from "@/components/assets/asset-edit-modal";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -40,6 +41,7 @@ import { useAuth } from "@/lib/auth-context";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [asset, setAsset] = useState<Asset | null>(null);
   const router = useRouter();
@@ -50,20 +52,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const currentUserRole = userRole || "USER";
   const isUser = currentUserRole === "USER";
 
+  // Fetch asset data function
+  const fetchAsset = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/assets/${id}`);
+      if (!res.ok) throw new Error("Failed to fetch asset");
+      const json = await res.json();
+      setAsset(json.data as Asset);
+    } catch {
+      setAsset(null);
+    }
+  }, [id]);
+
   // Fetch asset data once for all subcomponents
   useEffect(() => {
-    async function fetchAsset() {
-      try {
-        const res = await fetch(`/api/assets/${id}`);
-        if (!res.ok) throw new Error("Failed to fetch asset");
-        const json = await res.json();
-        setAsset(json.data as Asset);
-      } catch {
-        setAsset(null);
-      }
-    }
     fetchAsset();
-  }, [id]);
+  }, [fetchAsset]);
 
   // Handler for delete confirmation
   const handleDeleteConfirmed = async (reason: string, comment: string) => {
@@ -114,12 +118,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Link href={`/assets/${id}/edit`}>
-            <Button variant="outline" size="sm">
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditModalOpen(true)}
+            title="Edit Asset"
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            Edit
+          </Button>
           <Button
             variant="destructive"
             size="sm"
@@ -134,6 +141,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </Button>
         </div>
       </div>
+
+      {/* Asset Edit Modal */}
+      <AssetEditModal
+        assetNumber={asset?.assetNumber || null}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onUpdated={() => {
+          // Refetch asset data after edit
+          fetchAsset();
+        }}
+      />
 
       {/* Confirm Delete Modal */}
       <ConfirmDeleteModal

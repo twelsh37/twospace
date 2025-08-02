@@ -468,12 +468,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleEditClick(asset.assetNumber)}
-                            disabled={isUser}
-                            title={
-                              isUser
-                                ? "You do not have permission to edit assets."
-                                : "Edit Asset"
-                            }
+                            title="Edit Asset"
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Asset
@@ -536,12 +531,7 @@ export function AssetTable({ queryString, onPageChange }: AssetTableProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleEditClick(asset.assetNumber)}
-                        disabled={isUser}
-                        title={
-                          isUser
-                            ? "You do not have permission to edit assets."
-                            : "Edit Asset"
-                        }
+                        title="Edit Asset"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Asset

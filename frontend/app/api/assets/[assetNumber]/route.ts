@@ -38,6 +38,7 @@ import { getTableColumns } from "drizzle-orm";
 
 import { archivedAssetsTable } from "@/lib/db/schema";
 import { systemLogger, appLogger } from "@/lib/logger";
+import { requireUser, requireAdmin } from "@/lib/supabase-auth-helpers";
 
 /**
  * GET /api/assets/{assetNumber}
@@ -148,6 +149,17 @@ export async function PATCH(
 ) {
   // Log the start of the PATCH request
   appLogger.info("PATCH /api/assets/[assetNumber] called");
+
+  // Require any authenticated user (ADMIN or USER) for asset updates
+  const authResult = await requireUser(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authorized" },
+      { status: 401 }
+    );
+  }
+  const user = authResult.data.user;
+
   try {
     // Access assetNumber from params (await needed in Next.js 15)
     const { assetNumber } = await params;
@@ -223,6 +235,17 @@ export async function DELETE(
 ) {
   // Log the start of the DELETE request
   appLogger.info("DELETE /api/assets/[assetNumber] called");
+
+  // Require ADMIN role for asset deletion
+  const authResult = await requireAdmin(request);
+  if (authResult.error || !authResult.data.user) {
+    return NextResponse.json(
+      { error: authResult.error?.message || "Not authorized" },
+      { status: 401 }
+    );
+  }
+  const user = authResult.data.user;
+
   try {
     // Access assetNumber from params (await needed in Next.js 15)
     const { assetNumber } = await params;
