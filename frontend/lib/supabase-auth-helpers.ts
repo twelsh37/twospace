@@ -34,66 +34,52 @@ import { NextRequest, NextResponse } from "next/server";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Helper: Extract Supabase session from request (Authorization header or cookies)
+// Helper: Extract Supabase session from request (for API routes)
 export async function getSupabaseUserFromRequest(req: NextRequest) {
-  console.log("=== AUTH DEBUG ===");
-  console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+  try {
+    // Get the access token from the Authorization header (Bearer token)
+    const authHeader = req.headers.get("authorization");
+    console.log("Authorization header:", authHeader);
 
-  // Try to get the access token from the Authorization header (Bearer)
-  const authHeader = req.headers.get("authorization");
-  console.log("Authorization header:", authHeader);
-
-  let accessToken = null;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    accessToken = authHeader.replace("Bearer ", "");
-    console.log("Extracted access token from header");
-  } else {
-    // Fallback: Try to get from Supabase session cookie
-    // Look for the Supabase auth token cookie (format: sb-{project-ref}-auth-token)
-    const cookies = req.cookies.getAll();
-    const supabaseCookie = cookies.find(
-      (cookie) =>
-        cookie.name.startsWith("sb-") && cookie.name.endsWith("-auth-token")
-    );
-    console.log("Supabase cookie found:", supabaseCookie?.name);
-
-    if (supabaseCookie?.value) {
-      try {
-        // The cookie value is base64 encoded JSON containing the session
-        const decoded = Buffer.from(supabaseCookie.value, "base64").toString();
-        const session = JSON.parse(decoded);
-        accessToken = session.access_token;
-        console.log("Extracted access token from Supabase cookie");
-      } catch (error) {
-        console.log("Failed to parse Supabase cookie:", error);
-      }
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("No valid Authorization header found");
+      return null;
     }
-  }
 
-  console.log("Final access token:", accessToken ? "Present" : "Missing");
-  if (!accessToken) {
-    console.log("No access token found");
+    const accessToken = authHeader.replace("Bearer ", "");
+    console.log("Extracted access token from header");
+
+    // Create a Supabase client with the access token
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
+
+    // Get the user using the access token
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(accessToken);
+
+    if (error) {
+      console.log("Error getting user:", error.message);
+      return null;
+    }
+
+    if (!user) {
+      console.log("No user found");
+      return null;
+    }
+
+    console.log("Authentication successful for user:", user.email);
+    return user;
+  } catch (error) {
+    console.log("Error in getSupabaseUserFromRequest:", error);
     return null;
   }
-
-  // Create a Supabase client with the access token
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
-  });
-
-  // Get the user session
-  console.log("Calling supabase.auth.getUser");
-  const { data, error } = await supabase.auth.getUser(accessToken);
-  console.log("Supabase response - error:", error);
-  console.log("Supabase response - user:", data?.user ? "Present" : "Missing");
-
-  if (error || !data?.user) {
-    console.log("Authentication failed");
-    return null;
-  }
-
-  console.log("Authentication successful for user:", data.user.email);
-  return data.user;
 }
 
 // Middleware: Require authentication

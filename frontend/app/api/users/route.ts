@@ -29,11 +29,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, usersTable, departmentsTable, locationsTable } from "@/lib/db";
 import { eq, and, count } from "drizzle-orm";
 import { systemLogger, appLogger } from "@/lib/logger";
-import {
-  requireAuth,
-  requireAdmin,
-  requireUser,
-} from "@/lib/supabase-auth-helpers";
+import { requireAdmin, requireUser } from "@/lib/supabase-auth-helpers";
 
 // GET /api/users - returns paginated users
 export async function GET(request: NextRequest) {

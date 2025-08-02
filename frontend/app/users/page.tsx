@@ -119,10 +119,20 @@ export default async function UsersPage({
   }
 
   // Fetch all departments for filter dropdown
-  const departments = await db
+  const departmentsResult = await db
     .select({ id: departmentsTable.id, name: departmentsTable.name })
     .from(departmentsTable)
     .orderBy(departmentsTable.name);
+
+  // Deduplicate by name, but keep id (similar to departments API route)
+  const seen = new Set<string>();
+  const departments = departmentsResult
+    .filter((row) => {
+      if (!row.name || seen.has(row.name.toUpperCase())) return false;
+      seen.add(row.name.toUpperCase());
+      return true;
+    })
+    .map((row) => ({ ...row, name: row.name.toUpperCase() }));
 
   // Prepare filters object for the filter component
   const filters = {

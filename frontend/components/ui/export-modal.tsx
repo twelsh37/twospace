@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 // PDF or CSV ExportModal for /users page
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,20 +36,22 @@ import {
 import { Button } from "./button";
 
 /**
- * ExportModal component for exporting table data as PDF only (for reports).
+ * ExportModal component for exporting table data as PDF or CSV.
  * Props:
  * - open: boolean (modal open state)
  * - onOpenChange: (open: boolean) => void (modal open/close handler)
- * - onExport: (format: "pdf") => void (export handler, receives selected format)
+ * - onExport: (format: "pdf" | "csv") => void (export handler, receives selected format)
  * - loading?: boolean (optional, disables button while loading)
  * - title?: string (optional, modal title)
+ * - pdfOnly?: boolean (optional, if true only shows PDF option, defaults to false)
  */
 interface ExportModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onExport: (format: "pdf") => void;
+  onExport: (format: "pdf" | "csv") => void;
   loading?: boolean;
   title?: string;
+  pdfOnly?: boolean;
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({
@@ -58,13 +60,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onExport,
   loading,
   title = "Export Report",
+  pdfOnly = false,
 }) => {
-  // Only PDF export is allowed for reports
-  const format = "pdf";
+  // State for selected format (default to PDF for pdfOnly mode, otherwise CSV)
+  const [selectedFormat, setSelectedFormat] = useState<"pdf" | "csv">(
+    pdfOnly ? "pdf" : "csv"
+  );
 
   // Handler for export button
   const handleExport = () => {
-    onExport(format);
+    onExport(selectedFormat);
   };
 
   return (
@@ -76,24 +81,50 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         <div className="mb-4">
           <div className="font-medium mb-2">Export format:</div>
           <div className="flex flex-col gap-2">
-            {/* Only PDF option is available */}
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="export-format"
-                value="pdf"
-                checked
-                readOnly
-                disabled
-              />
-              PDF
-            </label>
+            {pdfOnly ? (
+              // Only PDF option is available for reports
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="export-format"
+                  value="pdf"
+                  checked
+                  readOnly
+                  disabled
+                />
+                PDF
+              </label>
+            ) : (
+              // Both PDF and CSV options available for users
+              <>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="export-format"
+                    value="csv"
+                    checked={selectedFormat === "csv"}
+                    onChange={() => setSelectedFormat("csv")}
+                  />
+                  CSV (Excel compatible)
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="export-format"
+                    value="pdf"
+                    checked={selectedFormat === "pdf"}
+                    onChange={() => setSelectedFormat("pdf")}
+                  />
+                  PDF
+                </label>
+              </>
+            )}
           </div>
         </div>
         <DialogFooter className="w-full mt-4">
           <div className="w-full flex flex-row gap-4 justify-center">
             <Button onClick={handleExport} disabled={loading}>
-              Export as PDF
+              Export as {selectedFormat.toUpperCase()}
             </Button>
           </div>
         </DialogFooter>

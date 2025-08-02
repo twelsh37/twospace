@@ -144,7 +144,40 @@ export async function POST(request: NextRequest) {
         ? new Date(asset.updatedAt).toLocaleString("en-GB")
         : "",
     }));
-    const filters = { type, state, status, locationId, assignedTo, search };
+
+    // Resolve location name for display in PDF filters
+    let displayLocation = locationId;
+    if (locationId !== "all") {
+      try {
+        const locationResult = await db
+          .select({ name: locationsTable.name })
+          .from(locationsTable)
+          .where(eq(locationsTable.id, locationId))
+          .limit(1);
+
+        if (locationResult.length > 0) {
+          displayLocation = locationResult[0].name;
+        } else {
+          // If location not found, show "Unknown Location"
+          displayLocation = "Unknown Location";
+        }
+      } catch (error) {
+        console.log("Failed to resolve location name:", error);
+        // Keep the UUID if resolution fails
+      }
+    } else {
+      // Show "All Locations" instead of "all"
+      displayLocation = "All Locations";
+    }
+
+    const filters = {
+      type,
+      state,
+      status,
+      locationId: displayLocation,
+      assignedTo,
+      search,
+    };
     if (format === "csv") {
       // Log CSV export
       appLogger.info(
