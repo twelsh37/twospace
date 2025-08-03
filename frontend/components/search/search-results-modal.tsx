@@ -26,7 +26,6 @@ SOFTWARE.
 
 // Modal to display global search results with expandable detail views.
 
-import { useState } from "react";
 import {
   Dialog,
   DialogContent,
