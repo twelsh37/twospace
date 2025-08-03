@@ -1,0 +1,156 @@
+# Cursor Rules for TwoSpace Frontend
+
+## Import Standards - ES6 Only
+
+### 🚫 Forbidden: require() Statements
+- **NEVER** use `require()` style imports in any TypeScript/JavaScript files
+- **NEVER** use `const module = require('module')` patterns
+- **NEVER** use `require('@/lib/db')` or similar require statements
+
+### ✅ Required: ES6 Import Statements
+- **ALWAYS** use ES6 `import` statements for all module imports
+- **ALWAYS** use named imports: `import { functionName } from 'module'`
+- **ALWAYS** use default imports: `import Component from './Component'`
+- **ALWAYS** use type imports: `import type { TypeName } from 'module'`
+
+### 📝 Import Patterns to Follow
+
+#### Named Imports
+```typescript
+// ✅ CORRECT
+import { db, appLogger, systemLogger } from '@/lib/db';
+import { requireAuth, requireAdmin } from '@/lib/supabase-auth-helpers';
+import { generateAssetNumber, getActiveAssets } from './utils';
+
+// ❌ INCORRECT
+const { db } = require('@/lib/db');
+const mockDb = require('@/lib/db').db;
+```
+
+#### Default Imports
+```typescript
+// ✅ CORRECT
+import Component from './Component';
+import { GET, POST } from './route';
+
+// ❌ INCORRECT
+const Component = require('./Component');
+const { GET } = require('./route');
+```
+
+#### Type Imports
+```typescript
+// ✅ CORRECT
+import type { Asset, User, Location } from '@/lib/types';
+import type { NextRequest, NextResponse } from 'next/server';
+
+// ❌ INCORRECT
+const { Asset, User } = require('@/lib/types');
+```
+
+### 🔧 Test File Specific Rules
+
+#### Mock Imports in Tests
+```typescript
+// ✅ CORRECT - Import at top of file
+import { db } from '@/lib/db';
+import { appLogger, systemLogger } from '@/lib/logger';
+import { getDashboardData } from './dashboard';
+
+describe('Test Suite', () => {
+  const mockDb = db;
+  const mockAppLogger = appLogger;
+
+  // Test implementation...
+});
+
+// ❌ INCORRECT - Require inside describe block
+describe('Test Suite', () => {
+  const mockDb = require('@/lib/db').db;
+  const mockAppLogger = require('@/lib/logger').appLogger;
+});
+```
+
+#### Dynamic Imports (when necessary)
+```typescript
+// ✅ CORRECT - Use dynamic import for conditional loading
+const { db } = await import('@/lib/db');
+
+// ❌ INCORRECT - Don't use require for dynamic loading
+const { db } = require('@/lib/db');
+```
+
+### 🎯 File Organization
+
+#### Import Order
+1. **External libraries** (React, Next.js, etc.)
+2. **Internal absolute imports** (@/lib/*, @/components/*)
+3. **Relative imports** (./Component, ../utils)
+4. **Type imports** (import type {...})
+5. **Style imports** (CSS, SCSS)
+
+```typescript
+// ✅ CORRECT - Proper import order
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { appLogger } from '@/lib/logger';
+import { AssetForm } from '@/components/assets/asset-form';
+import { generateAssetNumber } from './utils';
+import type { Asset, User } from '@/lib/types';
+import './styles.css';
+```
+
+### 🚨 ESLint Integration
+
+#### ESLint Rules to Enforce
+- `@typescript-eslint/no-require-imports`: Prevents require() usage
+- `@typescript-eslint/consistent-type-imports`: Enforces type import patterns
+- `import/order`: Enforces import ordering
+
+#### ESLint Disable Comments (Use Sparingly)
+```typescript
+// ✅ CORRECT - Only for legitimate module testing scenarios
+/* eslint-disable @typescript-eslint/no-require-imports */
+// This file tests module loading behavior which requires require()
+
+// ❌ INCORRECT - Don't disable for convenience
+/* eslint-disable @typescript-eslint/no-require-imports */
+// Just because it's easier
+```
+
+### 🔍 Code Review Checklist
+
+When reviewing code, ensure:
+- [ ] No `require()` statements are used
+- [ ] All imports use ES6 syntax
+- [ ] Import order follows the established pattern
+- [ ] Type imports are used for TypeScript types
+- [ ] Mock imports in tests are at the top of the file
+- [ ] ESLint disable comments are only used when absolutely necessary
+
+### 🛠️ Migration Guidelines
+
+When converting existing code:
+1. **Replace require() with import statements**
+2. **Move imports to the top of the file**
+3. **Use named imports for specific exports**
+4. **Add type imports for TypeScript types**
+5. **Update test files to use proper import patterns**
+
+### 📚 Examples of Common Conversions
+
+#### Before (require)
+```typescript
+const { db } = require('@/lib/db');
+const { appLogger } = require('@/lib/logger');
+const Component = require('./Component');
+```
+
+#### After (ES6 imports)
+```typescript
+import { db } from '@/lib/db';
+import { appLogger } from '@/lib/logger';
+import Component from './Component';
+```
+
+This rule ensures consistent, modern JavaScript/TypeScript practices throughout the codebase and prevents the build errors we just resolved.

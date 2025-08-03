@@ -1,0 +1,22 @@
+---
+description: Supabase integration, query, and data access conventions.
+globs: **/lib/supabase.ts, **/db/**/*
+alwaysApply: false
+---
+
+# Supabase Integration
+
+## Data Access
+- Use async/await for all queries.
+- Handle errors gracefully; never expose sensitive errors to the client.
+
+## Query Optimization
+- Suggest indexes and constraints for performance.
+- Use prepared statements and transactions when possible.
+
+## Security
+- Never store secrets client-side.
+- Validate all input before writing to the database.
+
+## Types
+- Use Supabase-generated types for database models.

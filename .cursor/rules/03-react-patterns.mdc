@@ -1,0 +1,28 @@
+---
+description: React component, hook, and state management best practices.
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# React Patterns
+
+## Component Structure
+- Use functional components with explicit props typing.
+- Use the RORO (Receive an Object, Return an Object) pattern for complex functions.
+- Keep components small and focused.
+
+## Hooks
+- Prefix custom hooks with `use`.
+- Place hooks in `/hooks` directory; test them in `/hooks/__tests__/`.
+- Clean up side effects in hooks.
+
+## State Management
+- Prefer local state or context over external libraries.
+- Use React context for cross-component state.
+
+## Naming
+- Use descriptive names: `isLoading`, `hasError`, `userList`.
+
+## Validation
+- Use `zod` for schema validation.
+- Integrate `react-hook-form` for form management.

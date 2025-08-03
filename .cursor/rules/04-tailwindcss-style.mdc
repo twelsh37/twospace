@@ -1,0 +1,22 @@
+---
+description: TailwindCSS utility usage and responsive design conventions.
+globs: **/*.tsx, **/*.css
+alwaysApply: false
+---
+
+# TailwindCSS Style Guide
+
+## Utility Usage
+- Use Tailwind utility classes for all layout, spacing, and color.
+- Avoid custom CSS unless necessary.
+
+## Responsive Design
+- Design mobile-first.
+- Use responsive variants (e.g., `md:`, `lg:`) for breakpoints.
+
+## Component Styling
+- Use Shadcn UI primitives for consistent design.
+- Compose utility classes for clarity and maintainability.
+
+✅ Good:
+<div className="p-4 md:p-8 bg-white rounded-lg shadow"> ... </div> 
