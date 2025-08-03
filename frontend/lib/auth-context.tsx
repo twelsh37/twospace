@@ -93,14 +93,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return role;
     }
 
-    // Fallback: check if user is admin based on email (for backward compatibility)
-    if (
-      user.email === "tom.welsh@gtrailway.com" ||
-      user.email === "tom.welsh@theaiaa.com"
-    ) {
-      return "ADMIN";
-    }
-
     return "USER"; // Default to USER if no role specified
   };
 
