@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2025-01-27
+
+### 🚀 Enhanced Search Experience
+
+#### Added
+- **Expandable Search Results**: Search results modal now displays items in an expandable format with comprehensive detail previews
+- **Direct Navigation**: Clicking on any search result now navigates directly to the full details page instead of expanding in the modal
+- **Auto-Clear Search**: Search bar automatically clears when navigating to detail pages from search results
+- **Visual Indicators**: External link icons clearly indicate that clicking will navigate to full detail pages
+- **Improved UX**: Better loading states, hover effects, and visual feedback throughout the search experience
+
+#### Changed
+- **Search Modal Behavior**: Removed expandable detail sections in favor of direct navigation to detail pages
+- **Modal Close Logic**: Search modal now closes immediately when navigating to detail pages
+- **Search Input Management**: Search query is automatically cleared when modal closes for any reason
+
+#### Technical Improvements
+- **Component Architecture**: Refactored search results into dedicated expandable components (`ExpandableAsset`, `ExpandableUser`, `ExpandableLocation`)
+- **State Management**: Improved state handling for search results and modal interactions
+- **Navigation Flow**: Streamlined navigation from search results to detail pages
+- **Type Safety**: Enhanced TypeScript types for search results and component props
+
+#### User Experience
+- **Faster Workflow**: Users can now quickly scan search results and jump directly to detail pages
+- **Cleaner Interface**: Removed redundant expand/collapse interactions in favor of direct navigation
+- **Consistent Behavior**: All search result types (assets, users, locations) behave consistently
+- **Better Feedback**: Clear visual indicators and improved loading states
+
 ## [1.0.0] - 2025-01-27
 
 ### 🎉 Major Release - Production Ready

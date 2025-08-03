@@ -260,7 +260,10 @@ export function Header({ onMobileMenuToggle }: HeaderProps) {
 
       <SearchResultsModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSearchQuery(""); // Clear the search query when modal closes
+        }}
         results={results}
         isLoading={isSearching}
         query={searchQuery}
