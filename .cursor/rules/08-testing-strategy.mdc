@@ -1,0 +1,23 @@
+---
+description: Testing strategy for components, hooks, and API endpoints.
+globs: **/*.test.ts, **/*.test.tsx
+alwaysApply: false
+---
+
+# Testing Strategy
+
+## Frameworks
+- Use Jest for unit tests.
+- Use React Testing Library for component tests.
+- Use Playwright or Cypress for E2E tests.
+
+## Coverage
+- Write tests for all components, hooks, and API endpoints.
+- Aim for high coverage but prioritize meaningful tests.
+
+## File Placement
+- Place tests next to the files they test or in a `__tests__` subfolder.
+
+## Best Practices
+- Use descriptive test names.
+- Mock external dependencies (e.g., Supabase) in tests.

@@ -1,0 +1,58 @@
+---
+description: Standards for file comments and documentation
+alwaysApply: false
+---
+# Documentation standards
+When we use typescript we will use docblocks to comment on our code.
+Each file will have a full path and file name as its fiirst entry. E.g. // frontend/app/api/assets/ready-to-go-by-type/route.ts
+
+The licence information should be included in every file at the top. Just beneth the filepath and file name
+the licence information to display is;
+
+// MIT Licence 
+//
+// Copyright © 2025 The AIAA Consultants Ltd. All rights reserved.
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
+
+This should then be followed by the File description docblock. 
+In this docblock we will have a brief summary of what the file is for. Then a more comprehensive description of the file and its contents.
+The file description docblock should have tags for:
+@author - This should be set to tom.welsh@theaiaa.com
+@version - we should start at version 0.01 and increase this each time the file is modified
+@since - This should be written only once and should be written as the file creation date.
+@copyright - Copyright 2025 The AIAA Consultants Ltd. All rights reserved
+@licence MIT Licence - The licence we distribute the software under
+
+Here is an example of what we would expect
+/**
+ * Handles all API requests for the application.
+ *
+ * Provides helper functions for GET, POST, PUT, and DELETE requests.
+ *
+ * @file api.ts
+ * @version 0.0.1
+ * @author Tom Welsh tom.welsh@theaiaa.com
+ * @copyright Copyright 2025 The AIAA Consultants Ltd
+ * @licence MIT Licence
+ * @since 0.0.1
+ */
+ 
+ From there on we expect that every function, method, class, interface has a docblock detailing what it dies its parameters and any returns it passes back
