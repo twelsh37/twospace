@@ -266,3 +266,106 @@ export type NewArchivedAsset = typeof archivedAssetsTable.$inferInsert;
 export type Role = typeof rolesTable.$inferSelect;
 export type NewRole = typeof rolesTable.$inferInsert;
 export type NewHoldingAsset = typeof holdingAssetsTable.$inferInsert;
+
+// Configuration table types
+export type TenantConfig = typeof tenantConfigsTable.$inferSelect;
+export type NewTenantConfig = typeof tenantConfigsTable.$inferInsert;
+export type AssetLabelTemplate = typeof assetLabelTemplatesTable.$inferSelect;
+export type NewAssetLabelTemplate =
+  typeof assetLabelTemplatesTable.$inferInsert;
+export type CustomAssetType = typeof customAssetTypesTable.$inferSelect;
+export type NewCustomAssetType = typeof customAssetTypesTable.$inferInsert;
+export type CustomAssetState = typeof customAssetStatesTable.$inferSelect;
+export type NewCustomAssetState = typeof customAssetStatesTable.$inferInsert;
+export type StateTransitionRule = typeof stateTransitionRulesTable.$inferSelect;
+export type NewStateTransitionRule =
+  typeof stateTransitionRulesTable.$inferInsert;
+export type BusinessRule = typeof businessRulesTable.$inferSelect;
+export type NewBusinessRule = typeof businessRulesTable.$inferInsert;
+
+// Configuration tables for multi-tenant support
+export const tenantConfigsTable = pgTable("tenant_configs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull().unique(), // Unique tenant identifier
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  companyPrefix: varchar("company_prefix", { length: 10 }).notNull(), // e.g., "AIAA"
+  logoUrl: text("logo_url"), // Company logo URL
+  primaryColor: varchar("primary_color", { length: 7 }), // Hex color code
+  secondaryColor: varchar("secondary_color", { length: 7 }), // Hex color code
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Asset label template configuration
+export const assetLabelTemplatesTable = pgTable("asset_label_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull(),
+  templateName: varchar("template_name", { length: 255 }).notNull(),
+  template: jsonb("template").notNull(), // JSON structure defining the template
+  isDefault: boolean("is_default").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Custom asset types per tenant
+export const customAssetTypesTable = pgTable("custom_asset_types", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull(),
+  typeCode: varchar("type_code", { length: 10 }).notNull(), // e.g., "01", "02"
+  typeName: varchar("type_name", { length: 255 }).notNull(), // e.g., "Mobile Phone"
+  category: varchar("category", { length: 100 }), // e.g., "Computing", "Mobile"
+  iconName: varchar("icon_name", { length: 100 }), // Icon identifier
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Custom asset states per tenant
+export const customAssetStatesTable = pgTable("custom_asset_states", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull(),
+  stateCode: varchar("state_code", { length: 50 }).notNull(), // e.g., "AVAILABLE", "IN_TRANSIT"
+  stateName: varchar("state_name", { length: 255 }).notNull(), // Display name
+  stateColor: varchar("state_color", { length: 7 }).notNull(), // Hex color code
+  stateOrder: integer("state_order").notNull(), // Order in workflow
+  isStartState: boolean("is_start_state").notNull().default(false), // Is this "Available Stock"?
+  isEndState: boolean("is_end_state").notNull().default(false), // Is this "Issued"?
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// State transition rules per tenant
+export const stateTransitionRulesTable = pgTable("state_transition_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull(),
+  assetTypeId: uuid("asset_type_id")
+    .notNull()
+    .references(() => customAssetTypesTable.id),
+  fromStateId: uuid("from_state_id")
+    .notNull()
+    .references(() => customAssetStatesTable.id),
+  toStateId: uuid("to_state_id")
+    .notNull()
+    .references(() => customAssetStatesTable.id),
+  requiresApproval: boolean("requires_approval").notNull().default(false),
+  requiredFields: jsonb("required_fields"), // JSON array of required field names
+  transitionNotes: text("transition_notes"), // Notes about this transition
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+// Business rules configuration
+export const businessRulesTable = pgTable("business_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tenantId: varchar("tenant_id", { length: 50 }).notNull(),
+  ruleName: varchar("rule_name", { length: 255 }).notNull(),
+  ruleType: varchar("rule_type", { length: 100 }).notNull(), // e.g., "auto_assignment", "notification"
+  ruleConfig: jsonb("rule_config").notNull(), // JSON configuration for the rule
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
