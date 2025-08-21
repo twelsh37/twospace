@@ -37,6 +37,7 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
@@ -99,6 +100,12 @@ const navItems = [
     badge: null,
   },
   {
+    title: "Configuration",
+    href: "/admin/configuration",
+    icon: Settings,
+    badge: null,
+  },
+  {
     title: "Settings",
     href: "/settings",
     icon: Package,
@@ -126,7 +133,7 @@ export function Sidebar({
 
   // Filter nav items: Only show Imports for Admins
   const filteredNavItems = navItems.filter((item) => {
-    if (item.title === "Imports") {
+    if (item.title === "Imports" || item.title === "Configuration") {
       // Only show for admins
       return isAdmin;
     }

@@ -31,8 +31,11 @@ import { defineConfig } from "drizzle-kit";
 // Explicitly load variables from .env.local
 dotenv.config({ path: ".env.local" });
 
-if (!process.env.POSTGRES_URL) {
-  throw new Error("POSTGRES_URL is not set in .env.local");
+// Check for either DATABASE_URL or POSTGRES_URL
+const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL or POSTGRES_URL is not set in .env.local");
 }
 
 export default defineConfig({
@@ -41,7 +44,10 @@ export default defineConfig({
   dialect: "postgresql",
 
   dbCredentials: {
-    url: process.env.POSTGRES_URL,
+    url: databaseUrl,
+    ssl: {
+      rejectUnauthorized: false, // This handles the self-signed certificate issue
+    },
   },
   verbose: true,
   strict: true,
