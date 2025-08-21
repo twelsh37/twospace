@@ -26,8 +26,7 @@ SOFTWARE.
 
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -38,16 +37,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import {
   getTenantConfig,
   getAssetLabelTemplate,
@@ -56,7 +46,6 @@ import {
   updateTenantConfig,
   updateAssetLabelTemplate,
   type AssetLabelTemplateConfig,
-  type TenantConfigData,
 } from "@/app/admin/configuration/actions";
 
 /**
@@ -72,7 +61,6 @@ interface ConfigurationManagerProps {
 }
 
 export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{
@@ -126,14 +114,20 @@ export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
   >([]);
 
   // Check if there are unsaved changes
-  const hasUnsavedChanges = () => {
+  const hasUnsavedChanges = useCallback(() => {
     return (
       companyName !== originalConfig.companyName ||
       companyPrefix !== originalConfig.companyPrefix ||
       primaryColor !== originalConfig.primaryColor ||
       secondaryColor !== originalConfig.secondaryColor
     );
-  };
+  }, [
+    companyName,
+    companyPrefix,
+    primaryColor,
+    secondaryColor,
+    originalConfig,
+  ]);
 
   // Navigation warning effect
   useEffect(() => {
@@ -166,42 +160,7 @@ export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handleRouteChange);
     };
-  }, [
-    companyName,
-    companyPrefix,
-    primaryColor,
-    secondaryColor,
-    originalConfig,
-  ]);
-
-  // Tab change warning effect
-  useEffect(() => {
-    const handleTabChange = (newTab: string) => {
-      if (hasUnsavedChanges() && activeTab === "general") {
-        const confirmed = window.confirm(
-          "You have unsaved changes on the General tab. Are you sure you want to switch tabs? Any unsaved changes will be lost."
-        );
-        if (!confirmed) {
-          // Prevent tab change by not updating the state
-          return;
-        }
-      }
-      // If confirmed or no unsaved changes, allow the tab change
-      setActiveTab(newTab);
-    };
-
-    // Store the handler in a ref so we can access it in the tab change handler
-    const currentHandler = handleTabChange;
-
-    return () => {
-      // Cleanup if needed
-    };
-  }, [hasUnsavedChanges, activeTab]);
-
-  // Load configuration on component mount
-  useEffect(() => {
-    loadConfiguration();
-  }, [tenantId]);
+  }, [hasUnsavedChanges]);
 
   /**
    * Show message to user
@@ -214,7 +173,7 @@ export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
   /**
    * Load all configuration data for the tenant
    */
-  const loadConfiguration = async () => {
+  const loadConfiguration = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -243,7 +202,7 @@ export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
 
       // Load custom asset types
       const types = await getCustomAssetTypes(tenantId);
-      if (types.success && types.data.length > 0) {
+      if (types.success && types.data && types.data.length > 0) {
         setAssetTypes(
           types.data.map((t) => ({
             typeCode: t.typeCode,
@@ -256,7 +215,7 @@ export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
 
       // Load custom asset states
       const states = await getCustomAssetStates(tenantId);
-      if (states.success && states.data.length > 0) {
+      if (states.success && states.data && states.data.length > 0) {
         setAssetStates(
           states.data.map((s) => ({
             stateCode: s.stateCode,
@@ -274,7 +233,12 @@ export function ConfigurationManager({ tenantId }: ConfigurationManagerProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [tenantId]);
+
+  // Load configuration on component mount
+  useEffect(() => {
+    loadConfiguration();
+  }, [tenantId, loadConfiguration]);
 
   /**
    * Save general tenant configuration

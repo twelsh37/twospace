@@ -32,7 +32,6 @@ import {
   assetLabelTemplatesTable,
   customAssetTypesTable,
   customAssetStatesTable,
-  stateTransitionRulesTable,
 } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -169,12 +168,23 @@ export async function updateTenantConfig(
       revalidatePath("/admin/configuration");
       return { success: true, data: updated };
     } else {
-      // Create new config
+      // Create new config - ensure required fields are provided
+      if (!config.companyName || !config.companyPrefix) {
+        return {
+          success: false,
+          error:
+            "Company name and company prefix are required for new configurations",
+        };
+      }
+
       const [newConfig] = await db
         .insert(tenantConfigsTable)
         .values({
           tenantId,
-          ...config,
+          companyName: config.companyName,
+          companyPrefix: config.companyPrefix,
+          primaryColor: config.primaryColor,
+          secondaryColor: config.secondaryColor,
         })
         .returning();
 

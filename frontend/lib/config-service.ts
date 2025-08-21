@@ -135,10 +135,10 @@ export class ConfigService {
       }
 
       const config = template.template as AssetLabelTemplateConfig;
-      const { companyPrefix, format, separator = "-" } = config;
+      const { companyPrefix, format } = config;
 
       // Replace placeholders in format string
-      let assetNumber = format
+      const assetNumber = format
         .replace("{prefix}", companyPrefix)
         .replace("{type}", assetTypeCode)
         .replace("{number}", sequenceNumber.toString().padStart(4, "0"));
@@ -257,12 +257,21 @@ export class ConfigService {
 
         return updated;
       } else {
-        // Create new config
+        // Create new config - ensure required fields are provided
+        if (!config.companyName || !config.companyPrefix) {
+          throw new Error(
+            "Company name and company prefix are required for new configurations"
+          );
+        }
+
         const [newConfig] = await db
           .insert(tenantConfigsTable)
           .values({
             tenantId: this.tenantId,
-            ...config,
+            companyName: config.companyName,
+            companyPrefix: config.companyPrefix,
+            primaryColor: config.primaryColor,
+            secondaryColor: config.secondaryColor,
           })
           .returning();
 
@@ -296,13 +305,20 @@ export class ConfigService {
 
         return updated;
       } else {
-        // Create new template
+        // Create new template - ensure required fields are provided
+        if (!template.templateName || !template.template) {
+          throw new Error(
+            "Template name and template data are required for new templates"
+          );
+        }
+
         const [newTemplate] = await db
           .insert(assetLabelTemplatesTable)
           .values({
             tenantId: this.tenantId,
+            templateName: template.templateName,
+            template: template.template,
             isDefault: true,
-            ...template,
           })
           .returning();
 
